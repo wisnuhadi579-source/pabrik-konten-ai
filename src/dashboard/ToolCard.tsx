@@ -9,6 +9,17 @@ interface ToolCardProps {
 }
 
 export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
+
+  const handleOpenTool = () => {
+    const toolUrl = (tool as any).url;
+
+    if (toolUrl) {
+      window.open(toolUrl, "_blank");
+    } else {
+      onClick(tool.id);
+    }
+  };
+
   return (
     <motion.div
       whileHover={{ y: -5, scale: 1.01 }}
@@ -27,7 +38,9 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
         {/* Plan Badge */}
         <div className="absolute top-3 right-3">
           <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-            tool.plan === 'Premium' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+            tool.plan === 'Premium' 
+              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+              : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
           }`}>
             {tool.plan}
           </span>
@@ -52,6 +65,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
         <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
           {tool.name}
         </h3>
+
         <p className="text-sm text-gray-400 line-clamp-2 mb-4">
           {tool.description}
         </p>
@@ -69,19 +83,23 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
         {/* Actions */}
         <div className="flex items-center gap-2">
           {tool.isComingSoon ? (
-            <button disabled className="flex-1 py-2 bg-white/5 text-gray-500 text-sm font-medium rounded-xl border border-white/5 cursor-not-allowed">
+            <button
+              disabled
+              className="flex-1 py-2 bg-white/5 text-gray-500 text-sm font-medium rounded-xl border border-white/5 cursor-not-allowed"
+            >
               Coming Soon
             </button>
           ) : (
             <>
-              <button 
-                onClick={() => onClick(tool.id)}
+              <button
+                onClick={handleOpenTool}
                 className="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-500 hover:bg-emerald-600 text-black text-sm font-bold rounded-xl transition-all"
               >
                 <Play className="w-3 h-3 fill-current" />
                 Buka Alat
               </button>
-              <a 
+
+              <a
                 href={tool.tutorialLink}
                 target="_blank"
                 rel="noreferrer"

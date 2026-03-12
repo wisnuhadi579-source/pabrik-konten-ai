@@ -3,17 +3,18 @@ import { Tool } from '../types/app';
 
 export const appRegistry: Tool[] = [
   {
-    id: 'car-restoration',
-    name: 'Cinematic Car Restoration Pro',
-    description: 'Generate cinematic restoration prompts for high-end automotive content.',
-    icon: Car,
-    isComingSoon: false,
-    images: ['https://picsum.photos/seed/car1/800/450', 'https://picsum.photos/seed/car2/800/450'],
-    features: ['Cinematic Prompts', 'Detailing Focus', 'Lighting Optimization'],
-    labels: ['Creator', 'Automotive'],
-    plan: 'Premium',
-    buyLink: '#',
-    tutorialLink: '#'
+  id: 'car-restoration',
+  name: 'Cinematic Car Restoration Pro',
+  description: 'Generate cinematic restoration prompts for high-end automotive content.',
+  icon: Car,
+  isComingSoon: false,
+  url: "https://cinematic-car-restoration-pro.pages.dev",
+  images: ['https://picsum.photos/seed/car1/800/450', 'https://picsum.photos/seed/car2/800/450'],
+  features: ['Cinematic Prompts', 'Detailing Focus', 'Lighting Optimization'],
+  labels: ['Creator', 'Automotive'],
+  plan: 'Premium',
+  buyLink: '#',
+  tutorialLink: '#'
   },
   {
     id: 'ai-writer',
