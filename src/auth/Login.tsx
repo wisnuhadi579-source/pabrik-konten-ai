@@ -5,372 +5,404 @@ import { supabase } from "../services/supabaseClient";
 
 export default function Login({ onLogin }: any) {
 
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+const navigate = useNavigate();
+const [searchParams] = useSearchParams();
 
-  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
 
-  const [newPassword, setNewPassword] = useState("");
+const [newPassword, setNewPassword] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
+const [isLoading, setIsLoading] = useState(false);
 
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+const [message, setMessage] = useState("");
+const [error, setError] = useState("");
 
-  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
 
-  /* =========================
-     DETECT LOGIN / REGISTER
-  ========================= */
 
-  useEffect(() => {
+/* =========================
+   DETECT LOGIN / REGISTER
+========================= */
 
-    const mode = searchParams.get("mode");
+useEffect(() => {
 
-    if (mode === "register") {
-      setAuthMode("register");
-    } else {
-      setAuthMode("login");
-    }
+const mode = searchParams.get("mode");
 
-  }, [searchParams]);
+if (mode === "register") {
+setAuthMode("register");
+} else {
+setAuthMode("login");
+}
 
+}, [searchParams]);
 
-  /* =========================
-     DETECT PASSWORD RECOVERY
-  ========================= */
 
-  useEffect(() => {
+/* =========================
+   DETECT PASSWORD RECOVERY
+========================= */
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event) => {
+useEffect(() => {
 
-        if (event === "PASSWORD_RECOVERY") {
-          setShowResetPasswordModal(true);
-        }
+const { data: listener } = supabase.auth.onAuthStateChange(
+async (event) => {
 
-      }
-    );
+if (event === "PASSWORD_RECOVERY") {
+setShowResetPasswordModal(true);
+}
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+}
+);
 
-  }, []);
+return () => {
+listener.subscription.unsubscribe();
+};
 
+}, []);
 
-  /* =========================
-     FORGOT PASSWORD
-  ========================= */
 
-  const handleForgotPassword = async () => {
+/* =========================
+   FORGOT PASSWORD
+========================= */
 
-    if (!email) {
-      setError("Masukkan email terlebih dahulu");
-      return;
-    }
+const handleForgotPassword = async () => {
 
-    setIsLoading(true);
-    setError("");
-    setMessage("");
+if (!email) {
+setError("Masukkan email terlebih dahulu");
+return;
+}
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+setIsLoading(true);
+setError("");
+setMessage("");
 
-      redirectTo: `${window.location.origin}/reset-password`
+const { error } = await supabase.auth.resetPasswordForEmail(email, {
 
-    });
+redirectTo: `${window.location.origin}/reset-password`
 
-    if (!error) {
+});
 
-      setMessage("Email pemulihan sandi telah dikirim. Silakan cek email Anda.");
+if (!error) {
 
-    } else {
+setMessage("Email pemulihan sandi telah dikirim. Silakan cek email Anda.");
 
-      setError(error.message);
+} else {
 
-    }
+setError(error.message);
 
-    setIsLoading(false);
-  };
+}
 
+setIsLoading(false);
 
-  /* =========================
-     UPDATE PASSWORD
-  ========================= */
+};
 
-  const handleUpdatePassword = async () => {
 
-    if (!newPassword || newPassword.length < 6) {
-      setError("Password minimal 6 karakter");
-      return;
-    }
+/* =========================
+   UPDATE PASSWORD
+========================= */
 
-    setIsLoading(true);
-    setError("");
-    setMessage("");
+const handleUpdatePassword = async () => {
 
-    const { error } = await supabase.auth.updateUser({
+if (!newPassword || newPassword.length < 6) {
+setError("Password minimal 6 karakter");
+return;
+}
 
-      password: newPassword
+setIsLoading(true);
+setError("");
+setMessage("");
 
-    });
+const { error } = await supabase.auth.updateUser({
 
-    if (!error) {
+password: newPassword
 
-      setMessage("Password berhasil diperbarui. Silahkan login kembali.");
+});
 
-      setShowResetPasswordModal(false);
+if (!error) {
 
-      setAuthMode("login");
+setMessage("Password berhasil diperbarui. Silahkan login kembali.");
 
-    } else {
+setShowResetPasswordModal(false);
 
-      setError(error.message);
+setAuthMode("login");
 
-    }
+} else {
 
-    setIsLoading(false);
-  };
+setError(error.message);
 
+}
 
-  /* =========================
-     LOGIN / REGISTER
-  ========================= */
+setIsLoading(false);
 
-  const handleAuth = async () => {
+};
 
-    setIsLoading(true);
-    setError("");
 
-    try {
+/* =========================
+   LOGIN / REGISTER
+========================= */
 
-      if (authMode === "login") {
+const handleAuth = async () => {
 
-        const { data, error } = await supabase.auth.signInWithPassword({
+setIsLoading(true);
+setError("");
 
-          email,
-          password
+try {
 
-        });
+if (authMode === "login") {
 
-        if (error) throw error;
+const { error } = await supabase.auth.signInWithPassword({
 
-        const { data: userData } = await supabase
-          .from("users")
-          .select("role")
-          .eq("email", email)
-          .single();
+email,
+password
 
-        const role = userData?.role || "freemium";
+});
 
-        let memberStatus = "Gratis";
+if (error) throw error;
 
-        if (role === "premium") memberStatus = "Premium";
-        if (role === "vip") memberStatus = "VIP";
+const { data: userData } = await supabase
+.from("users")
+.select("role")
+.eq("email", email)
+.single();
 
-        const sessionData = {
+const role = userData?.role || "freemium";
 
-          email: email,
-          member: memberStatus,
-          loggedIn: true
+let memberStatus = "Gratis";
 
-        };
+if (role === "premium") memberStatus = "Premium";
+if (role === "vip") memberStatus = "VIP";
 
-        localStorage.setItem("userSession", JSON.stringify(sessionData));
+const sessionData = {
 
-        onLogin(sessionData);
+email: email,
+member: memberStatus,
+loggedIn: true
 
-        navigate("/dashboard");
+};
 
-      } else {
+localStorage.setItem("userSession", JSON.stringify(sessionData));
 
-        const { error } = await supabase.auth.signUp({
+onLogin(sessionData);
 
-          email,
-          password
+navigate("/dashboard");
 
-        });
+} else {
 
-        if (error) throw error;
+const { error } = await supabase.auth.signUp({
 
-        alert("Registrasi berhasil! Silahkan login.");
+email,
+password
 
-        setAuthMode("login");
+});
 
-      }
+if (error) throw error;
 
-    } catch (error: any) {
+alert("Registrasi berhasil! Silahkan login.");
 
-      setError(error.message);
+setAuthMode("login");
 
-    } finally {
+}
 
-      setIsLoading(false);
+} catch (error: any) {
 
-    }
-  };
+setError(error.message);
 
+} finally {
 
-  /* =========================
-     UI
-  ========================= */
+setIsLoading(false);
 
-  return (
+}
 
-    <div className="min-h-screen flex items-center justify-center bg-black/95 text-white p-4">
+};
 
-      <div className="w-full max-w-md bg-gradient-to-b from-zinc-900 to-black border border-white/10 rounded-2xl p-8 relative">
 
-        <button
-          onClick={() => navigate("/")}
-          className="absolute top-4 right-4 text-zinc-500 hover:text-white"
-        >
-          <X size={24} />
-        </button>
+/* =========================
+   UI
+========================= */
 
-        <div className="text-center mb-8">
+return (
 
-          <h1 className="text-2xl font-black tracking-tighter italic">
-            PABRIK <span className="text-amber-500">KONTEN</span> AI
-          </h1>
+<div className="min-h-screen flex items-center justify-center bg-black/95 text-white p-4">
 
-          <h2 className="text-2xl font-bold mt-6">
+<div className="w-full max-w-md bg-gradient-to-b from-zinc-900 to-black border border-white/10 rounded-2xl p-8 relative">
 
-            {authMode === "login" ? "Selamat Datang" : "Daftar Gratis"}
 
-          </h2>
+<button
+onClick={() => navigate("/")}
+className="absolute top-4 right-4 text-zinc-500 hover:text-white"
+>
+<X size={24} />
+</button>
 
-          <p className="text-zinc-500 text-sm">
 
-            {authMode === "login"
-              ? "Silahkan masuk dengan Emailmu"
-              : "Buat akun baru untuk mulai menggunakan AI"}
+<div className="text-center mb-8">
 
-          </p>
 
-        </div>
+{/* LOGO */}
 
+<div className="flex flex-col items-center leading-none select-none">
 
-        {error && (
-          <div className="mb-6 text-red-400 text-xs text-center">
-            {error}
-          </div>
-        )}
+<div className="flex items-start gap-2 font-black tracking-tight">
 
-        {message && (
-          <div className="mb-6 text-green-400 text-xs text-center">
-            {message}
-          </div>
-        )}
+<span className="text-white text-2xl">
+PABRIK
+</span>
 
+<span className="text-yellow-400 text-2xl">
+KONTEN
+</span>
 
-        <div className="space-y-4">
+<span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
+AI
+<span className="absolute -top-1 -right-1 text-yellow-400 text-[8px]">✦</span>
+</span>
 
-          <input
-            type="email"
-            placeholder="Alamat Email"
-            className="w-full bg-black border border-white/10 rounded-xl px-4 py-3"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+</div>
 
-          <input
-            type="password"
-            placeholder="Kata Sandi (Min 6 karakter)"
-            className="w-full bg-black border border-white/10 rounded-xl px-4 py-3"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+<div className="bg-red-600 text-white text-xs font-bold px-3 py-[2px] mt-1 rounded">
+Pakar Digital
+</div>
 
-          {authMode === "login" && (
+</div>
 
-            <div className="text-right">
 
-              <button
-                onClick={handleForgotPassword}
-                className="text-xs text-amber-500 font-bold"
-              >
-                Lupa Kata Sandi?
-              </button>
+<h2 className="text-2xl font-bold mt-8">
 
-            </div>
+{authMode === "login" ? "Selamat Datang" : "Daftar Gratis"}
 
-          )}
+</h2>
 
+<p className="text-zinc-500 text-sm">
 
-          <button
-            onClick={handleAuth}
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-black rounded-xl py-3"
-          >
+{authMode === "login"
+? "Silahkan masuk dengan Emailmu"
+: "Buat akun baru untuk mulai menggunakan AI"}
 
-            {isLoading ? "Memproses..." : authMode === "login"
-              ? "Masuk Sekarang"
-              : "Daftar Gratis"}
+</p>
 
-          </button>
+</div>
 
-        </div>
 
+{error && (
+<div className="mb-6 text-red-400 text-xs text-center">
+{error}
+</div>
+)}
 
-        <div className="text-center mt-8">
+{message && (
+<div className="mb-6 text-green-400 text-xs text-center">
+{message}
+</div>
+)}
 
-          <button
-            onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
-            className="text-amber-500 font-bold"
-          >
 
-            {authMode === "login"
-              ? "Daftar di sini (Gratis)"
-              : "Login ke Dashboard"}
+<div className="space-y-4">
 
-          </button>
+<input
+type="email"
+placeholder="Alamat Email"
+className="w-full bg-black border border-white/10 rounded-xl px-4 py-3"
+value={email}
+onChange={(e) => setEmail(e.target.value)}
+/>
 
-        </div>
+<input
+type="password"
+placeholder="Kata Sandi (Min 6 karakter)"
+className="w-full bg-black border border-white/10 rounded-xl px-4 py-3"
+value={password}
+onChange={(e) => setPassword(e.target.value)}
+/>
 
-      </div>
+{authMode === "login" && (
 
+<div className="text-right">
 
-      {/* RESET PASSWORD MODAL */}
+<button
+onClick={handleForgotPassword}
+className="text-xs text-amber-500 font-bold"
+>
+Lupa Kata Sandi?
+</button>
 
-      {showResetPasswordModal && (
+</div>
 
-        <div className="fixed inset-0 flex items-center justify-center bg-black/90">
+)}
 
-          <div className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-2xl p-8">
 
-            <h2 className="text-2xl font-black text-center mb-6">
+<button
+onClick={handleAuth}
+disabled={isLoading}
+className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-black rounded-xl py-3"
+>
 
-              BUAT <span className="text-amber-500">SANDI BARU</span>
+{isLoading ? "Memproses..." : authMode === "login"
+? "Masuk Sekarang"
+: "Daftar Gratis"}
 
-            </h2>
+</button>
 
-            <input
-              type="password"
-              placeholder="Password Baru"
-              className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 mb-4"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+</div>
 
-            <button
-              onClick={handleUpdatePassword}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-black rounded-xl py-3"
-            >
 
-              SIMPAN SANDI BARU
+<div className="text-center mt-8">
 
-            </button>
+<button
+onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
+className="text-amber-500 font-bold"
+>
 
-          </div>
+{authMode === "login"
+? "Daftar di sini (Gratis)"
+: "Login ke Dashboard"}
 
-        </div>
+</button>
 
-      )}
+</div>
 
-    </div>
-  );
+</div>
+
+
+{/* RESET PASSWORD MODAL */}
+
+{showResetPasswordModal && (
+
+<div className="fixed inset-0 flex items-center justify-center bg-black/90">
+
+<div className="w-full max-w-md bg-zinc-900 border border-white/10 rounded-2xl p-8">
+
+<h2 className="text-2xl font-black text-center mb-6">
+
+BUAT <span className="text-amber-500">SANDI BARU</span>
+
+</h2>
+
+<input
+type="password"
+placeholder="Password Baru"
+className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 mb-4"
+value={newPassword}
+onChange={(e) => setNewPassword(e.target.value)}
+/>
+
+<button
+onClick={handleUpdatePassword}
+className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-black rounded-xl py-3"
+>
+
+SIMPAN SANDI BARU
+
+</button>
+
+</div>
+
+</div>
+
+)}
+
+</div>
+
+);
 }
