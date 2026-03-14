@@ -22,6 +22,7 @@ export const appRegistry: Tool[] = [
     description: 'Create high-converting copy for social media and blogs using advanced AI.',
     icon: Sparkles,
     isComingSoon: true,
+    url: "#",
     images: ['https://picsum.photos/seed/write1/800/450'],
     features: ['SEO Optimized', 'Tone Control', 'Multi-language'],
     labels: ['Marketing', 'Blogger'],

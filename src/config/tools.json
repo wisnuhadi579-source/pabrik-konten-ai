@@ -1,0 +1,57 @@
+[
+{
+  "id": "car-restoration",
+  "name": "Cinematic Car Restoration Pro",
+  "description": "Generate cinematic restoration prompts for high-end automotive content.",
+  "plan": "Premium",
+
+  "url": "https://cinematic-car-restoration-pro.pages.dev",
+  "buyLink": "https://lynk.id/pabrikkontenai/cinematic-car-restoration",
+
+  "singleAccessCode": "CCR-ACCESS-2026",
+
+  "images": [
+    "https://picsum.photos/seed/car1/800/450",
+    "https://picsum.photos/seed/car2/800/450"
+  ],
+
+  "labels": ["Creator","Automotive"],
+
+  "features": [
+    "Cinematic Prompts",
+    "Detailing Focus"
+  ],
+
+  "tutorialLink": "#",
+  "isComingSoon": false
+},
+
+  {
+    "id": "ai-writer",
+    "name": "AI Content Writer",
+    "description": "Create high-converting copy for social media and blogs.",
+    "plan": "Free",
+
+    "url": "https://example.com",
+    "buyLink": "https://lynk.id/pabrikkontenai/ai-writer",
+
+    "images": [
+      "https://picsum.photos/seed/write1/800/450",
+      "https://picsum.photos/seed/write2/800/450",
+      "https://picsum.photos/seed/write3/800/450",
+      "https://picsum.photos/seed/write4/800/450",
+      "https://picsum.photos/seed/write5/800/450"
+    ],
+
+    "labels": ["Marketing", "Blogger"],
+
+    "features": [
+      "SEO Optimized",
+      "Multi Platform",
+      "AI Generated Copy"
+    ],
+
+    "tutorialLink": "#",
+    "isComingSoon": false
+  }
+]

@@ -6,10 +6,11 @@ export interface Tool {
   description: string;
   icon: LucideIcon;
   isComingSoon: boolean;
+  url: string;
   images: string[];
   features: string[];
   labels: string[];
-  plan: 'Gratis' | 'Premium';
+  plan: 'Gratis' | 'Premium' | 'Free' | 'VIP';
   buyLink: string;
   tutorialLink: string;
 }
