@@ -5,357 +5,397 @@ import { supabase } from "../services/supabaseClient";
 
 export const Navbar = () => {
 
-  const navigate = useNavigate();
-  const location = useLocation();
+const navigate = useNavigate();
+const location = useLocation();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [userRole, setUserRole] = useState("Gratis");
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [userEmail, setUserEmail] = useState("");
+const [userRole, setUserRole] = useState("Gratis");
 
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const [dropdownOpen, setDropdownOpen] = useState(false);
+const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const [resetMessage, setResetMessage] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
+const [resetMessage, setResetMessage] = useState("");
+const [resetLoading, setResetLoading] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
 
-    const session = localStorage.getItem("userSession");
+const session = localStorage.getItem("userSession");
 
-    if (session) {
+if (session) {
 
-      try {
+try {
 
-        const sessionData = JSON.parse(session);
+const sessionData = JSON.parse(session);
 
-        if (sessionData && sessionData.loggedIn) {
+if (sessionData && sessionData.loggedIn) {
 
-          setIsLoggedIn(true);
-          setUserRole(sessionData.member);
-          setUserEmail(sessionData.email);
+setIsLoggedIn(true);
+setUserRole(sessionData.member);
+setUserEmail(sessionData.email);
 
-        }
+}
 
-      } catch (e) {
+} catch (e) {
 
-        console.error("Failed to parse session", e);
+console.error("Failed to parse session", e);
 
-      }
+}
 
-    }
+}
 
-  }, [location.pathname]);
+}, [location.pathname]);
 
+const handleLogout = () => {
 
-  const handleLogout = () => {
+localStorage.removeItem("userSession");
+setIsLoggedIn(false);
+setDropdownOpen(false);
+navigate("/");
 
-    localStorage.removeItem("userSession");
-    setIsLoggedIn(false);
-    setDropdownOpen(false);
-    navigate("/");
+};
 
-  };
+const handleResetPassword = async () => {
 
+setResetLoading(true);
+setResetMessage("");
 
-  const handleResetPassword = async () => {
+const user = await supabase.auth.getUser();
 
-    setResetLoading(true);
-    setResetMessage("");
+if (!user?.data?.user?.email) {
 
-    const user = await supabase.auth.getUser();
+setResetMessage("Sesi tidak ditemukan. Silakan login kembali.");
+setResetLoading(false);
+return;
 
-    if (!user?.data?.user?.email) {
+}
 
-      setResetMessage("Sesi tidak ditemukan. Silakan login kembali.");
-      setResetLoading(false);
-      return;
+const { error } = await supabase.auth.resetPasswordForEmail(
+user.data.user.email,
+{
+redirectTo: `${window.location.origin}/reset-password`
+}
+);
 
-    }
+if (!error) {
 
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      user.data.user.email,
-      {
-        redirectTo: `${window.location.origin}/reset-password`
-      }
-    );
+setResetMessage("Link reset password sudah dikirim. Silakan cek inbox email Anda.");
 
-    if (!error) {
+} else {
 
-      setResetMessage("Link reset password sudah dikirim. Silakan cek inbox email Anda.");
+setResetMessage("Gagal mengirim email reset password.");
 
-    } else {
+}
 
-      setResetMessage("Gagal mengirim email reset password.");
+setResetLoading(false);
 
-    }
+};
 
-    setResetLoading(false);
+const menuItems = [
 
-  };
+{ name: "Landing Page", path: "/" },
+{ name: "Dashboard", path: "/dashboard" },
+{ name: "Tutorial", path: "/tutorial" },
+{ name: "Pricing", path: "/pricing" }
 
+];
 
-  const menuItems = [
+const handleNavClick = (path: string) => {
 
-    { name: "Landing Page", path: "/" },
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Tutorial", path: "/tutorial" },
-    { name: "Pricing", path: "/pricing" }
+if (path === "/dashboard" && !isLoggedIn) {
 
-  ];
+navigate("/login?mode=login");
+return;
 
+}
 
-  const handleNavClick = (path: string) => {
+navigate(path);
 
-    if (path === "/dashboard" && !isLoggedIn) {
+};
 
-      navigate("/login?mode=login");
-      return;
+return (
 
-    }
+<div className="sticky top-0 z-[100] backdrop-blur-md bg-black/70 border-b border-white/10">
 
-    navigate(path);
+{mobileMenuOpen && (
 
-  };
+<div
+className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
+onClick={() => setMobileMenuOpen(false)}
+/>
 
+)}
 
-  return (
+{/* MOBILE DRAWER */}
 
-    <div className="sticky top-0 z-[100] backdrop-blur-md bg-black/70 border-b border-white/10">
+<div className={`fixed top-0 left-0 h-full w-72 bg-zinc-900 border-r border-white/10 shadow-xl z-[120] transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
 
-      {mobileMenuOpen && (
+<div className="p-6">
 
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
-          onClick={() => setMobileMenuOpen(false)}
-        />
+<div className="flex items-center justify-between mb-8">
 
-      )}
+{/* LOGO */}
 
+<div className="flex flex-col items-center leading-none select-none">
 
-      <div className={`fixed top-0 left-0 h-full w-72 bg-zinc-900 border-r border-white/10 shadow-xl z-[120] transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+<div className="flex items-start gap-2 font-black tracking-tight">
 
-        <div className="p-6">
+<span className="text-white text-lg">
+PABRIK
+</span>
 
-          <div className="flex items-center justify-between mb-8">
+<span className="text-yellow-400 text-lg">
+KONTEN
+</span>
 
-            <div className="text-yellow-400 font-bold tracking-widest text-sm">
-              PABRIK KONTEN AI
-            </div>
+<span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
+AI
+<span className="absolute -top-1 -right-1 text-yellow-400 text-[8px]">✦</span>
+</span>
 
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-zinc-500 hover:text-white transition"
-            >
-              <X size={20}/>
-            </button>
+</div>
 
-          </div>
+<div className="bg-red-600 text-white text-xs font-bold px-3 py-[2px] mt-1 rounded">
+Pakar Digital
+</div>
 
+</div>
 
-          <div className="h-[1px] bg-white/5 mb-8"/>
+<button
+onClick={() => setMobileMenuOpen(false)}
+className="text-zinc-500 hover:text-white transition"
+>
+<X size={20}/>
+</button>
 
+</div>
 
-          <div className="space-y-6">
+<div className="h-[1px] bg-white/5 mb-8"/>
 
-            {menuItems.map((item) => (
+<div className="space-y-6">
 
-              <div
-                key={item.path}
-                onClick={() => {
-                  handleNavClick(item.path);
-                  setMobileMenuOpen(false);
-                }}
-                className={`text-sm transition cursor-pointer ${
-                  location.pathname === item.path
-                    ? "text-yellow-400 font-medium"
-                    : "text-zinc-400 hover:text-yellow-400"
-                }`}
-              >
+{menuItems.map((item) => (
 
-                {item.name}
+<div
+key={item.path}
+onClick={() => {
+handleNavClick(item.path);
+setMobileMenuOpen(false);
+}}
+className={`text-sm transition cursor-pointer ${
+location.pathname === item.path
+? "text-yellow-400 font-medium"
+: "text-zinc-400 hover:text-yellow-400"
+}`}
+>
 
-              </div>
+{item.name}
 
-            ))}
+</div>
 
-          </div>
+))}
 
-        </div>
+</div>
 
-      </div>
+</div>
 
+</div>
 
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+{/* HEADER */}
 
+<div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
-        <div className="flex items-center gap-4">
+{/* LEFT */}
 
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="flex md:hidden text-zinc-400 hover:text-white transition"
-          >
-            <Menu size={22}/>
-          </button>
+<div className="flex items-center gap-4">
 
-          <div
-            className="text-yellow-400 font-bold tracking-widest text-sm cursor-pointer"
-            onClick={() => navigate("/")}
-          >
-            PABRIK KONTEN AI
-          </div>
+<button
+onClick={() => setMobileMenuOpen(true)}
+className="flex md:hidden text-zinc-400 hover:text-white transition"
+>
+<Menu size={22}/>
+</button>
 
-        </div>
+{/* LOGO */}
 
+<div
+onClick={() => navigate("/")}
+className="cursor-pointer flex flex-col items-center leading-none select-none"
+>
 
-        <div className="hidden md:flex items-center gap-8">
+<div className="flex items-start gap-2 font-black tracking-tight">
 
-          {menuItems.map((item) => (
+<span className="text-white text-lg md:text-xl">
+PABRIK
+</span>
 
-            <div
-              key={item.path}
-              onClick={() => handleNavClick(item.path)}
-              className={`text-sm transition cursor-pointer ${
-                location.pathname === item.path
-                  ? "text-yellow-400 font-medium"
-                  : "text-zinc-400 hover:text-yellow-400"
-              }`}
-            >
+<span className="text-yellow-400 text-lg md:text-xl">
+KONTEN
+</span>
 
-              {item.name}
+<span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
+AI
+<span className="absolute -top-1 -right-1 text-yellow-400 text-[8px]">✦</span>
+</span>
 
-            </div>
+</div>
 
-          ))}
+<div className="bg-red-600 text-white text-xs font-bold px-3 py-[2px] mt-1 rounded">
+Pakar Digital
+</div>
 
-        </div>
+</div>
 
+</div>
 
-        <div className="relative flex items-center gap-3">
+{/* MENU DESKTOP */}
 
-          {isLoggedIn ? (
+<div className="hidden md:flex items-center gap-8">
 
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 transition text-sm flex items-center gap-2"
-            >
+{menuItems.map((item) => (
 
-              Akun Saya
-              <ChevronDown size={14} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}/>
+<div
+key={item.path}
+onClick={() => handleNavClick(item.path)}
+className={`text-sm transition cursor-pointer ${
+location.pathname === item.path
+? "text-yellow-400 font-medium"
+: "text-zinc-400 hover:text-yellow-400"
+}`}
+>
 
-            </button>
+{item.name}
 
-          ) : (
+</div>
 
-            <>
-              <button
-                onClick={() => navigate("/login?mode=login")}
-                className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
-              >
-                Login
-              </button>
+))}
 
-              <button
-                onClick={() => navigate("/login?mode=register")}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm transition"
-              >
-                Daftar Gratis
-              </button>
-            </>
+</div>
 
-          )}
+{/* RIGHT */}
 
+<div className="relative flex items-center gap-3">
 
-          {dropdownOpen && (
+{isLoggedIn ? (
 
-            <div className="absolute right-0 top-full mt-3 w-72 rounded-xl bg-zinc-900 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 p-5">
+<button
+onClick={() => setDropdownOpen(!dropdownOpen)}
+className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 transition text-sm flex items-center gap-2"
+>
 
-              <div className="space-y-4">
+Akun Saya
+<ChevronDown size={14} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}/>
 
+</button>
 
-                <div className="flex items-center gap-3 pb-3 border-b border-white/5">
+) : (
 
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                    <User size={20} className="text-yellow-400"/>
-                  </div>
+<>
+<button
+onClick={() => navigate("/login?mode=login")}
+className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
+>
+Login
+</button>
 
-                  <div className="overflow-hidden">
+<button
+onClick={() => navigate("/login?mode=register")}
+className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm transition"
+>
+Daftar Gratis
+</button>
+</>
 
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Email</p>
+)}
 
-                    <p className="text-xs text-white truncate font-medium">{userEmail}</p>
+{/* ACCOUNT DROPDOWN */}
 
-                  </div>
+{dropdownOpen && (
 
-                </div>
+<div className="absolute right-0 top-full mt-3 w-72 rounded-xl bg-zinc-900 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 p-5">
 
+<div className="space-y-4">
 
-                <div>
+<div className="flex items-center gap-3 pb-3 border-b border-white/5">
 
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Member Status</p>
+<div className="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+<User size={20} className="text-yellow-400"/>
+</div>
 
-                  <div className="flex items-center gap-2">
+<div className="overflow-hidden">
 
-                    {userRole === "VIP" ? (
-                      <Crown size={14} className="text-fuchsia-400"/>
-                    ) : userRole === "Premium" ? (
-                      <Zap size={14} className="text-yellow-400"/>
-                    ) : (
-                      <ShieldCheck size={14} className="text-zinc-400"/>
-                    )}
+<p className="text-[10px] text-zinc-500 uppercase tracking-widest">Email</p>
 
-                    <span className="text-sm font-bold text-yellow-400">{userRole}</span>
+<p className="text-xs text-white truncate font-medium">{userEmail}</p>
 
-                  </div>
+</div>
 
-                </div>
+</div>
 
+<div>
 
-                <div className="pt-2 space-y-2">
+<p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Member Status</p>
 
-                  <button
-                    onClick={handleResetPassword}
-                    className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transition-colors py-1"
-                  >
+<div className="flex items-center gap-2">
 
-                    {resetLoading ? "Mengirim..." : "Reset Password"}
+{userRole === "VIP" ? (
+<Crown size={14} className="text-fuchsia-400"/>
+) : userRole === "Premium" ? (
+<Zap size={14} className="text-yellow-400"/>
+) : (
+<ShieldCheck size={14} className="text-zinc-400"/>
+)}
 
-                  </button>
+<span className="text-sm font-bold text-yellow-400">{userRole}</span>
 
+</div>
 
-                  {resetMessage && (
+</div>
 
-                    <div className="text-xs text-emerald-400">
+<div className="pt-2 space-y-2">
 
-                      {resetMessage}
+<button
+onClick={handleResetPassword}
+className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transition-colors py-1"
+>
 
-                    </div>
+{resetLoading ? "Mengirim..." : "Reset Password"}
 
-                  )}
+</button>
 
+{resetMessage && (
 
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition pt-2 border-t border-white/5"
-                  >
+<div className="text-xs text-emerald-400">
 
-                    <LogOut size={14}/> Logout
+{resetMessage}
 
-                  </button>
+</div>
 
-                </div>
+)}
 
-              </div>
+<button
+onClick={handleLogout}
+className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition pt-2 border-t border-white/5"
+>
 
-            </div>
+<LogOut size={14}/> Logout
 
-          )}
+</button>
 
-        </div>
+</div>
 
-      </div>
+</div>
 
-    </div>
+</div>
 
-  );
+)}
+
+</div>
+
+</div>
+
+</div>
+
+);
 
 };
