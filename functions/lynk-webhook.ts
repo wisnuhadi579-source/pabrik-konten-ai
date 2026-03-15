@@ -4,6 +4,22 @@ try {
 
 const body = await request.json()
 
+/* VERIFY LYNK SIGNATURE */
+
+const merchantKey = env.LYNK_MERCHANT_KEY
+const incomingKey = request.headers.get("x-merchant-key")
+
+if(incomingKey !== merchantKey){
+
+return new Response(
+JSON.stringify({error:"unauthorized webhook"}),
+{status:401}
+)
+
+}
+
+/* DATA */
+
 const email = body.customer_email
 const productName = body.product_name
 
@@ -16,7 +32,7 @@ JSON.stringify({error:"missing data"}),
 
 }
 
-/* PRODUCT MAPPING */
+/* PRODUCT MAP */
 
 const productMap = {
 
@@ -55,24 +71,23 @@ body:JSON.stringify({
 
 email:email,
 product:product,
-plan:product==="vip-all" ? "vip" :
-product==="premium-all" ? "premium" :
-"premium"
+plan:
+product==="vip-all"
+? "vip"
+: product==="premium-all"
+? "premium"
+: "premium"
 
 })
-
 }
 )
 
 if(!res.ok){
 
-const errorText = await res.text()
+const error = await res.text()
 
 return new Response(
-JSON.stringify({
-error:"supabase insert failed",
-details:errorText
-}),
+JSON.stringify({error}),
 {status:500}
 )
 
@@ -86,10 +101,7 @@ JSON.stringify({success:true}),
 }catch(err){
 
 return new Response(
-JSON.stringify({
-error:"server error",
-message:err.message
-}),
+JSON.stringify({error:err.message}),
 {status:500}
 )
 
