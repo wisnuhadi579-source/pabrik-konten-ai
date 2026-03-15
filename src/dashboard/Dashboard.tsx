@@ -63,10 +63,19 @@ export const Dashboard = () => {
 
 const navigate = useNavigate()
 
+/* STATES */
+
 const [isLoggedIn,setIsLoggedIn] = useState(false)
 const [loading,setLoading] = useState(true)
-
 const [licenses,setLicenses] = useState([])
+
+const [search,setSearch] = useState("")
+const [filterOpen,setFilterOpen] = useState(false)
+const [activeCategory,setActiveCategory] = useState("Semua Tools")
+const [openCard,setOpenCard] = useState(null)
+const [popup,setPopup] = useState(null)
+
+/* SESSION CHECK */
 
 useEffect(()=>{
 
@@ -89,7 +98,6 @@ useEffect(()=>{
 const loadLicenses = async ()=>{
 
 const session = localStorage.getItem("userSession")
-
 if(!session) return
 
 const user = JSON.parse(session)
@@ -106,15 +114,6 @@ setLicenses(data || [])
 loadLicenses()
 
 },[])
-
-const [search,setSearch] = useState("")
-const [filterOpen,setFilterOpen] = useState(false)
-const [activeCategory,setActiveCategory] = useState("Semua Tools")
-const [openCard,setOpenCard] = useState(null)
-const [popup,setPopup] = useState(null)
-
-if(loading) return null
-if(!isLoggedIn) return null
 
 /* FILTER TOOLS */
 
@@ -172,6 +171,11 @@ if(singleLicense) return true
 return false
 
 }
+
+/* LOADING */
+
+if(loading) return null
+if(!isLoggedIn) return null
 
 return (
 
@@ -240,10 +244,8 @@ FILTER TOOLS ▾
 <div
 key={cat}
 onClick={()=>{
-
 setActiveCategory(cat)
 setFilterOpen(false)
-
 }}
 className={`px-4 py-2 text-xs cursor-pointer uppercase tracking-widest hover:bg-white/5 transition ${
 activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
