@@ -3,6 +3,7 @@ import { Tool } from "../types/app"
 import { Play, ChevronRight } from "lucide-react"
 import { motion } from "motion/react"
 import { AccessPopup } from "./AccessPopup"
+import { supabase } from "../services/supabaseClient"
 
 interface ToolCardProps {
   tool: Tool
@@ -12,6 +13,34 @@ interface ToolCardProps {
 export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
 
   const [showAccess,setShowAccess] = useState(false)
+  const [hasLicense,setHasLicense] = useState(false)
+
+  /* LOAD LICENSE FROM SUPABASE */
+
+  useEffect(()=>{
+
+    const loadLicense = async ()=>{
+
+      const session = localStorage.getItem("userSession")
+      if(!session) return
+
+      const user = JSON.parse(session)
+
+      const { data } = await supabase
+        .from("licenses")
+        .select("*")
+        .eq("email", user.email)
+        .eq("product",(tool as any).product)
+
+      if(data && data.length > 0){
+        setHasLicense(true)
+      }
+
+    }
+
+    loadLicense()
+
+  },[tool])
 
   const handleOpenTool = () => {
 
@@ -27,6 +56,17 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
       else onClick(tool.id)
 
       return
+    }
+
+    /* SAAS LICENSE CHECK */
+
+    if(hasLicense){
+
+      if(toolUrl) window.open(toolUrl,"_blank")
+      else onClick(tool.id)
+
+      return
+
     }
 
     /* PREMIUM TOOL */

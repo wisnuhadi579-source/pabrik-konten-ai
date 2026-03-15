@@ -1,6 +1,8 @@
 [
 {
   "id": "car-restoration",
+  "product": "car-restoration",
+
   "name": "Cinematic Car Restoration Pro",
   "description": "Generate cinematic restoration prompts for high-end automotive content.",
   "plan": "Premium",
@@ -15,7 +17,10 @@
     "https://picsum.photos/seed/car2/800/450"
   ],
 
-  "labels": ["Creator","Automotive"],
+  "labels": [
+    "Creator",
+    "Automotive"
+  ],
 
   "features": [
     "Cinematic Prompts",
@@ -23,35 +28,42 @@
   ],
 
   "tutorialLink": "#",
+
   "isComingSoon": false
 },
 
-  {
-    "id": "ai-writer",
-    "name": "AI Content Writer",
-    "description": "Create high-converting copy for social media and blogs.",
-    "plan": "Free",
+{
+  "id": "ai-writer",
+  "product": "ai-writer",
 
-    "url": "https://example.com",
-    "buyLink": "https://lynk.id/pabrikkontenai/ai-writer",
+  "name": "AI Content Writer",
+  "description": "Create high-converting copy for social media and blogs.",
+  "plan": "Free",
 
-    "images": [
-      "https://picsum.photos/seed/write1/800/450",
-      "https://picsum.photos/seed/write2/800/450",
-      "https://picsum.photos/seed/write3/800/450",
-      "https://picsum.photos/seed/write4/800/450",
-      "https://picsum.photos/seed/write5/800/450"
-    ],
+  "url": "https://example.com",
+  "buyLink": "https://lynk.id/pabrikkontenai/ai-writer",
 
-    "labels": ["Marketing", "Blogger"],
+  "images": [
+    "https://picsum.photos/seed/write1/800/450",
+    "https://picsum.photos/seed/write2/800/450",
+    "https://picsum.photos/seed/write3/800/450",
+    "https://picsum.photos/seed/write4/800/450",
+    "https://picsum.photos/seed/write5/800/450"
+  ],
 
-    "features": [
-      "SEO Optimized",
-      "Multi Platform",
-      "AI Generated Copy"
-    ],
+  "labels": [
+    "Marketing",
+    "Blogger"
+  ],
 
-    "tutorialLink": "#",
-    "isComingSoon": false
-  }
+  "features": [
+    "SEO Optimized",
+    "Multi Platform",
+    "AI Generated Copy"
+  ],
+
+  "tutorialLink": "#",
+
+  "isComingSoon": false
+}
 ]
