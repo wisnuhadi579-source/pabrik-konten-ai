@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import tools from "../config/tools.json"
 import { supabase } from "../services/supabaseClient"
@@ -118,7 +118,9 @@ if(!isLoggedIn) return null
 
 /* FILTER TOOLS */
 
-const filtered = tools.filter(tool=>{
+const filtered = useMemo(()=>{
+
+return tools.filter(tool=>{
 
 const matchSearch =
 tool.name.toLowerCase().includes(search.toLowerCase())
@@ -131,15 +133,19 @@ return matchSearch && matchCategory
 
 })
 
+},[search,activeCategory])
+
 /* LICENSE ENGINE */
 
 const isPurchased = (tool)=>{
+
+const productId = tool.product || tool.id
 
 /* FREE TOOL */
 
 if(tool.plan==="Free") return true
 
-/* VIP MEMBER */
+/* VIP BUNDLE */
 
 const hasVIP = licenses.find(
 l => l.product === "vip-all"
@@ -147,7 +153,7 @@ l => l.product === "vip-all"
 
 if(hasVIP) return true
 
-/* PREMIUM MEMBER */
+/* PREMIUM BUNDLE */
 
 const hasPremium = licenses.find(
 l => l.product === "premium-all"
@@ -155,10 +161,10 @@ l => l.product === "premium-all"
 
 if(hasPremium && tool.plan === "Premium") return true
 
-/* SINGLE LICENSE */
+/* SINGLE TOOL LICENSE */
 
 const singleLicense = licenses.find(
-l => l.product === tool.product
+l => l.product === productId
 )
 
 if(singleLicense) return true
