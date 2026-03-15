@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import tools from "../config/tools.json"
 import { supabase } from "../services/supabaseClient"
-import { Search, ChevronDown, Lock, ChevronRight, Play } from "lucide-react"
+import { Search, ChevronDown, ChevronRight, Play } from "lucide-react"
 
 const TOOL_CATEGORIES = [
 "Semua Tools",
@@ -82,7 +82,7 @@ setLoading(false)
 
 },[navigate])
 
-/* LOAD LICENSE FROM SUPABASE */
+/* LOAD LICENSES */
 
 useEffect(()=>{
 
@@ -96,7 +96,7 @@ const user = JSON.parse(session)
 
 const { data } = await supabase
 .from("licenses")
-.select("*")
+.select("product,plan")
 .eq("email", user.email)
 
 setLicenses(data || [])
@@ -116,8 +116,6 @@ const [popup,setPopup] = useState(null)
 if(loading) return null
 if(!isLoggedIn) return null
 
-const purchasedCodes = JSON.parse(localStorage.getItem("purchased") || "[]")
-
 /* FILTER TOOLS */
 
 const filtered = tools.filter(tool=>{
@@ -133,23 +131,39 @@ return matchSearch && matchCategory
 
 })
 
-/* CHECK TOOL ACCESS */
+/* LICENSE ENGINE */
 
 const isPurchased = (tool)=>{
 
+/* FREE TOOL */
+
 if(tool.plan==="Free") return true
 
-/* SAAS LICENSE CHECK */
+/* VIP MEMBER */
 
-const licenseMatch = licenses.find(
+const hasVIP = licenses.find(
+l => l.product === "vip-all"
+)
+
+if(hasVIP) return true
+
+/* PREMIUM MEMBER */
+
+const hasPremium = licenses.find(
+l => l.product === "premium-all"
+)
+
+if(hasPremium && tool.plan === "Premium") return true
+
+/* SINGLE LICENSE */
+
+const singleLicense = licenses.find(
 l => l.product === tool.product
 )
 
-if(licenseMatch) return true
+if(singleLicense) return true
 
-/* FALLBACK OLD SYSTEM */
-
-return purchasedCodes.includes(tool.singleAccessCode)
+return false
 
 }
 
@@ -188,7 +202,7 @@ iklan, dan automation lebih cepat dengan sistem AI terintegrasi.
 <input
 value={search}
 onChange={e=>setSearch(e.target.value)}
-placeholder="Cari fitur (contoh: Iklan, Gambar, Video)..."
+placeholder="Cari fitur..."
 className="w-full bg-[#0c0c0c] border border-white/10 rounded-xl pl-9 py-2 focus:border-yellow-500"
 />
 
@@ -220,8 +234,10 @@ FILTER TOOLS ▾
 <div
 key={cat}
 onClick={()=>{
+
 setActiveCategory(cat)
 setFilterOpen(false)
+
 }}
 className={`px-4 py-2 text-xs cursor-pointer uppercase tracking-widest hover:bg-white/5 transition ${
 activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"

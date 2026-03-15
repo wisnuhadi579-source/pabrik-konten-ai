@@ -1,51 +1,98 @@
-export async function onRequestPost(context: any) {
+export const onRequestPost = async ({ request, env }) => {
 
-  try {
+try {
 
-    const body = await context.request.json()
+const body = await request.json()
 
-    const email = body.customer_email
-    const productName = body.product_name
+const email = body.customer_email
+const productName = body.product_name
 
-    const supabaseUrl = context.env.SUPABASE_URL
-    const supabaseKey = context.env.SUPABASE_SERVICE_KEY
+if(!email || !productName){
 
-    console.log("ENV URL:", supabaseUrl)
-    console.log("ENV KEY EXISTS:", !!supabaseKey)
+return new Response(
+JSON.stringify({error:"missing data"}),
+{status:400}
+)
 
-    const response = await fetch(`${supabaseUrl}/rest/v1/licenses`, {
+}
 
-      method: "POST",
+/* PRODUCT MAPPING */
 
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": supabaseKey,
-        "Authorization": `Bearer ${supabaseKey}`
-      },
+const productMap = {
 
-      body: JSON.stringify({
-        email: email,
-        product: "car-restoration",
-        plan: "premium",
-        license_key: crypto.randomUUID(),
-        status: "active"
-      })
+"Cinematic Car Restoration Pro":"car-restoration",
 
-    })
+"Premium Bundle":"premium-all",
 
-    const text = await response.text()
+"VIP Bundle":"vip-all"
 
-    return new Response(JSON.stringify({
-      status: response.status,
-      response: text
-    }), { status: 200 })
+}
 
-  } catch (err:any) {
+const product = productMap[productName]
 
-    return new Response(JSON.stringify({
-      error: err.message
-    }), { status: 500 })
+if(!product){
 
-  }
+return new Response(
+JSON.stringify({error:"unknown product"}),
+{status:400}
+)
+
+}
+
+/* INSERT LICENSE */
+
+const res = await fetch(
+`${env.SUPABASE_URL}/rest/v1/licenses`,
+{
+method:"POST",
+headers:{
+"apikey":env.SUPABASE_SERVICE_ROLE_KEY,
+"Authorization":`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json",
+"Prefer":"return=minimal"
+},
+body:JSON.stringify({
+
+email:email,
+product:product,
+plan:product==="vip-all" ? "vip" :
+product==="premium-all" ? "premium" :
+"premium"
+
+})
+
+}
+)
+
+if(!res.ok){
+
+const errorText = await res.text()
+
+return new Response(
+JSON.stringify({
+error:"supabase insert failed",
+details:errorText
+}),
+{status:500}
+)
+
+}
+
+return new Response(
+JSON.stringify({success:true}),
+{status:200}
+)
+
+}catch(err){
+
+return new Response(
+JSON.stringify({
+error:"server error",
+message:err.message
+}),
+{status:500}
+)
+
+}
 
 }

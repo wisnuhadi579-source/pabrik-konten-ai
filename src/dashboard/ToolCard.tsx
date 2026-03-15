@@ -13,13 +13,13 @@ interface ToolCardProps {
 export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
 
   const [showAccess,setShowAccess] = useState(false)
-  const [hasLicense,setHasLicense] = useState(false)
+  const [licenses,setLicenses] = useState<string[]>([])
 
-  /* LOAD LICENSE FROM SUPABASE */
+  /* LOAD USER LICENSES */
 
   useEffect(()=>{
 
-    const loadLicense = async ()=>{
+    const loadLicenses = async ()=>{
 
       const session = localStorage.getItem("userSession")
       if(!session) return
@@ -28,29 +28,61 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
 
       const { data } = await supabase
         .from("licenses")
-        .select("*")
+        .select("product")
         .eq("email", user.email)
-        .eq("product",(tool as any).product)
 
-      if(data && data.length > 0){
-        setHasLicense(true)
+      if(data){
+
+        const products = data.map((l:any)=>l.product)
+        setLicenses(products)
+
       }
 
     }
 
-    loadLicense()
+    loadLicenses()
 
-  },[tool])
+  },[])
 
-  const handleOpenTool = () => {
+  /* CHECK ACCESS RULE */
 
-    const role = localStorage.getItem("user_role") || "freemium"
-
-    const toolUrl = (tool as any).url
+  const hasAccess = ()=>{
 
     /* FREE TOOL */
 
     if(!tool.plan || tool.plan === "Free"){
+      return true
+    }
+
+    /* VIP MEMBER */
+
+    if(licenses.includes("vip-all")){
+      return true
+    }
+
+    /* PREMIUM MEMBER */
+
+    if(
+      licenses.includes("premium-all") &&
+      tool.plan === "Premium"
+    ){
+      return true
+    }
+
+    /* SINGLE LICENSE */
+
+    if(licenses.includes((tool as any).product)){
+      return true
+    }
+
+    return false
+  }
+
+  const handleOpenTool = () => {
+
+    const toolUrl = (tool as any).url
+
+    if(hasAccess()){
 
       if(toolUrl) window.open(toolUrl,"_blank")
       else onClick(tool.id)
@@ -58,39 +90,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
       return
     }
 
-    /* SAAS LICENSE CHECK */
-
-    if(hasLicense){
-
-      if(toolUrl) window.open(toolUrl,"_blank")
-      else onClick(tool.id)
-
-      return
-
-    }
-
-    /* PREMIUM TOOL */
-
-    if(tool.plan === "Premium" && role === "freemium"){
-
-      setShowAccess(true)
-      return
-
-    }
-
-    /* VIP TOOL */
-
-    if(tool.plan === "VIP" && role !== "vip"){
-
-      setShowAccess(true)
-      return
-
-    }
-
-    /* ALLOWED */
-
-    if(toolUrl) window.open(toolUrl,"_blank")
-    else onClick(tool.id)
+    setShowAccess(true)
 
   }
 
@@ -138,8 +138,6 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-60" />
 
-        {/* PLAN BADGE */}
-
         <div className="absolute top-3 right-3">
 
           <span
@@ -162,33 +160,6 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
 
       <div className="p-5">
 
-        <div className="flex items-start justify-between mb-3">
-
-          <div className="p-2 bg-white/5 rounded-lg border border-white/10 group-hover:border-emerald-500/50 transition-colors">
-
-            {tool.icon
-              ? <tool.icon className="w-5 h-5 text-emerald-400"/>
-              : <div className="w-5 h-5 bg-emerald-400 rounded"/>}
-
-          </div>
-
-          <div className="flex gap-1">
-
-            {(tool.labels || []).map((label:string,idx:number)=>(
-
-              <span
-                key={idx}
-                className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/5"
-              >
-                {label}
-              </span>
-
-            ))}
-
-          </div>
-
-        </div>
-
         <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
           {tool.name}
         </h3>
@@ -197,62 +168,26 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
           {tool.description}
         </p>
 
-        <div className="flex flex-wrap gap-2 mb-6">
-
-          {(tool.features || []).slice(0,2).map((feature:string,idx:number)=>(
-
-            <div
-              key={idx}
-              className="flex items-center gap-1 text-[11px] text-gray-500"
-            >
-
-              <div className="w-1 h-1 rounded-full bg-emerald-500"/>
-
-              {feature}
-
-            </div>
-
-          ))}
-
-        </div>
-
         <div className="flex items-center gap-2">
 
-          {tool.isComingSoon ? (
+          <button
+            onClick={handleOpenTool}
+            className="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-500 hover:bg-emerald-600 text-black text-sm font-bold rounded-xl transition-all"
+          >
+            <Play className="w-3 h-3 fill-current"/>
+            {hasAccess() ? "Buka Aplikasi" : "Beli Akses"}
+          </button>
 
-            <button
-              disabled
-              className="flex-1 py-2 bg-white/5 text-gray-500 text-sm font-medium rounded-xl border border-white/5 cursor-not-allowed"
+          {tool.tutorialLink && (
+
+            <a
+              href={tool.tutorialLink}
+              target="_blank"
+              rel="noreferrer"
+              className="p-2 bg-white/5 hover:bg-white/10 text-gray-400 rounded-xl border border-white/10 transition-all"
             >
-              Coming Soon
-            </button>
-
-          ) : (
-
-            <>
-
-              <button
-                onClick={handleOpenTool}
-                className="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-500 hover:bg-emerald-600 text-black text-sm font-bold rounded-xl transition-all"
-              >
-                <Play className="w-3 h-3 fill-current"/>
-                Buka Alat
-              </button>
-
-              {tool.tutorialLink && (
-
-                <a
-                  href={tool.tutorialLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2 bg-white/5 hover:bg-white/10 text-gray-400 rounded-xl border border-white/10 transition-all"
-                >
-                  <ChevronRight className="w-5 h-5"/>
-                </a>
-
-              )}
-
-            </>
+              <ChevronRight className="w-5 h-5"/>
+            </a>
 
           )}
 
@@ -268,10 +203,6 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onClick }) => {
         plan={tool.plan || "Premium"}
         buyLink={(tool as any).buyLink}
         onClose={()=>setShowAccess(false)}
-        onSuccess={()=>{
-          setShowAccess(false)
-          window.open((tool as any).url,"_blank")
-        }}
       />
 
     )}
