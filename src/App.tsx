@@ -12,13 +12,19 @@ import { Admin } from "./pages/Admin"
 
 import { AdminToolsPro } from "./pages/admin/AdminToolsPro"
 
+/* ADMIN EMAIL LIST */
+
 const ADMIN_EMAILS = [
-"[wisnuhadi579@gmail.com](mailto:wisnuhadi579@gmail.com)"
+"wisnuhadi579@gmail.com"
 ]
+
+/* NORMALIZE EMAIL */
 
 const normalizeEmail = (email:string) => {
 return email?.toLowerCase().trim()
 }
+
+/* USER PROTECTED ROUTE */
 
 const ProtectedRoute = ({ user, children }: any) => {
 
@@ -29,6 +35,8 @@ return <Navigate to="/login" replace />
 return children
 
 }
+
+/* ADMIN PROTECTED ROUTE */
 
 const AdminRoute = ({ user, children }: any) => {
 
@@ -94,6 +102,8 @@ return (
 
 <Routes>
 
+{/* PUBLIC */}
+
 <Route path="/" element={<Landing />} />
 
 <Route path="/tutorial" element={<Tutorial />} />
@@ -105,25 +115,40 @@ path="/login"
 element={<Login onLogin={setUser} />}
 />
 
+{/* DASHBOARD */}
+
 <Route
 path="/dashboard"
-element={ <ProtectedRoute user={user}> <Dashboard /> </ProtectedRoute>
+element={
+<ProtectedRoute user={user}>
+<Dashboard />
+</ProtectedRoute>
 }
 />
 
+{/* ADMIN */}
+
 <Route
 path="/admin"
-element={ <AdminRoute user={user}> <Admin /> </AdminRoute>
+element={
+<AdminRoute user={user}>
+<Admin />
+</AdminRoute>
 }
 />
 
 <Route
 path="/admin/tools"
-element={ <AdminRoute user={user}> <AdminToolsPro /> </AdminRoute>
+element={
+<AdminRoute user={user}>
+<AdminToolsPro />
+</AdminRoute>
 }
 />
 
-<Route path="*" element={<Navigate to="/" replace />} />
+{/* FALLBACK */}
+
+<Route path="*" element={<Navigate to="/dashboard" replace />} />
 
 </Routes>
 
