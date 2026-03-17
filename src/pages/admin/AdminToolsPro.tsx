@@ -1,29 +1,41 @@
-import React,{useEffect,useState} from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "../../services/supabaseClient"
 
 export const AdminToolsPro = () => {
 
 const [tools,setTools] = useState<any[]>([])
-const [editing,setEditing] = useState<any>(null)
 
-const emptyForm = {
+/* FORM STATE */
+
+const [form,setForm] = useState({
+
 id:"",
-name:"",
 product:"",
+name:"",
 description:"",
 plan:"Free",
+
 url:"",
 buy_link:"",
-images:"",
-labels:"",
-features:"",
 tutorial_link:"",
+
+images:[""],
+labels:[""],
+features:[""],
+
 is_coming_soon:false
-}
 
-const [form,setForm] = useState<any>(emptyForm)
+})
 
-const loadTools = async () => {
+/* LOAD TOOLS */
+
+useEffect(()=>{
+
+loadTools()
+
+},[])
+
+const loadTools = async()=>{
 
 const {data} = await supabase
 .from("tools")
@@ -34,76 +46,82 @@ setTools(data || [])
 
 }
 
-useEffect(()=>{
+/* INPUT CHANGE */
 
-loadTools()
+const handleChange = (e:any)=>{
 
-},[])
-
-/* SAVE TOOL */
-
-const saveTool = async () => {
-
-const payload = {
-
-...form,
-
-images: JSON.parse(form.images || "[]"),
-labels: JSON.parse(form.labels || "[]"),
-features: JSON.parse(form.features || "[]")
-
-}
-
-if(editing){
-
-await supabase
-.from("tools")
-.update(payload)
-.eq("id",editing)
-
-}else{
-
-await supabase
-.from("tools")
-.insert(payload)
-
-}
-
-setForm(emptyForm)
-setEditing(null)
-
-loadTools()
-
-}
-
-/* EDIT TOOL */
-
-const editTool = (tool:any) => {
-
-setEditing(tool.id)
+const {name,value,type,checked} = e.target
 
 setForm({
 
-...tool,
-
-images: JSON.stringify(tool.images || []),
-labels: JSON.stringify(tool.labels || []),
-features: JSON.stringify(tool.features || [])
+...form,
+[name]: type==="checkbox" ? checked : value
 
 })
 
 }
 
-/* DELETE TOOL */
+/* ARRAY CHANGE */
 
-const deleteTool = async (id:string) => {
+const handleArrayChange = (field:string,index:number,value:string)=>{
 
-if(!confirm("Delete tool?")) return
+const arr = [...(form as any)[field]]
+
+arr[index] = value
+
+setForm({...form,[field]:arr})
+
+}
+
+/* ADD ARRAY ITEM */
+
+const addArrayField = (field:string)=>{
+
+const arr = [...(form as any)[field], ""]
+
+setForm({...form,[field]:arr})
+
+}
+
+/* REMOVE ARRAY ITEM */
+
+const removeArrayField = (field:string,index:number)=>{
+
+const arr = [...(form as any)[field]]
+
+arr.splice(index,1)
+
+setForm({...form,[field]:arr})
+
+}
+
+/* CREATE TOOL */
+
+const createTool = async()=>{
 
 await supabase
 .from("tools")
-.delete()
-.eq("id",id)
+.insert([form])
+
+setForm({
+
+id:"",
+product:"",
+name:"",
+description:"",
+plan:"Free",
+
+url:"",
+buy_link:"",
+tutorial_link:"",
+
+images:[""],
+labels:[""],
+features:[""],
+
+is_coming_soon:false
+
+})
 
 loadTools()
 
@@ -111,156 +129,266 @@ loadTools()
 
 return (
 
-<div className="min-h-screen bg-black text-white p-10">
+<div className="max-w-6xl mx-auto py-14">
 
-<h1 className="text-3xl font-bold mb-8">
+<h1 className="text-4xl font-black mb-10">
 ADMIN TOOL MANAGER PRO
 </h1>
 
-{/* FORM */}
+<div className="bg-[#0c0c0c] border border-white/10 rounded-2xl p-8">
 
-<div className="bg-[#111] p-6 rounded-xl mb-12">
-
-<h2 className="text-xl font-semibold mb-6">
-{editing ? "Edit Tool" : "Create Tool"}
+<h2 className="text-xl font-bold mb-6">
+Create Tool
 </h2>
 
-<div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-2 gap-6">
 
-<input placeholder="id"
+{/* ID */}
+
+<input
+name="id"
+placeholder="tool id"
 value={form.id}
-onChange={e=>setForm({...form,id:e.target.value})}
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
 />
 
-<input placeholder="name"
-value={form.name}
-onChange={e=>setForm({...form,name:e.target.value})}
-/>
+{/* PRODUCT */}
 
-<input placeholder="product"
+<input
+name="product"
+placeholder="product id"
 value={form.product}
-onChange={e=>setForm({...form,product:e.target.value})}
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
 />
 
-<input placeholder="plan (Free / Premium / VIP)"
+{/* NAME */}
+
+<input
+name="name"
+placeholder="tool name"
+value={form.name}
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
+/>
+
+{/* PLAN */}
+
+<select
+name="plan"
 value={form.plan}
-onChange={e=>setForm({...form,plan:e.target.value})}
-/>
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
+>
 
-<input placeholder="tool url"
+<option>Free</option>
+<option>Premium</option>
+<option>VIP</option>
+
+</select>
+
+{/* URL */}
+
+<input
+name="url"
+placeholder="tool url"
 value={form.url}
-onChange={e=>setForm({...form,url:e.target.value})}
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
 />
 
-<input placeholder="buy link"
+{/* BUY LINK */}
+
+<input
+name="buy_link"
+placeholder="buy link"
 value={form.buy_link}
-onChange={e=>setForm({...form,buy_link:e.target.value})}
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
 />
 
-<textarea
-placeholder='images JSON ["url1","url2"]'
-value={form.images}
-onChange={e=>setForm({...form,images:e.target.value})}
+{/* TUTORIAL */}
+
+<input
+name="tutorial_link"
+placeholder="tutorial link"
+value={form.tutorial_link}
+onChange={handleChange}
+className="bg-black border border-white/10 p-3 rounded"
 />
 
-<textarea
-placeholder='labels JSON ["Creator","Designer"]'
-value={form.labels}
-onChange={e=>setForm({...form,labels:e.target.value})}
-/>
+</div>
+
+{/* DESCRIPTION */}
 
 <textarea
-placeholder='features JSON ["Feature A","Feature B"]'
-value={form.features}
-onChange={e=>setForm({...form,features:e.target.value})}
-/>
-
-<textarea
+name="description"
 placeholder="description"
 value={form.description}
-onChange={e=>setForm({...form,description:e.target.value})}
+onChange={handleChange}
+className="w-full mt-6 bg-black border border-white/10 p-3 rounded"
 />
 
-</div>
+{/* IMAGES */}
+
+<div className="mt-8">
+
+<h3 className="font-bold mb-2">Images</h3>
+
+{form.images.map((img,index)=>(
+
+<div key={index} className="flex gap-2 mb-2">
+
+<input
+value={img}
+placeholder="image url"
+onChange={(e)=>handleArrayChange("images",index,e.target.value)}
+className="flex-1 bg-black border border-white/10 p-2 rounded"
+/>
 
 <button
-onClick={saveTool}
-className="mt-6 bg-yellow-500 text-black px-6 py-2 rounded"
+onClick={()=>removeArrayField("images",index)}
+className="px-3 bg-red-600 rounded"
 >
-
-{editing ? "UPDATE TOOL" : "CREATE TOOL"}
-
+X
 </button>
 
 </div>
-
-{/* TOOL TABLE */}
-
-<div className="bg-[#111] p-6 rounded-xl">
-
-<h2 className="text-xl font-semibold mb-4">
-Tools
-</h2>
-
-<table className="w-full">
-
-<thead>
-
-<tr className="border-b border-white/10">
-
-<th className="text-left">ID</th>
-<th className="text-left">Name</th>
-<th className="text-left">Plan</th>
-<th>Edit</th>
-<th>Delete</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{tools.map(tool=>(
-
-<tr key={tool.id} className="border-b border-white/5">
-
-<td>{tool.id}</td>
-<td>{tool.name}</td>
-<td>{tool.plan}</td>
-
-<td>
-
-<button
-onClick={()=>editTool(tool)}
-className="bg-blue-500 px-3 py-1 rounded"
->
-
-Edit
-
-</button>
-
-</td>
-
-<td>
-
-<button
-onClick={()=>deleteTool(tool.id)}
-className="bg-red-600 px-3 py-1 rounded"
->
-
-Delete
-
-</button>
-
-</td>
-
-</tr>
 
 ))}
 
-</tbody>
+<button
+onClick={()=>addArrayField("images")}
+className="mt-2 px-4 py-2 bg-yellow-500 text-black rounded"
+>
++ Add Image
+</button>
 
-</table>
+</div>
+
+{/* LABELS */}
+
+<div className="mt-8">
+
+<h3 className="font-bold mb-2">Labels</h3>
+
+{form.labels.map((label,index)=>(
+
+<div key={index} className="flex gap-2 mb-2">
+
+<input
+value={label}
+placeholder="label"
+onChange={(e)=>handleArrayChange("labels",index,e.target.value)}
+className="flex-1 bg-black border border-white/10 p-2 rounded"
+/>
+
+<button
+onClick={()=>removeArrayField("labels",index)}
+className="px-3 bg-red-600 rounded"
+>
+X
+</button>
+
+</div>
+
+))}
+
+<button
+onClick={()=>addArrayField("labels")}
+className="mt-2 px-4 py-2 bg-yellow-500 text-black rounded"
+>
++ Add Label
+</button>
+
+</div>
+
+{/* FEATURES */}
+
+<div className="mt-8">
+
+<h3 className="font-bold mb-2">Features</h3>
+
+{form.features.map((f,index)=>(
+
+<div key={index} className="flex gap-2 mb-2">
+
+<input
+value={f}
+placeholder="feature"
+onChange={(e)=>handleArrayChange("features",index,e.target.value)}
+className="flex-1 bg-black border border-white/10 p-2 rounded"
+/>
+
+<button
+onClick={()=>removeArrayField("features",index)}
+className="px-3 bg-red-600 rounded"
+>
+X
+</button>
+
+</div>
+
+))}
+
+<button
+onClick={()=>addArrayField("features")}
+className="mt-2 px-4 py-2 bg-yellow-500 text-black rounded"
+>
++ Add Feature
+</button>
+
+</div>
+
+{/* COMING SOON */}
+
+<div className="mt-8 flex items-center gap-3">
+
+<input
+type="checkbox"
+name="is_coming_soon"
+checked={form.is_coming_soon}
+onChange={handleChange}
+/>
+
+<label>Coming Soon</label>
+
+</div>
+
+<button
+onClick={createTool}
+className="mt-8 px-6 py-3 bg-yellow-500 text-black rounded-xl font-bold"
+>
+CREATE TOOL
+</button>
+
+</div>
+
+{/* TOOL LIST */}
+
+<div className="mt-12">
+
+<h2 className="text-xl font-bold mb-4">
+Tools Database
+</h2>
+
+<div className="space-y-2">
+
+{tools.map(tool=>(
+
+<div
+key={tool.id}
+className="bg-[#0c0c0c] border border-white/10 p-4 rounded"
+>
+
+{tool.name}
+
+</div>
+
+))}
+
+</div>
 
 </div>
 
