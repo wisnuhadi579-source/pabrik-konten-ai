@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, LogOut, User, Zap, ShieldCheck, Crown, Menu, X } from "lucide-react";
+import { ChevronDown, LogOut, User, Zap, ShieldCheck, Crown, Menu, X, Settings, Wrench } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
+
+const ADMIN_EMAILS = [
+"[wisnuhadi579@gmail.com](mailto:wisnuhadi579@gmail.com)"
+];
 
 export const Navbar = () => {
 
@@ -113,6 +117,10 @@ navigate(path);
 
 };
 
+/* ADMIN DETECTION */
+
+const isAdmin = ADMIN_EMAILS.includes(userEmail);
+
 return (
 
 <div className="sticky top-0 z-[100] backdrop-blur-md bg-black/70 border-b border-white/10">
@@ -134,19 +142,11 @@ onClick={() => setMobileMenuOpen(false)}
 
 <div className="flex items-center justify-between mb-8">
 
-{/* LOGO */}
-
 <div className="flex flex-col items-center leading-none select-none">
 
 <div className="flex items-start gap-2 font-black tracking-tight">
 
-<span className="text-white text-lg">
-PABRIK
-</span>
-
-<span className="text-yellow-400 text-lg">
-KONTEN
-</span>
+<span className="text-white text-lg">PABRIK</span> <span className="text-yellow-400 text-lg">KONTEN</span>
 
 <span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
 AI
@@ -164,7 +164,9 @@ Pakar Digital
 <button
 onClick={() => setMobileMenuOpen(false)}
 className="text-zinc-500 hover:text-white transition"
+
 >
+
 <X size={20}/>
 </button>
 
@@ -212,11 +214,11 @@ location.pathname === item.path
 <button
 onClick={() => setMobileMenuOpen(true)}
 className="flex md:hidden text-zinc-400 hover:text-white transition"
+
 >
+
 <Menu size={22}/>
 </button>
-
-{/* LOGO */}
 
 <div
 onClick={() => navigate("/")}
@@ -225,13 +227,7 @@ className="cursor-pointer flex flex-col items-center leading-none select-none"
 
 <div className="flex items-start gap-2 font-black tracking-tight">
 
-<span className="text-white text-lg md:text-xl">
-PABRIK
-</span>
-
-<span className="text-yellow-400 text-lg md:text-xl">
-KONTEN
-</span>
+<span className="text-white text-lg md:text-xl">PABRIK</span> <span className="text-yellow-400 text-lg md:text-xl">KONTEN</span>
 
 <span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
 AI
@@ -281,6 +277,7 @@ location.pathname === item.path
 <button
 onClick={() => setDropdownOpen(!dropdownOpen)}
 className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 transition text-sm flex items-center gap-2"
+
 >
 
 Akun Saya
@@ -291,19 +288,23 @@ Akun Saya
 ) : (
 
 <>
+
 <button
 onClick={() => navigate("/login?mode=login")}
 className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
+
 >
-Login
-</button>
+
+Login </button>
 
 <button
 onClick={() => navigate("/login?mode=register")}
 className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm transition"
+
 >
-Daftar Gratis
-</button>
+
+Daftar Gratis </button>
+
 </>
 
 )}
@@ -325,7 +326,6 @@ Daftar Gratis
 <div className="overflow-hidden">
 
 <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Email</p>
-
 <p className="text-xs text-white truncate font-medium">{userEmail}</p>
 
 </div>
@@ -338,12 +338,9 @@ Daftar Gratis
 
 <div className="flex items-center gap-2">
 
-{userRole === "VIP" ? (
-<Crown size={14} className="text-fuchsia-400"/>
-) : userRole === "Premium" ? (
-<Zap size={14} className="text-yellow-400"/>
-) : (
-<ShieldCheck size={14} className="text-zinc-400"/>
+{userRole === "VIP" ? ( <Crown size={14} className="text-fuchsia-400"/>
+) : userRole === "Premium" ? ( <Zap size={14} className="text-yellow-400"/>
+) : ( <ShieldCheck size={14} className="text-zinc-400"/>
 )}
 
 <span className="text-sm font-bold text-yellow-400">{userRole}</span>
@@ -352,11 +349,38 @@ Daftar Gratis
 
 </div>
 
+{/* ADMIN MENU */}
+
+{isAdmin && (
+
+<div className="pt-3 border-t border-white/5 space-y-2">
+
+<button
+onClick={() => navigate("/admin")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
+
+>
+
+<Settings size={14}/> Admin Panel </button>
+
+<button
+onClick={() => navigate("/admin/tools")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
+
+>
+
+<Wrench size={14}/> Tool Manager </button>
+
+</div>
+
+)}
+
 <div className="pt-2 space-y-2">
 
 <button
 onClick={handleResetPassword}
 className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transition-colors py-1"
+
 >
 
 {resetLoading ? "Mengirim..." : "Reset Password"}
@@ -366,9 +390,7 @@ className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transitio
 {resetMessage && (
 
 <div className="text-xs text-emerald-400">
-
 {resetMessage}
-
 </div>
 
 )}
@@ -376,6 +398,7 @@ className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transitio
 <button
 onClick={handleLogout}
 className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition pt-2 border-t border-white/5"
+
 >
 
 <LogOut size={14}/> Logout
