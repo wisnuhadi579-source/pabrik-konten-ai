@@ -2,131 +2,44 @@
   {
     "id": "car-restoration",
     "product": "car-restoration",
-
     "name": "Cinematic Car Restoration Pro",
     "description": "Generate cinematic restoration prompts for high-end automotive content.",
     "plan": "Premium",
-
     "url": "https://cinematic-car-restoration-pro.pages.dev",
     "buyLink": "https://lynk.id/pabrikkontenai/cinematic-car-restoration",
-
     "images": [
       "https://picsum.photos/seed/car1/800/450",
       "https://picsum.photos/seed/car2/800/450"
     ],
-
-    "labels": [
-      "Creator",
-      "Automotive"
-    ],
-
+    "labels": ["Creator", "Automotive"],
     "features": [
       "Cinematic Prompts",
       "Detailing Focus",
       "AI Restoration Scene Builder"
     ],
-
     "tutorialLink": "#",
-
     "isComingSoon": false
   },
-
   {
     "id": "ai-writer",
     "product": "ai-writer",
-
     "name": "AI Content Writer",
     "description": "Create high-converting copy for social media and blogs.",
     "plan": "Free",
-
     "url": "https://example.com",
     "buyLink": "https://lynk.id/pabrikkontenai/ai-writer",
-
     "images": [
       "https://picsum.photos/seed/write1/800/450",
       "https://picsum.photos/seed/write2/800/450",
-      "https://picsum.photos/seed/write3/800/450",
-      "https://picsum.photos/seed/write4/800/450",
-      "https://picsum.photos/seed/write5/800/450"
+      "https://picsum.photos/seed/write3/800/450"
     ],
-
-    "labels": [
-      "Marketing",
-      "Blogger"
-    ],
-
+    "labels": ["Marketing", "Blogger"],
     "features": [
       "SEO Optimized",
       "Multi Platform",
       "AI Generated Copy"
     ],
-
     "tutorialLink": "#",
-
     "isComingSoon": false
-  },
-
-  {
-    "id": "ai-thumbnail-generator",
-    "product": "ai-thumbnail-generator",
-
-    "name": "AI Thumbnail Generator",
-    "description": "Generate viral YouTube thumbnails using AI prompt templates.",
-    "plan": "Premium",
-
-    "url": "#",
-    "buyLink": "https://lynk.id/pabrikkontenai/thumbnail-generator",
-
-    "images": [
-      "https://picsum.photos/seed/thumb1/800/450",
-      "https://picsum.photos/seed/thumb2/800/450"
-    ],
-
-    "labels": [
-      "Creator",
-      "Designer"
-    ],
-
-    "features": [
-      "YouTube Viral Hooks",
-      "Clickbait Optimization",
-      "AI Thumbnail Prompt"
-    ],
-
-    "tutorialLink": "#",
-
-    "isComingSoon": true
-  },
-
-  {
-    "id": "ai-script-generator",
-    "product": "ai-script-generator",
-
-    "name": "AI Script Generator",
-    "description": "Generate viral video scripts for YouTube, TikTok and Reels.",
-    "plan": "VIP",
-
-    "url": "#",
-    "buyLink": "https://lynk.id/pabrikkontenai/script-generator",
-
-    "images": [
-      "https://picsum.photos/seed/script1/800/450",
-      "https://picsum.photos/seed/script2/800/450"
-    ],
-
-    "labels": [
-      "Creator",
-      "Vlogger"
-    ],
-
-    "features": [
-      "Story Driven Script",
-      "Hook Generator",
-      "AI Narrative Builder"
-    ],
-
-    "tutorialLink": "#",
-
-    "isComingSoon": true
   }
 ]

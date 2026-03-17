@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import tools from "../config/tools.json"
+import fallbackTools from "../config/tools.json"
 import { supabase } from "../services/supabaseClient"
 import { Search, ChevronDown, ChevronRight, Play } from "lucide-react"
 
@@ -39,7 +39,7 @@ return (
 
 <div className="relative w-full h-full overflow-hidden">
 
-{images.map((img,i)=>(
+{images?.map((img,i)=>(
 
 <img
 key={i}
@@ -68,6 +68,7 @@ const navigate = useNavigate()
 const [isLoggedIn,setIsLoggedIn] = useState(false)
 const [loading,setLoading] = useState(true)
 const [licenses,setLicenses] = useState([])
+const [tools,setTools] = useState([])
 
 const [search,setSearch] = useState("")
 const [filterOpen,setFilterOpen] = useState(false)
@@ -115,6 +116,36 @@ loadLicenses()
 
 },[])
 
+/* LOAD TOOLS FROM SUPABASE */
+
+useEffect(()=>{
+
+const loadTools = async ()=>{
+
+const { data } = await supabase
+.from("tools")
+.select("*")
+
+if(!data || data.length === 0){
+setTools(fallbackTools)
+return
+}
+
+const formatted = data.map(tool => ({
+...tool,
+buyLink: tool.buy_link,
+tutorialLink: tool.tutorial_link,
+isComingSoon: tool.is_coming_soon
+}))
+
+setTools(formatted)
+
+}
+
+loadTools()
+
+},[])
+
 /* FILTER TOOLS */
 
 const filtered = useMemo(()=>{
@@ -132,7 +163,7 @@ return matchSearch && matchCategory
 
 })
 
-},[search,activeCategory])
+},[search,activeCategory,tools])
 
 /* LICENSE ENGINE */
 
@@ -140,11 +171,7 @@ const isPurchased = (tool)=>{
 
 const productId = tool.product || tool.id
 
-/* FREE TOOL */
-
 if(tool.plan==="Free") return true
-
-/* VIP BUNDLE */
 
 const hasVIP = licenses.find(
 l => l.product === "vip-all"
@@ -152,15 +179,11 @@ l => l.product === "vip-all"
 
 if(hasVIP) return true
 
-/* PREMIUM BUNDLE */
-
 const hasPremium = licenses.find(
 l => l.product === "premium-all"
 )
 
 if(hasPremium && tool.plan === "Premium") return true
-
-/* SINGLE TOOL LICENSE */
 
 const singleLicense = licenses.find(
 l => l.product === productId
@@ -172,7 +195,33 @@ return false
 
 }
 
-/* LOADING */
+/* TRACK TOOL OPEN */
+
+const trackOpen = async (tool) => {
+
+try{
+
+const session = localStorage.getItem("userSession")
+
+if(!session) return
+
+const user = JSON.parse(session)
+
+await supabase.from("tool_events").insert({
+
+tool_id: tool.id,
+user_email: user.email,
+event_type: "open_tool"
+
+})
+
+}catch(e){
+
+console.error("Analytics error",e)
+
+}
+
+}
 
 if(loading) return null
 if(!isLoggedIn) return null
@@ -181,11 +230,7 @@ return (
 
 <div className="min-h-screen bg-black text-white relative overflow-hidden">
 
-{/* GLOBAL LIGHT */}
-
 <div className="absolute left-1/2 top-[450px] -translate-x-1/2 w-[900px] h-[400px] bg-yellow-500/10 blur-[200px] pointer-events-none"></div>
-
-{/* HERO */}
 
 <div className="text-center mt-14 mb-10">
 
@@ -200,8 +245,6 @@ iklan, dan automation lebih cepat dengan sistem AI terintegrasi.
 </p>
 
 </div>
-
-{/* SEARCH */}
 
 <div className="flex justify-center">
 
@@ -220,16 +263,15 @@ className="w-full bg-[#0c0c0c] border border-white/10 rounded-xl pl-9 py-2 focus
 
 </div>
 
-{/* FILTER */}
-
 <div className="flex justify-center mt-4 gap-3 relative">
 
 <button
 onClick={()=>setFilterOpen(!filterOpen)}
 className="bg-[#111] border border-white/10 px-6 py-2 rounded-xl text-xs uppercase tracking-widest hover:border-yellow-400 transition"
+
 >
-FILTER TOOLS ▾
-</button>
+
+FILTER TOOLS ▾ </button>
 
 <div className="bg-yellow-500 text-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(255,215,0,0.35)]">
 {activeCategory}
@@ -264,8 +306,6 @@ activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
 
 </div>
 
-{/* GRID */}
-
 <div className="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
 {filtered.map(tool=>{
@@ -282,11 +322,7 @@ expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1
 }`}
 >
 
-{/* CARD CLICK */}
-
 <div onClick={()=>setOpenCard(expanded?null:tool.id)} className="cursor-pointer">
-
-{/* IMAGE */}
 
 <div className="p-2 relative">
 
@@ -304,7 +340,7 @@ tool.plan==="Free"
 : "bg-purple-600"
 }`}>
 
-{tool.plan.toUpperCase()}
+{tool.plan?.toUpperCase()}
 
 </div>
 
@@ -313,8 +349,6 @@ tool.plan==="Free"
 </div>
 
 </div>
-
-{/* TITLE */}
 
 <div className="p-5">
 
@@ -340,8 +374,6 @@ tool.plan==="Free"
 
 </div>
 
-{/* DROPDOWN */}
-
 <div className={`grid transition-all duration-500 ${
 expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
 }`}>
@@ -366,15 +398,18 @@ className="bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-sm mb-2 
 {purchased ? (
 
 <button
-onClick={(e)=>{
+onClick={async (e)=>{
 e.stopPropagation()
+
+await trackOpen(tool)
+
 window.open(tool.url)
 }}
 className="w-full bg-gradient-to-r from-yellow-400 to-amber-600 text-black font-bold text-sm py-3 rounded-xl mt-4 shadow-[0_12px_30px_rgba(255,215,0,0.35)] hover:brightness-110 transition flex items-center justify-center gap-2"
+
 >
 
-BUKA APLIKASI
-<ChevronRight size={16}/>
+BUKA APLIKASI <ChevronRight size={16}/>
 
 </button>
 
@@ -386,6 +421,7 @@ e.stopPropagation()
 setPopup(tool)
 }}
 className="w-full bg-gray-700 text-gray-200 font-bold text-sm py-3 rounded-xl mt-4"
+
 >
 
 BELI AKSES
@@ -397,6 +433,7 @@ BELI AKSES
 <button
 onClick={(e)=>e.stopPropagation()}
 className="w-full bg-red-600 text-white text-sm py-3 rounded-xl mt-3 shadow-[0_10px_25px_rgba(255,0,0,0.35)] hover:bg-red-700 transition flex items-center justify-center gap-2"
+
 >
 
 <Play size={14}/>
