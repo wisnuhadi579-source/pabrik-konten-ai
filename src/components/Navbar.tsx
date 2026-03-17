@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, LogOut, User, Zap, ShieldCheck, Crown, Menu, X, Settings, Wrench } from "lucide-react";
+import { ChevronDown, LogOut, User, Zap, ShieldCheck, Crown, Menu, X, Settings, Wrench, Users, BarChart3, KeyRound } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
 
 const ADMIN_EMAILS = [
@@ -131,6 +131,8 @@ return (
 
 <div className="sticky top-0 z-[100] backdrop-blur-md bg-black/70 border-b border-white/10">
 
+{/* MOBILE DRAWER */}
+
 {mobileMenuOpen && (
 
 <div
@@ -139,8 +141,6 @@ onClick={() => setMobileMenuOpen(false)}
 />
 
 )}
-
-{/* MOBILE DRAWER */}
 
 <div className={`fixed top-0 left-0 h-full w-72 bg-zinc-900 border-r border-white/10 shadow-xl z-[120] transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
 
@@ -168,11 +168,7 @@ Pakar Digital
 
 </div>
 
-<button
-type="button"
-onClick={() => setMobileMenuOpen(false)}
-className="text-zinc-500 hover:text-white transition"
->
+<button onClick={() => setMobileMenuOpen(false)} className="text-zinc-500 hover:text-white">
 <X size={20}/>
 </button>
 
@@ -190,15 +186,13 @@ onClick={() => {
 handleNavClick(item.path);
 setMobileMenuOpen(false);
 }}
-className={`text-sm transition cursor-pointer ${
+className={`text-sm cursor-pointer ${
 location.pathname === item.path
-? "text-yellow-400 font-medium"
+? "text-yellow-400"
 : "text-zinc-400 hover:text-yellow-400"
 }`}
 >
-
 {item.name}
-
 </div>
 
 ))}
@@ -218,31 +212,29 @@ location.pathname === item.path
 <div className="flex items-center gap-4">
 
 <button
-type="button"
 onClick={() => setMobileMenuOpen(true)}
-className="flex md:hidden text-zinc-400 hover:text-white transition"
+className="flex md:hidden text-zinc-400 hover:text-white"
 >
 <Menu size={22}/>
 </button>
 
 <div
 onClick={() => navigate("/")}
-className="cursor-pointer flex flex-col items-center leading-none select-none"
+className="cursor-pointer flex flex-col items-center"
 >
 
-<div className="flex items-start gap-2 font-black tracking-tight">
+<div className="flex items-start gap-2 font-black">
 
-<span className="text-white text-lg md:text-xl">PABRIK</span>
-<span className="text-yellow-400 text-lg md:text-xl">KONTEN</span>
+<span className="text-white">PABRIK</span>
+<span className="text-yellow-400">KONTEN</span>
 
-<span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
+<span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded px-1">
 AI
-<span className="absolute -top-1 -right-1 text-yellow-400 text-[8px]">✦</span>
 </span>
 
 </div>
 
-<div className="bg-red-600 text-white text-xs font-bold px-3 py-[2px] mt-1 rounded">
+<div className="bg-red-600 text-white text-xs px-3 py-[2px] mt-1 rounded">
 Pakar Digital
 </div>
 
@@ -250,7 +242,7 @@ Pakar Digital
 
 </div>
 
-{/* MENU DESKTOP */}
+{/* DESKTOP MENU */}
 
 <div className="hidden md:flex items-center gap-8">
 
@@ -259,9 +251,9 @@ Pakar Digital
 <div
 key={item.path}
 onClick={() => handleNavClick(item.path)}
-className={`text-sm transition cursor-pointer ${
+className={`text-sm cursor-pointer ${
 location.pathname === item.path
-? "text-yellow-400 font-medium"
+? "text-yellow-400"
 : "text-zinc-400 hover:text-yellow-400"
 }`}
 >
@@ -281,47 +273,41 @@ location.pathname === item.path
 {isLoggedIn ? (
 
 <button
-type="button"
 onClick={() => setDropdownOpen(!dropdownOpen)}
-className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 transition text-sm flex items-center gap-2"
+className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 flex items-center gap-2 text-sm"
 >
 
 Akun Saya
-<ChevronDown size={14} className={`transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}/>
+<ChevronDown size={14}/>
 
 </button>
 
 ) : (
 
 <>
-
-<button
-type="button"
-onClick={() => navigate("/login?mode=login")}
-className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
->
+<button onClick={() => navigate("/login?mode=login")} className="text-zinc-400">
 Login
 </button>
 
 <button
-type="button"
 onClick={() => navigate("/login?mode=register")}
-className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm transition"
+className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm"
 >
 Daftar Gratis
 </button>
-
 </>
 
 )}
 
-{/* ACCOUNT DROPDOWN */}
+{/* DROPDOWN */}
 
 {dropdownOpen && (
 
-<div className="absolute right-0 top-full mt-3 w-72 rounded-xl bg-zinc-900 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] z-50 p-5">
+<div className="absolute right-0 top-full mt-3 w-72 rounded-xl bg-zinc-900 border border-white/10 shadow-xl z-50 p-5">
 
 <div className="space-y-4">
+
+{/* USER INFO */}
 
 <div className="flex items-center gap-3 pb-3 border-b border-white/5">
 
@@ -329,18 +315,20 @@ Daftar Gratis
 <User size={20} className="text-yellow-400"/>
 </div>
 
-<div className="overflow-hidden">
+<div>
 
-<p className="text-[10px] text-zinc-500 uppercase tracking-widest">Email</p>
-<p className="text-xs text-white truncate font-medium">{userEmail}</p>
+<p className="text-[10px] text-zinc-500 uppercase">Email</p>
+<p className="text-xs text-white truncate">{userEmail}</p>
+
+</div>
 
 </div>
 
-</div>
+{/* ROLE */}
 
 <div>
 
-<p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Member Status</p>
+<p className="text-[10px] text-zinc-500 uppercase mb-1">Member Status</p>
 
 <div className="flex items-center gap-2">
 
@@ -365,53 +353,77 @@ Daftar Gratis
 <div className="pt-3 border-t border-white/5 space-y-2">
 
 <button
-type="button"
-onClick={() => navigate("/admin")}
+onClick={()=>navigate("/admin")}
 className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
 >
 
-<Settings size={14}/> Admin Panel
+<Settings size={14}/>
+Admin Dashboard
 
 </button>
 
 <button
-type="button"
-onClick={() => navigate("/admin/tools")}
+onClick={()=>navigate("/admin/tools")}
 className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
 >
 
-<Wrench size={14}/> Tool Manager
+<Wrench size={14}/>
+Tools Manager
+
+</button>
+
+<button
+onClick={()=>navigate("/admin/licenses")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
+>
+
+<KeyRound size={14}/>
+Licenses Manager
+
+</button>
+
+<button
+onClick={()=>navigate("/admin/users")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
+>
+
+<Users size={14}/>
+Users Manager
+
+</button>
+
+<button
+onClick={()=>navigate("/admin/analytics")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
+>
+
+<BarChart3 size={14}/>
+Analytics
 
 </button>
 
 </div>
 
 )}
+
+{/* ACCOUNT ACTIONS */}
 
 <div className="pt-2 space-y-2">
 
 <button
-type="button"
 onClick={handleResetPassword}
-className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transition-colors py-1"
+className="text-zinc-400 hover:text-amber-500 text-sm"
 >
-
 {resetLoading ? "Mengirim..." : "Reset Password"}
-
 </button>
 
 {resetMessage && (
-
-<div className="text-xs text-emerald-400">
-{resetMessage}
-</div>
-
+<div className="text-xs text-emerald-400">{resetMessage}</div>
 )}
 
 <button
-type="button"
 onClick={handleLogout}
-className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition pt-2 border-t border-white/5"
+className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 pt-2 border-t border-white/5"
 >
 
 <LogOut size={14}/> Logout
@@ -433,5 +445,4 @@ className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 h
 </div>
 
 );
-
 };

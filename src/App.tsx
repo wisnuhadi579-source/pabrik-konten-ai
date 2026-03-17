@@ -8,11 +8,16 @@ import { Navbar } from "./components/Navbar"
 import { Landing } from "./pages/Landing"
 import { Tutorial } from "./pages/Tutorial"
 import { Pricing } from "./pages/Pricing"
-import { Admin } from "./pages/Admin"
 
-import { AdminToolsPro } from "./pages/admin/AdminToolsPro"
+/* ADMIN MODULES */
 
-/* ADMIN EMAIL LIST */
+import { AdminDashboard } from "./pages/admin/AdminDashboard"
+import { AdminToolsManager } from "./pages/admin/AdminToolsManager"
+import { AdminLicensesManager } from "./pages/admin/AdminLicensesManager"
+import { AdminUsersManager } from "./pages/admin/AdminUsersManager"
+import { AdminAnalytics } from "./pages/admin/AdminAnalytics"
+
+/* ADMIN EMAIL */
 
 const ADMIN_EMAILS = [
 "wisnuhadi579@gmail.com"
@@ -115,7 +120,7 @@ path="/login"
 element={<Login onLogin={setUser} />}
 />
 
-{/* DASHBOARD */}
+{/* USER DASHBOARD */}
 
 <Route
 path="/dashboard"
@@ -126,22 +131,57 @@ element={
 }
 />
 
-{/* ADMIN */}
+{/* ADMIN DASHBOARD */}
 
 <Route
 path="/admin"
 element={
 <AdminRoute user={user}>
-<Admin />
+<AdminDashboard />
 </AdminRoute>
 }
 />
+
+{/* TOOLS MANAGER */}
 
 <Route
 path="/admin/tools"
 element={
 <AdminRoute user={user}>
-<AdminToolsPro />
+<AdminToolsManager />
+</AdminRoute>
+}
+/>
+
+{/* LICENSE MANAGER */}
+
+<Route
+path="/admin/licenses"
+element={
+<AdminRoute user={user}>
+<AdminLicensesManager />
+</AdminRoute>
+}
+/>
+
+{/* USERS MANAGER */}
+
+<Route
+path="/admin/users"
+element={
+<AdminRoute user={user}>
+<AdminUsersManager />
+</AdminRoute>
+}
+/>
+
+{/* ANALYTICS */}
+
+<Route
+path="/admin/analytics"
+element={
+<AdminRoute user={user}>
+<AdminAnalytics />
 </AdminRoute>
 }
 />

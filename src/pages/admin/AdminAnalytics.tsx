@@ -1,82 +1,127 @@
-import React,{useEffect,useState} from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "../../services/supabaseClient"
 
 export const AdminAnalytics = () => {
 
-const [stats,setStats] = useState<any[]>([])
+const [stats,setStats] = useState({
 
-const loadStats = async () => {
+tools:0,
+freeTools:0,
+premiumTools:0,
+vipTools:0,
 
-const {data} = await supabase
-.from("tool_events")
-.select("tool_id")
-
-if(!data) return
-
-const grouped:any = {}
-
-data.forEach(e=>{
-
-if(!grouped[e.tool_id]) grouped[e.tool_id]=0
-
-grouped[e.tool_id]++
+licenses:0,
+premiumUsers:0,
+vipUsers:0
 
 })
 
-const result = Object.keys(grouped).map(id=>({
+/* LOAD ANALYTICS */
 
-tool_id:id,
-opens:grouped
+const loadAnalytics = async () => {
 
-}))
+const { data:tools } = await supabase
+.from("tools")
+.select("*")
 
-setStats(result)
+const { data:licenses } = await supabase
+.from("licenses")
+.select("*")
+
+const toolsCount = tools?.length || 0
+
+const freeTools = tools?.filter(t => t.plan === "Free").length || 0
+const premiumTools = tools?.filter(t => t.plan === "Premium").length || 0
+const vipTools = tools?.filter(t => t.plan === "VIP").length || 0
+
+const licensesCount = licenses?.length || 0
+
+const premiumUsers = licenses?.filter(l => l.plan === "premium").length || 0
+const vipUsers = licenses?.filter(l => l.plan === "vip").length || 0
+
+setStats({
+
+tools:toolsCount,
+freeTools,
+premiumTools,
+vipTools,
+
+licenses:licensesCount,
+premiumUsers,
+vipUsers
+
+})
 
 }
 
 useEffect(()=>{
 
-loadStats()
+loadAnalytics()
 
 },[])
 
 return (
 
-<div className="min-h-screen bg-black text-white p-10">
+<div className="max-w-7xl mx-auto p-6">
 
 <h1 className="text-3xl font-bold mb-8">
-Tool Analytics
+Platform Analytics
 </h1>
 
-<table className="w-full">
+{/* TOOLS */}
 
-<thead>
+<h2 className="text-xl font-semibold mb-4">
+Tools Statistics
+</h2>
 
-<tr className="border-b border-white/10">
+<div className="grid md:grid-cols-4 gap-6 mb-10">
 
-<th className="text-left">Tool</th>
-<th className="text-left">Open Count</th>
+<div className="card">
+<h3>Total Tools</h3>
+<p>{stats.tools}</p>
+</div>
 
-</tr>
+<div className="card">
+<h3>Free Tools</h3>
+<p>{stats.freeTools}</p>
+</div>
 
-</thead>
+<div className="card">
+<h3>Premium Tools</h3>
+<p>{stats.premiumTools}</p>
+</div>
 
-<tbody>
+<div className="card">
+<h3>VIP Tools</h3>
+<p>{stats.vipTools}</p>
+</div>
 
-{stats.map(s=>(
+</div>
 
-<tr key={s.tool_id} className="border-b border-white/5">
+{/* LICENSES */}
 
-<td>{s.tool_id}</td>
-<td>{s.opens}</td>
+<h2 className="text-xl font-semibold mb-4">
+License Statistics
+</h2>
 
-</tr>
+<div className="grid md:grid-cols-3 gap-6">
 
-))}
+<div className="card">
+<h3>Total Licenses</h3>
+<p>{stats.licenses}</p>
+</div>
 
-</tbody>
+<div className="card">
+<h3>Premium Users</h3>
+<p>{stats.premiumUsers}</p>
+</div>
 
-</table>
+<div className="card">
+<h3>VIP Users</h3>
+<p>{stats.vipUsers}</p>
+</div>
+
+</div>
 
 </div>
 
