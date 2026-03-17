@@ -16,6 +16,10 @@ const ADMIN_EMAILS = [
 "[wisnuhadi579@gmail.com](mailto:wisnuhadi579@gmail.com)"
 ]
 
+const normalizeEmail = (email:string) => {
+return email?.toLowerCase().trim()
+}
+
 const ProtectedRoute = ({ user, children }: any) => {
 
 if (!user) {
@@ -32,7 +36,13 @@ if (!user) {
 return <Navigate to="/login" replace />
 }
 
-if (!ADMIN_EMAILS.includes(user.email)) {
+const email = normalizeEmail(user.email)
+
+const isAdmin = ADMIN_EMAILS
+.map(e => normalizeEmail(e))
+.includes(email)
+
+if (!isAdmin) {
 return <Navigate to="/dashboard" replace />
 }
 
