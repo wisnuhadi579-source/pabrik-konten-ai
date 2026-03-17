@@ -7,6 +7,10 @@ const ADMIN_EMAILS = [
 "[wisnuhadi579@gmail.com](mailto:wisnuhadi579@gmail.com)"
 ];
 
+const normalizeEmail = (email:string) => {
+return email?.toLowerCase().trim();
+};
+
 export const Navbar = () => {
 
 const navigate = useNavigate();
@@ -119,7 +123,9 @@ navigate(path);
 
 /* ADMIN DETECTION */
 
-const isAdmin = ADMIN_EMAILS.includes(userEmail);
+const isAdmin = ADMIN_EMAILS
+.map(e => normalizeEmail(e))
+.includes(normalizeEmail(userEmail));
 
 return (
 
@@ -295,7 +301,9 @@ className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
 
 >
 
-Login </button>
+Login
+
+</button>
 
 <button
 onClick={() => navigate("/login?mode=register")}
@@ -303,7 +311,9 @@ className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px
 
 >
 
-Daftar Gratis </button>
+Daftar Gratis
+
+</button>
 
 </>
 
@@ -361,7 +371,9 @@ className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yel
 
 >
 
-<Settings size={14}/> Admin Panel </button>
+<Settings size={14}/> Admin Panel
+
+</button>
 
 <button
 onClick={() => navigate("/admin/tools")}
@@ -369,7 +381,9 @@ className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yel
 
 >
 
-<Wrench size={14}/> Tool Manager </button>
+<Wrench size={14}/> Tool Manager
+
+</button>
 
 </div>
 
