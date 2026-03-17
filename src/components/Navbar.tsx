@@ -3,13 +3,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, LogOut, User, Zap, ShieldCheck, Crown, Menu, X, Settings, Wrench } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
 
-/* ADMIN EMAIL LIST */
-
 const ADMIN_EMAILS = [
 "wisnuhadi579@gmail.com"
 ];
-
-/* NORMALIZE EMAIL */
 
 const normalizeEmail = (email:string) => {
 return email?.toLowerCase().trim();
@@ -29,8 +25,6 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 const [resetMessage, setResetMessage] = useState("");
 const [resetLoading, setResetLoading] = useState(false);
-
-/* SESSION LOAD */
 
 useEffect(() => {
 
@@ -60,8 +54,6 @@ console.error("Failed to parse session", e);
 
 }, [location.pathname]);
 
-/* LOGOUT */
-
 const handleLogout = () => {
 
 localStorage.removeItem("userSession");
@@ -70,8 +62,6 @@ setDropdownOpen(false);
 navigate("/");
 
 };
-
-/* RESET PASSWORD */
 
 const handleResetPassword = async () => {
 
@@ -108,8 +98,6 @@ setResetMessage("Gagal mengirim email reset password.");
 setResetLoading(false);
 
 };
-
-/* NAV MENU */
 
 const menuItems = [
 
@@ -181,6 +169,7 @@ Pakar Digital
 </div>
 
 <button
+type="button"
 onClick={() => setMobileMenuOpen(false)}
 className="text-zinc-500 hover:text-white transition"
 >
@@ -229,6 +218,7 @@ location.pathname === item.path
 <div className="flex items-center gap-4">
 
 <button
+type="button"
 onClick={() => setMobileMenuOpen(true)}
 className="flex md:hidden text-zinc-400 hover:text-white transition"
 >
@@ -291,6 +281,7 @@ location.pathname === item.path
 {isLoggedIn ? (
 
 <button
+type="button"
 onClick={() => setDropdownOpen(!dropdownOpen)}
 className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 transition text-sm flex items-center gap-2"
 >
@@ -305,6 +296,7 @@ Akun Saya
 <>
 
 <button
+type="button"
 onClick={() => navigate("/login?mode=login")}
 className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
 >
@@ -312,6 +304,7 @@ Login
 </button>
 
 <button
+type="button"
 onClick={() => navigate("/login?mode=register")}
 className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm transition"
 >
@@ -372,6 +365,7 @@ Daftar Gratis
 <div className="pt-3 border-t border-white/5 space-y-2">
 
 <button
+type="button"
 onClick={() => navigate("/admin")}
 className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
 >
@@ -381,6 +375,7 @@ className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yel
 </button>
 
 <button
+type="button"
 onClick={() => navigate("/admin/tools")}
 className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
 >
@@ -396,6 +391,7 @@ className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yel
 <div className="pt-2 space-y-2">
 
 <button
+type="button"
 onClick={handleResetPassword}
 className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transition-colors py-1"
 >
@@ -413,6 +409,7 @@ className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transitio
 )}
 
 <button
+type="button"
 onClick={handleLogout}
 className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition pt-2 border-t border-white/5"
 >
