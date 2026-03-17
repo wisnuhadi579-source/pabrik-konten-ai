@@ -3,9 +3,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronDown, LogOut, User, Zap, ShieldCheck, Crown, Menu, X, Settings, Wrench } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
 
+/* ADMIN EMAIL LIST */
+
 const ADMIN_EMAILS = [
-"[wisnuhadi579@gmail.com](mailto:wisnuhadi579@gmail.com)"
+"wisnuhadi579@gmail.com"
 ];
+
+/* NORMALIZE EMAIL */
 
 const normalizeEmail = (email:string) => {
 return email?.toLowerCase().trim();
@@ -25,6 +29,8 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 const [resetMessage, setResetMessage] = useState("");
 const [resetLoading, setResetLoading] = useState(false);
+
+/* SESSION LOAD */
 
 useEffect(() => {
 
@@ -54,6 +60,8 @@ console.error("Failed to parse session", e);
 
 }, [location.pathname]);
 
+/* LOGOUT */
+
 const handleLogout = () => {
 
 localStorage.removeItem("userSession");
@@ -62,6 +70,8 @@ setDropdownOpen(false);
 navigate("/");
 
 };
+
+/* RESET PASSWORD */
 
 const handleResetPassword = async () => {
 
@@ -98,6 +108,8 @@ setResetMessage("Gagal mengirim email reset password.");
 setResetLoading(false);
 
 };
+
+/* NAV MENU */
 
 const menuItems = [
 
@@ -152,7 +164,8 @@ onClick={() => setMobileMenuOpen(false)}
 
 <div className="flex items-start gap-2 font-black tracking-tight">
 
-<span className="text-white text-lg">PABRIK</span> <span className="text-yellow-400 text-lg">KONTEN</span>
+<span className="text-white text-lg">PABRIK</span>
+<span className="text-yellow-400 text-lg">KONTEN</span>
 
 <span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
 AI
@@ -170,9 +183,7 @@ Pakar Digital
 <button
 onClick={() => setMobileMenuOpen(false)}
 className="text-zinc-500 hover:text-white transition"
-
 >
-
 <X size={20}/>
 </button>
 
@@ -220,9 +231,7 @@ location.pathname === item.path
 <button
 onClick={() => setMobileMenuOpen(true)}
 className="flex md:hidden text-zinc-400 hover:text-white transition"
-
 >
-
 <Menu size={22}/>
 </button>
 
@@ -233,7 +242,8 @@ className="cursor-pointer flex flex-col items-center leading-none select-none"
 
 <div className="flex items-start gap-2 font-black tracking-tight">
 
-<span className="text-white text-lg md:text-xl">PABRIK</span> <span className="text-yellow-400 text-lg md:text-xl">KONTEN</span>
+<span className="text-white text-lg md:text-xl">PABRIK</span>
+<span className="text-yellow-400 text-lg md:text-xl">KONTEN</span>
 
 <span className="relative -top-2 text-yellow-400 text-xs border border-yellow-400 rounded-md px-1 py-[1px]">
 AI
@@ -283,7 +293,6 @@ location.pathname === item.path
 <button
 onClick={() => setDropdownOpen(!dropdownOpen)}
 className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 transition text-sm flex items-center gap-2"
-
 >
 
 Akun Saya
@@ -298,21 +307,15 @@ Akun Saya
 <button
 onClick={() => navigate("/login?mode=login")}
 className="text-zinc-400 hover:text-white transition text-sm font-medium px-2"
-
 >
-
 Login
-
 </button>
 
 <button
 onClick={() => navigate("/login?mode=register")}
 className="bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold px-4 py-2 rounded-xl text-sm transition"
-
 >
-
 Daftar Gratis
-
 </button>
 
 </>
@@ -348,9 +351,12 @@ Daftar Gratis
 
 <div className="flex items-center gap-2">
 
-{userRole === "VIP" ? ( <Crown size={14} className="text-fuchsia-400"/>
-) : userRole === "Premium" ? ( <Zap size={14} className="text-yellow-400"/>
-) : ( <ShieldCheck size={14} className="text-zinc-400"/>
+{userRole === "VIP" ? (
+<Crown size={14} className="text-fuchsia-400"/>
+) : userRole === "Premium" ? (
+<Zap size={14} className="text-yellow-400"/>
+) : (
+<ShieldCheck size={14} className="text-zinc-400"/>
 )}
 
 <span className="text-sm font-bold text-yellow-400">{userRole}</span>
@@ -368,7 +374,6 @@ Daftar Gratis
 <button
 onClick={() => navigate("/admin")}
 className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
-
 >
 
 <Settings size={14}/> Admin Panel
@@ -378,7 +383,6 @@ className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yel
 <button
 onClick={() => navigate("/admin/tools")}
 className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
-
 >
 
 <Wrench size={14}/> Tool Manager
@@ -394,7 +398,6 @@ className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yel
 <button
 onClick={handleResetPassword}
 className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transition-colors py-1"
-
 >
 
 {resetLoading ? "Mengirim..." : "Reset Password"}
@@ -412,7 +415,6 @@ className="w-full text-left text-zinc-400 hover:text-amber-500 text-sm transitio
 <button
 onClick={handleLogout}
 className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 hover:text-red-400 transition pt-2 border-t border-white/5"
-
 >
 
 <LogOut size={14}/> Logout
