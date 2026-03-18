@@ -8,65 +8,38 @@ console.log("LYNK WEBHOOK BODY:", body)
 console.log("LYNK HEADERS:", Object.fromEntries(request.headers))
 
 /* =========================
-VERIFY MERCHANT KEY
+EXTRACT DATA
 ========================= */
 
-const merchantKey = env.LYNK_MERCHANT_KEY
+const email =
+body.customer_email ||
+body.email ||
+body.customer?.email
 
-const incomingKey =
-request.headers.get("x-merchant-key") ||
-request.headers.get("merchant-key") ||
-request.headers.get("x-lynk-key") ||
-request.headers.get("authorization")
-
-/* allow test webhook without merchant key */
-
-if(!incomingKey){
-
-console.log("Test webhook detected")
-
-return new Response(
-JSON.stringify({test:true}),
-{status:200}
-)
-
-}
-
-if(incomingKey !== merchantKey){
-
-return new Response(
-JSON.stringify({error:"unauthorized webhook"}),
-{status:401}
-)
-
-}
-
-/* =========================
-VALIDATE PAYMENT
-========================= */
-
-if(body.status && body.status !== "PAID"){
-
-return new Response(
-JSON.stringify({ignored:true}),
-{status:200}
-)
-
-}
-
-/* =========================
-DATA
-========================= */
-
-const email = body.customer_email
-const productName = body.product_name
+const productName =
+body.product_name ||
+body.product ||
+body.item_name ||
+body.title
 
 const orderId =
 body.order_id ||
 body.transaction_id ||
+body.id ||
 crypto.randomUUID()
 
+const amount =
+body.amount ||
+body.total ||
+0
+
+/* =========================
+VALIDATE BASIC DATA
+========================= */
+
 if(!email || !productName){
+
+console.log("Missing data")
 
 return new Response(
 JSON.stringify({error:"missing data"}),
@@ -76,30 +49,45 @@ JSON.stringify({error:"missing data"}),
 }
 
 /* =========================
-PRODUCT MAP
+EXTRACT PRODUCT CODE
 ========================= */
 
-const productMap = {
+let product = productName
 
-"Cinematic Car Restoration Pro":"car-restoration",
-"Premium Bundle":"premium-all",
-"VIP Bundle":"vip-all"
+const match = productName.match(/\[(.*?)\]/)
 
-}
+if(match){
 
-let product = productMap[productName]
-
-if(!product){
-
-product =
-body.product_slug ||
-body.product_code ||
-productName
+product = match[1]
 
 }
 
 /* =========================
-CHECK USER PROFILE
+SAVE PAYMENT LOG
+========================= */
+
+await fetch(
+`${env.SUPABASE_URL}/rest/v1/payments`,
+{
+method:"POST",
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+email,
+product,
+trx_id:orderId,
+amount
+
+})
+}
+)
+
+/* =========================
+CHECK USER
 ========================= */
 
 let userId = null
@@ -128,9 +116,9 @@ CREATE USER IF NOT EXIST
 
 if(!userId){
 
-console.log("Creating new user:", email)
+console.log("Creating user:", email)
 
-/* CREATE AUTH ACCOUNT */
+/* CREATE AUTH USER */
 
 await fetch(
 `${env.SUPABASE_URL}/auth/v1/admin/users`,
@@ -143,7 +131,7 @@ Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
 },
 body:JSON.stringify({
 
-email:email,
+email,
 password:"pakar123",
 email_confirm:true
 
@@ -151,7 +139,7 @@ email_confirm:true
 }
 )
 
-/* CREATE USER PROFILE */
+/* CREATE PROFILE */
 
 const createUser = await fetch(
 `${env.SUPABASE_URL}/rest/v1/users`,
@@ -165,7 +153,7 @@ Prefer:"return=representation"
 },
 body:JSON.stringify({
 
-email:email,
+email,
 plan:"free"
 
 })
@@ -183,7 +171,7 @@ userId = newUser[0].id
 }
 
 /* =========================
-DUPLICATE ORDER PROTECTION
+CHECK DUPLICATE ORDER
 ========================= */
 
 const check = await fetch(
@@ -200,7 +188,7 @@ const existing = await check.json()
 
 if(existing && existing.length > 0){
 
-console.log("Duplicate order ignored:", orderId)
+console.log("Duplicate order:", orderId)
 
 return new Response(
 JSON.stringify({duplicate:true}),
@@ -255,7 +243,7 @@ if(!res.ok){
 
 const error = await res.text()
 
-console.log("License insert error:", error)
+console.log("License error:", error)
 
 return new Response(
 JSON.stringify({error}),
@@ -279,17 +267,13 @@ Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
 },
 body:JSON.stringify({
 
-plan:plan
+plan
 
 })
 }
 )
 
-console.log("License success for:", email)
-
-/* =========================
-SUCCESS
-========================= */
+console.log("SUCCESS:", email, product)
 
 return new Response(
 JSON.stringify({success:true}),
@@ -298,7 +282,7 @@ JSON.stringify({success:true}),
 
 }catch(err){
 
-console.log("Webhook error:", err)
+console.log("WEBHOOK ERROR:", err)
 
 return new Response(
 JSON.stringify({error:err.message}),
