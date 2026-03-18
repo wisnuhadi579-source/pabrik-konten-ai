@@ -22,9 +22,8 @@ const [error, setError] = useState("");
 
 const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
 
-
 /* =========================
-   DETECT LOGIN / REGISTER
+DETECT LOGIN / REGISTER
 ========================= */
 
 useEffect(() => {
@@ -39,9 +38,8 @@ setAuthMode("login");
 
 }, [searchParams]);
 
-
 /* =========================
-   DETECT PASSWORD RECOVERY
+DETECT PASSWORD RECOVERY
 ========================= */
 
 useEffect(() => {
@@ -62,9 +60,8 @@ listener.subscription.unsubscribe();
 
 }, []);
 
-
 /* =========================
-   FORGOT PASSWORD
+FORGOT PASSWORD
 ========================= */
 
 const handleForgotPassword = async () => {
@@ -98,9 +95,8 @@ setIsLoading(false);
 
 };
 
-
 /* =========================
-   UPDATE PASSWORD
+UPDATE PASSWORD
 ========================= */
 
 const handleUpdatePassword = async () => {
@@ -138,9 +134,8 @@ setIsLoading(false);
 
 };
 
-
 /* =========================
-   LOGIN / REGISTER
+LOGIN / REGISTER
 ========================= */
 
 const handleAuth = async () => {
@@ -163,11 +158,11 @@ if (error) throw error;
 
 const { data: userData } = await supabase
 .from("users")
-.select("role")
+.select("plan")
 .eq("email", email)
 .single();
 
-const role = userData?.role || "freemium";
+const role = userData?.plan || "free";
 
 let memberStatus = "Gratis";
 
@@ -190,6 +185,8 @@ navigate("/dashboard");
 
 } else {
 
+/* REGISTER USER */
+
 const { error } = await supabase.auth.signUp({
 
 email,
@@ -197,7 +194,30 @@ password
 
 });
 
-if (error) throw error;
+if (error) {
+
+if(error.message.includes("User already registered")){
+
+throw new Error(
+"Akun sudah terdaftar. Silakan klik 'Lupa Kata Sandi' untuk membuat password."
+)
+
+}
+
+throw error;
+
+}
+
+/* SIMPAN USER KE DATABASE */
+
+await supabase
+.from("users")
+.upsert({
+
+email: email,
+plan: "free"
+
+}, { onConflict: "email" });
 
 alert("Registrasi berhasil! Silahkan login.");
 
@@ -217,9 +237,8 @@ setIsLoading(false);
 
 };
 
-
 /* =========================
-   UI
+UI
 ========================= */
 
 return (
@@ -228,19 +247,16 @@ return (
 
 <div className="w-full max-w-md bg-gradient-to-b from-zinc-900 to-black border border-white/10 rounded-2xl p-8 relative">
 
-
 <button
 onClick={() => navigate("/")}
 className="absolute top-4 right-4 text-zinc-500 hover:text-white"
+
 >
+
 <X size={24} />
 </button>
 
-
 <div className="text-center mb-8">
-
-
-{/* LOGO */}
 
 <div className="flex flex-col items-center leading-none select-none">
 
@@ -267,7 +283,6 @@ Pakar Digital
 
 </div>
 
-
 <h2 className="text-2xl font-bold mt-8">
 
 {authMode === "login" ? "Selamat Datang" : "Daftar Gratis"}
@@ -284,19 +299,19 @@ Pakar Digital
 
 </div>
 
-
 {error && (
+
 <div className="mb-6 text-red-400 text-xs text-center">
 {error}
 </div>
 )}
 
 {message && (
+
 <div className="mb-6 text-green-400 text-xs text-center">
 {message}
 </div>
 )}
-
 
 <div className="space-y-4">
 
@@ -323,19 +338,22 @@ onChange={(e) => setPassword(e.target.value)}
 <button
 onClick={handleForgotPassword}
 className="text-xs text-amber-500 font-bold"
+
 >
+
 Lupa Kata Sandi?
+
 </button>
 
 </div>
 
 )}
 
-
 <button
 onClick={handleAuth}
 disabled={isLoading}
 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-black rounded-xl py-3"
+
 >
 
 {isLoading ? "Memproses..." : authMode === "login"
@@ -346,12 +364,12 @@ className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-b
 
 </div>
 
-
 <div className="text-center mt-8">
 
 <button
 onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
 className="text-amber-500 font-bold"
+
 >
 
 {authMode === "login"
@@ -363,9 +381,6 @@ className="text-amber-500 font-bold"
 </div>
 
 </div>
-
-
-{/* RESET PASSWORD MODAL */}
 
 {showResetPasswordModal && (
 
@@ -390,6 +405,7 @@ onChange={(e) => setNewPassword(e.target.value)}
 <button
 onClick={handleUpdatePassword}
 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 font-bold text-black rounded-xl py-3"
+
 >
 
 SIMPAN SANDI BARU

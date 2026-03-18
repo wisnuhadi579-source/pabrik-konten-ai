@@ -7,54 +7,94 @@ const [users,setUsers] = useState<any[]>([])
 const [search,setSearch] = useState("")
 const [loading,setLoading] = useState(true)
 
+const [stats,setStats] = useState({
+total:0,
+free:0,
+premium:0,
+vip:0
+})
+
 /* LOAD USERS */
 
 const loadUsers = async () => {
 
 setLoading(true)
 
-const { data } = await supabase
-.from("licenses")
+/* GET USERS */
+
+const { data: userData } = await supabase
+.from("users")
 .select("*")
 
-if(!data){
+if(!userData){
 setUsers([])
 setLoading(false)
 return
 }
 
-/* GROUP BY EMAIL */
+/* GET LICENSES */
+
+const { data: licenseData } = await supabase
+.from("licenses")
+.select("*")
 
 const grouped:any = {}
 
-data.forEach((license)=>{
+userData.forEach((user)=>{
 
-if(!grouped[license.email]){
+grouped[user.email] = {
 
-grouped[license.email] = {
-
-email:license.email,
+email:user.email,
 licenses:[],
-plans:new Set()
+plans:new Set(),
+plan:user.plan || "free"
 
 }
 
-}
+})
+
+if(licenseData){
+
+licenseData.forEach((license)=>{
+
+if(!grouped[license.email]) return
 
 grouped[license.email].licenses.push(license)
 grouped[license.email].plans.add(license.plan)
 
 })
 
+}
+
 const usersArray = Object.values(grouped).map((u:any)=>({
 
 email:u.email,
 licenseCount:u.licenses.length,
-plans:Array.from(u.plans).join(", ")
+plans:u.licenses.length > 0
+? Array.from(u.plans).join(", ")
+: "free"
 
 }))
 
 setUsers(usersArray)
+
+/* =========================
+CALCULATE STATS
+========================= */
+
+const stat = {
+
+total: usersArray.length,
+
+free: usersArray.filter(u => u.plans === "free").length,
+
+premium: usersArray.filter(u => u.plans === "premium").length,
+
+vip: usersArray.filter(u => u.plans === "vip").length
+
+}
+
+setStats(stat)
 
 setLoading(false)
 
@@ -79,6 +119,34 @@ return (
 <h1 className="text-3xl font-bold mb-6">
 Users Manager
 </h1>
+
+{/* =========================
+USER STATS
+========================= */}
+
+<div className="grid grid-cols-4 gap-4 mb-6">
+
+<div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+<div className="text-xs text-zinc-400">Total Users</div>
+<div className="text-2xl font-bold">{stats.total}</div>
+</div>
+
+<div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+<div className="text-xs text-zinc-400">Free Users</div>
+<div className="text-2xl font-bold">{stats.free}</div>
+</div>
+
+<div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+<div className="text-xs text-zinc-400">Premium Users</div>
+<div className="text-2xl font-bold">{stats.premium}</div>
+</div>
+
+<div className="bg-zinc-900 border border-white/10 rounded-xl p-4">
+<div className="text-xs text-zinc-400">VIP Users</div>
+<div className="text-2xl font-bold">{stats.vip}</div>
+</div>
+
+</div>
 
 {/* SEARCH */}
 
@@ -110,6 +178,7 @@ className="input mb-6"
 <tbody>
 
 {filtered.map((user)=>(
+
 <tr key={user.email} className="border-b border-white/5">
 
 <td className="p-3">
@@ -125,6 +194,7 @@ className="input mb-6"
 </td>
 
 </tr>
+
 ))}
 
 </tbody>

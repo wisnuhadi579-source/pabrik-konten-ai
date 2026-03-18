@@ -167,29 +167,36 @@ return matchSearch && matchCategory
 
 /* LICENSE ENGINE */
 
+const licenseProducts = useMemo(()=>{
+
+const set = new Set()
+
+licenses.forEach(l=>{
+if(l?.product){
+set.add(l.product)
+}
+})
+
+return set
+
+},[licenses])
+
 const isPurchased = (tool)=>{
 
 const productId = tool.product || tool.id
 
 if(tool.plan==="Free") return true
 
-const hasVIP = licenses.find(
-l => l.product === "vip-all"
-)
+if(licenseProducts.has("vip-all")) return true
 
-if(hasVIP) return true
+if(
+licenseProducts.has("premium-all") &&
+tool.plan === "Premium"
+){
+return true
+}
 
-const hasPremium = licenses.find(
-l => l.product === "premium-all"
-)
-
-if(hasPremium && tool.plan === "Premium") return true
-
-const singleLicense = licenses.find(
-l => l.product === productId
-)
-
-if(singleLicense) return true
+if(licenseProducts.has(productId)) return true
 
 return false
 
@@ -218,6 +225,47 @@ event_type: "open_tool"
 }catch(e){
 
 console.error("Analytics error",e)
+
+}
+
+}
+
+/* OPEN TOOL WITH TOKEN */
+
+const openTool = async (tool) => {
+
+try{
+
+const session = localStorage.getItem("userSession")
+if(!session) return
+
+const user = JSON.parse(session)
+
+const res = await fetch("/functions/generate-token",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+email:user.email,
+product:tool.product || tool.id
+})
+})
+
+const data = await res.json()
+
+if(!data.token){
+alert("Access denied")
+return
+}
+
+const url = `${tool.url}?token=${data.token}`
+
+window.open(url)
+
+}catch(err){
+
+console.error("Token error",err)
 
 }
 
@@ -293,9 +341,7 @@ className={`px-4 py-2 text-xs cursor-pointer uppercase tracking-widest hover:bg-
 activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
 }`}
 >
-
 {cat}
-
 </div>
 
 ))}
@@ -339,9 +385,7 @@ tool.plan==="Free"
 ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
 : "bg-purple-600"
 }`}>
-
 {tool.plan?.toUpperCase()}
-
 </div>
 
 </div>
@@ -388,9 +432,7 @@ expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
 key={i}
 className="bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-sm mb-2 hover:border-yellow-500/30 transition"
 >
-
 {f}
-
 </div>
 
 ))}
@@ -400,10 +442,8 @@ className="bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-sm mb-2 
 <button
 onClick={async (e)=>{
 e.stopPropagation()
-
 await trackOpen(tool)
-
-window.open(tool.url)
+await openTool(tool)
 }}
 className="w-full bg-gradient-to-r from-yellow-400 to-amber-600 text-black font-bold text-sm py-3 rounded-xl mt-4 shadow-[0_12px_30px_rgba(255,215,0,0.35)] hover:brightness-110 transition flex items-center justify-center gap-2"
 
