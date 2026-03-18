@@ -30,34 +30,51 @@ console.log("LYNK WEBHOOK BODY:", JSON.stringify(body,null,2))
 console.log("LYNK HEADERS:", Object.fromEntries(request.headers))
 
 /* =========================
-EXTRACT DATA (FLEXIBLE)
+VALIDATE EVENT
+========================= */
+
+const event = body.event
+
+if(event !== "payment.received"){
+
+console.log("Ignored event:", event)
+
+return new Response(
+JSON.stringify({ignored:true}),
+{status:200}
+)
+
+}
+
+/* =========================
+EXTRACT DATA (LYNK FORMAT)
 ========================= */
 
 const email =
+body.data?.customer?.email ||
 body.customer_email ||
 body.email ||
-body.customer?.email ||
 body.buyer_email ||
-body.data?.customer_email
+null
 
 const productName =
-body.product_name ||
-body.product ||
-body.item_name ||
-body.title ||
+body.data?.items?.[0]?.title ||
 body.items?.[0]?.name ||
-body.data?.product_name
+body.product_name ||
+body.title ||
+null
 
 const orderId =
+body.data?.refId ||
+body.refId ||
 body.order_id ||
 body.transaction_id ||
-body.id ||
 crypto.randomUUID()
 
 const amount =
+body.data?.items?.[0]?.price ||
+body.data?.totals?.grandTotal ||
 body.amount ||
-body.total ||
-body.price ||
 0
 
 /* =========================
@@ -70,7 +87,7 @@ console.log("Missing data:", email, productName)
 
 return new Response(
 JSON.stringify({error:"missing data"}),
-{status:400}
+{status:200}
 )
 
 }
@@ -85,6 +102,33 @@ const match = productName.match(/\[(.*?)\]/)
 
 if(match){
 product = match[1]
+}
+
+/* =========================
+CHECK DUPLICATE ORDER
+========================= */
+
+const check = await fetch(
+`${env.SUPABASE_URL}/rest/v1/licenses?order_id=eq.${orderId}`,
+{
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+}
+}
+)
+
+const existing = await check.json()
+
+if(existing && existing.length > 0){
+
+console.log("Duplicate webhook ignored:", orderId)
+
+return new Response(
+JSON.stringify({duplicate:true}),
+{status:200}
+)
+
 }
 
 /* =========================
@@ -162,7 +206,7 @@ email_confirm:true
 }
 )
 
-/* CREATE USER PROFILE */
+/* CREATE PROFILE */
 
 const createUser = await fetch(
 `${env.SUPABASE_URL}/rest/v1/users`,
@@ -188,33 +232,6 @@ const newUser = await createUser.json()
 if(newUser && newUser.length > 0){
 userId = newUser[0].id
 }
-
-}
-
-/* =========================
-CHECK DUPLICATE ORDER
-========================= */
-
-const check = await fetch(
-`${env.SUPABASE_URL}/rest/v1/licenses?order_id=eq.${orderId}`,
-{
-headers:{
-apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
-}
-}
-)
-
-const existing = await check.json()
-
-if(existing && existing.length > 0){
-
-console.log("Duplicate order ignored:", orderId)
-
-return new Response(
-JSON.stringify({duplicate:true}),
-{status:200}
-)
 
 }
 
@@ -294,7 +311,7 @@ plan
 }
 )
 
-console.log("LICENSE SUCCESS:", email, product)
+console.log("LICENSE CREATED:", email, product)
 
 return new Response(
 JSON.stringify({success:true}),
@@ -307,7 +324,7 @@ console.log("WEBHOOK ERROR:", err)
 
 return new Response(
 JSON.stringify({error:err.message}),
-{status:500}
+{status:200}
 )
 
 }
