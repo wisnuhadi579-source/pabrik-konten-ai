@@ -19,11 +19,15 @@ request.headers.get("merchant-key") ||
 request.headers.get("x-lynk-key") ||
 request.headers.get("authorization")
 
+/* allow test webhook without merchant key */
+
 if(!incomingKey){
 
+console.log("Test webhook detected")
+
 return new Response(
-JSON.stringify({error:"missing merchant key"}),
-{status:401}
+JSON.stringify({test:true}),
+{status:200}
 )
 
 }
@@ -56,6 +60,7 @@ DATA
 
 const email = body.customer_email
 const productName = body.product_name
+
 const orderId =
 body.order_id ||
 body.transaction_id ||
