@@ -1,280 +1,315 @@
 // File: functions/lynk-webhook.ts
+
 export async function onRequest(context) {
-  const request = context.request;
-  const env = context.env;
 
-  try {
-    const body = await request.json()
+const request = context.request
+const env = context.env
 
-    console.log("LYNK WEBHOOK BODY:", body)
-    console.log("LYNK HEADERS:", Object.fromEntries(request.headers))
+try{
 
-    /* =========================
-    EXTRACT DATA
-    ========================= */
+/* =========================
+CHECK METHOD
+========================= */
 
-    const email =
-      body.customer_email ||
-      body.email ||
-      body.customer?.email
+if(request.method !== "POST"){
 
-    const productName =
-      body.product_name ||
-      body.product ||
-      body.item_name ||
-      body.title
+return new Response(
+JSON.stringify({status:"webhook alive"}),
+{status:200}
+)
 
-    const orderId =
-      body.order_id ||
-      body.transaction_id ||
-      body.id ||
-      crypto.randomUUID()
+}
 
-    const amount =
-      body.amount ||
-      body.total ||
-      0
+/* =========================
+PARSE BODY
+========================= */
 
-    /* =========================
-    VALIDATE BASIC DATA
-    ========================= */
+const body = await request.json()
 
-    if(!email || !productName){
-      console.log("Missing data")
+console.log("LYNK WEBHOOK BODY:", JSON.stringify(body,null,2))
+console.log("LYNK HEADERS:", Object.fromEntries(request.headers))
 
-      return new Response(
-        JSON.stringify({error:"missing data"}),
-        {status:400}
-      )
-    }
+/* =========================
+EXTRACT DATA (FLEXIBLE)
+========================= */
 
-    /* =========================
-    EXTRACT PRODUCT CODE
-    ========================= */
+const email =
+body.customer_email ||
+body.email ||
+body.customer?.email ||
+body.buyer_email ||
+body.data?.customer_email
 
-    let product = productName
+const productName =
+body.product_name ||
+body.product ||
+body.item_name ||
+body.title ||
+body.items?.[0]?.name ||
+body.data?.product_name
 
-    const match = productName.match(/\[(.*?)\]/)
+const orderId =
+body.order_id ||
+body.transaction_id ||
+body.id ||
+crypto.randomUUID()
 
-    if(match){
-      product = match[1]
-    }
+const amount =
+body.amount ||
+body.total ||
+body.price ||
+0
 
-    /* =========================
-    SAVE PAYMENT LOG
-    ========================= */
+/* =========================
+VALIDATE BASIC DATA
+========================= */
 
-    await fetch(
-      `${env.SUPABASE_URL}/rest/v1/payments`,
-      {
-        method:"POST",
-        headers:{
-          apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-          Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
+if(!email || !productName){
 
-          email,
-          product,
-          trx_id:orderId,
-          amount
+console.log("Missing data:", email, productName)
 
-        })
-      }
-    )
+return new Response(
+JSON.stringify({error:"missing data"}),
+{status:400}
+)
 
-    /* =========================
-    CHECK USER
-    ========================= */
+}
 
-    let userId = null
+/* =========================
+EXTRACT PRODUCT CODE
+========================= */
 
-    const userCheck = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/users?email=eq.${email}`,
-      {
-        headers:{
-          apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-          Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
-        }
-      }
-    )
+let product = productName
 
-    const users = await userCheck.json()
+const match = productName.match(/\[(.*?)\]/)
 
-    if(users && users.length > 0){
-      userId = users[0].id
-    }
+if(match){
+product = match[1]
+}
 
-    /* =========================
-    CREATE USER IF NOT EXIST
-    ========================= */
+/* =========================
+SAVE PAYMENT LOG
+========================= */
 
-    if(!userId){
-      console.log("Creating user:", email)
+await fetch(
+`${env.SUPABASE_URL}/rest/v1/payments`,
+{
+method:"POST",
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
 
-      /* CREATE AUTH USER */
+email,
+product,
+trx_id:orderId,
+amount
 
-      await fetch(
-        `${env.SUPABASE_URL}/auth/v1/admin/users`,
-        {
-          method:"POST",
-          headers:{
-            apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-            Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-            "Content-Type":"application/json"
-          },
-          body:JSON.stringify({
+})
+}
+)
 
-            email,
-            password:"pakar123",
-            email_confirm:true
+/* =========================
+CHECK USER
+========================= */
 
-          })
-        }
-      )
+let userId = null
 
-      /* CREATE PROFILE */
+const userCheck = await fetch(
+`${env.SUPABASE_URL}/rest/v1/users?email=eq.${email}`,
+{
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+}
+}
+)
 
-      const createUser = await fetch(
-        `${env.SUPABASE_URL}/rest/v1/users`,
-        {
-          method:"POST",
-          headers:{
-            apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-            Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-            "Content-Type":"application/json",
-            Prefer:"return=representation"
-          },
-          body:JSON.stringify({
+const users = await userCheck.json()
 
-            email,
-            plan:"free"
+if(users && users.length > 0){
+userId = users[0].id
+}
 
-          })
-        }
-      )
+/* =========================
+CREATE USER IF NOT EXIST
+========================= */
 
-      const newUser = await createUser.json()
+if(!userId){
 
-      if(newUser && newUser.length > 0){
-        userId = newUser[0].id
-      }
+console.log("Creating new user:", email)
 
-    }
+/* CREATE AUTH USER */
 
-    /* =========================
-    CHECK DUPLICATE ORDER
-    ========================= */
+await fetch(
+`${env.SUPABASE_URL}/auth/v1/admin/users`,
+{
+method:"POST",
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
 
-    const check = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/licenses?order_id=eq.${orderId}`,
-      {
-        headers:{
-          apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-          Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
-        }
-      }
-    )
+email,
+password:"pakar123",
+email_confirm:true
 
-    const existing = await check.json()
+})
+}
+)
 
-    if(existing && existing.length > 0){
-      console.log("Duplicate order:", orderId)
+/* CREATE USER PROFILE */
 
-      return new Response(
-        JSON.stringify({duplicate:true}),
-        {status:200}
-      )
-    }
+const createUser = await fetch(
+`${env.SUPABASE_URL}/rest/v1/users`,
+{
+method:"POST",
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json",
+Prefer:"return=representation"
+},
+body:JSON.stringify({
 
-    /* =========================
-    GENERATE LICENSE
-    ========================= */
+email,
+plan:"free"
 
-    const licenseKey = crypto.randomUUID()
+})
+}
+)
 
-    /* =========================
-    PLAN DETECTION
-    ========================= */
+const newUser = await createUser.json()
 
-    let plan = "premium"
+if(newUser && newUser.length > 0){
+userId = newUser[0].id
+}
 
-    if(product === "vip-all") plan = "vip"
-    if(product === "premium-all") plan = "premium"
+}
 
-    /* =========================
-    INSERT LICENSE
-    ========================= */
+/* =========================
+CHECK DUPLICATE ORDER
+========================= */
 
-    const res = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/licenses`,
-      {
-        method:"POST",
-        headers:{
-          apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-          Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
+const check = await fetch(
+`${env.SUPABASE_URL}/rest/v1/licenses?order_id=eq.${orderId}`,
+{
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+}
+}
+)
 
-          user_id:userId,
-          email,
-          product,
-          plan,
-          license_key:licenseKey,
-          order_id:orderId,
-          status:"active"
+const existing = await check.json()
 
-        })
-      }
-    )
+if(existing && existing.length > 0){
 
-    if(!res.ok){
-      const error = await res.text()
+console.log("Duplicate order ignored:", orderId)
 
-      console.log("License error:", error)
+return new Response(
+JSON.stringify({duplicate:true}),
+{status:200}
+)
 
-      return new Response(
-        JSON.stringify({error}),
-        {status:500}
-      )
-    }
+}
 
-    /* =========================
-    UPDATE USER PLAN
-    ========================= */
+/* =========================
+GENERATE LICENSE
+========================= */
 
-    await fetch(
-      `${env.SUPABASE_URL}/rest/v1/users?email=eq.${email}`,
-      {
-        method:"PATCH",
-        headers:{
-          apikey:env.SUPABASE_SERVICE_ROLE_KEY,
-          Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
+const licenseKey = crypto.randomUUID()
 
-          plan
+/* =========================
+PLAN DETECTION
+========================= */
 
-        })
-      }
-    )
+let plan = "premium"
 
-    console.log("SUCCESS:", email, product)
+if(product === "vip-all") plan = "vip"
+if(product === "premium-all") plan = "premium"
 
-    return new Response(
-      JSON.stringify({success:true}),
-      {status:200}
-    )
+/* =========================
+INSERT LICENSE
+========================= */
 
-  }catch(err){
-    console.log("WEBHOOK ERROR:", err)
+const res = await fetch(
+`${env.SUPABASE_URL}/rest/v1/licenses`,
+{
+method:"POST",
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
 
-    return new Response(
-      JSON.stringify({error:err.message}),
-      {status:500}
-    )
-  }
+user_id:userId,
+email,
+product,
+plan,
+license_key:licenseKey,
+order_id:orderId,
+status:"active"
+
+})
+}
+)
+
+if(!res.ok){
+
+const error = await res.text()
+
+console.log("License insert error:", error)
+
+return new Response(
+JSON.stringify({error}),
+{status:500}
+)
+
+}
+
+/* =========================
+UPDATE USER PLAN
+========================= */
+
+await fetch(
+`${env.SUPABASE_URL}/rest/v1/users?email=eq.${email}`,
+{
+method:"PATCH",
+headers:{
+apikey:env.SUPABASE_SERVICE_ROLE_KEY,
+Authorization:`Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+plan
+
+})
+}
+)
+
+console.log("LICENSE SUCCESS:", email, product)
+
+return new Response(
+JSON.stringify({success:true}),
+{status:200}
+)
+
+}catch(err){
+
+console.log("WEBHOOK ERROR:", err)
+
+return new Response(
+JSON.stringify({error:err.message}),
+{status:500}
+)
+
+}
+
 }
