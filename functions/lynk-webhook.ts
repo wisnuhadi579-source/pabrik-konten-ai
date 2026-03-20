@@ -7,6 +7,8 @@ export async function onRequest(context) {
 
   try {
 
+    console.log("🔥 WEBHOOK HIT")
+
     /* =========================
     HEALTH CHECK
     ========================= */
@@ -24,28 +26,57 @@ export async function onRequest(context) {
 
     const body = await request.json()
 
-    console.log("BODY:", JSON.stringify(body, null, 2))
+    console.log("📦 BODY:", JSON.stringify(body, null, 2))
 
     /* =========================
     VALIDATE EVENT
     ========================= */
 
     if (body.event !== "payment.received") {
+      console.log("⏭️ Ignored event:", body.event)
       return new Response(JSON.stringify({ ignored: true }), { status: 200 })
     }
 
     if (body.data?.message_action !== "SUCCESS") {
+      console.log("⏭️ Not SUCCESS:", body.data?.message_action)
       return new Response(JSON.stringify({ ignored: true }), { status: 200 })
     }
 
     /* =========================
-    EXTRACT DATA (FIXED)
+    EXTRACT DATA (SUPER FLEXIBLE)
     ========================= */
 
-    const email = body.data?.customer?.email || null
-    const productName = body.data?.items?.[0]?.title || null
-    const orderId = body.data?.refId || crypto.randomUUID()
-    const amount = body.data?.items?.[0]?.price || 0
+    const email =
+      body?.data?.customer?.email ||
+      body?.customer?.email ||
+      body?.email ||
+      null
+
+    const productName =
+      body?.data?.items?.[0]?.title ||
+      body?.data?.items?.[0]?.name ||
+      body?.items?.[0]?.title ||
+      body?.items?.[0]?.name ||
+      body?.title ||
+      null
+
+    const orderId =
+      body?.data?.refId ||
+      body?.refId ||
+      body?.order_id ||
+      crypto.randomUUID()
+
+    const amount =
+      body?.data?.items?.[0]?.price ||
+      body?.data?.totals?.grandTotal ||
+      body?.amount ||
+      0
+
+    console.log("📊 EXTRACTED:", { email, productName, orderId, amount })
+
+    /* =========================
+    VALIDATION
+    ========================= */
 
     if (!email || !productName) {
       console.log("❌ Missing data:", email, productName)
@@ -60,10 +91,10 @@ export async function onRequest(context) {
     const match = productName.match(/\[(.*?)\]/)
     if (match) product = match[1]
 
-    console.log("✅ Parsed:", { email, product, orderId, amount })
+    console.log("🏷️ PRODUCT:", product)
 
     /* =========================
-    CHECK DUPLICATE (IMPORTANT)
+    CHECK DUPLICATE
     ========================= */
 
     const checkRes = await fetch(
@@ -84,7 +115,7 @@ export async function onRequest(context) {
     }
 
     /* =========================
-    INSERT PAYMENT (SAFE)
+    INSERT PAYMENT
     ========================= */
 
     const payRes = await fetch(
@@ -107,10 +138,12 @@ export async function onRequest(context) {
 
     if (!payRes.ok) {
       console.log("❌ Payment insert failed:", await payRes.text())
+    } else {
+      console.log("✅ Payment saved")
     }
 
     /* =========================
-    GET / CREATE USER
+    GET USER
     ========================= */
 
     let userId = null
@@ -129,9 +162,12 @@ export async function onRequest(context) {
 
     if (users?.length > 0) {
       userId = users[0].id
+      console.log("👤 Existing user:", userId)
     }
 
-    /* CREATE USER IF NOT EXISTS */
+    /* =========================
+    CREATE USER IF NOT EXISTS
+    ========================= */
 
     if (!userId) {
 
@@ -158,7 +194,7 @@ export async function onRequest(context) {
 
       userId = authUser?.id
 
-      /* fallback create profile */
+      console.log("🔑 Auth user created:", userId)
 
       const profileRes = await fetch(
         `${env.SUPABASE_URL}/rest/v1/users`,
@@ -186,7 +222,7 @@ export async function onRequest(context) {
     }
 
     if (!userId) {
-      console.log("❌ USER CREATION FAILED")
+      console.log("❌ USER FAILED")
       return new Response(JSON.stringify({ error: "user failed" }), { status: 200 })
     }
 
@@ -229,8 +265,10 @@ export async function onRequest(context) {
       return new Response(JSON.stringify({ error: "license failed" }), { status: 200 })
     }
 
+    console.log("🔐 License created")
+
     /* =========================
-    UPDATE PLAN
+    UPDATE USER PLAN
     ========================= */
 
     await fetch(
