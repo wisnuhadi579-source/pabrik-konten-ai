@@ -1,102 +1,202 @@
-const handleAuth = async () => {
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../services/supabaseClient";
 
-  setIsLoading(true);
-  setError("");
+function Login({ onLogin }: any) {
 
-  try {
+  const navigate = useNavigate();
 
-    if (authMode === "login") {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+  const handleAuth = async () => {
 
-      if (error) throw error;
+    setIsLoading(true);
+    setError("");
 
-      // 🔥 ambil user dari supabase auth
-      const { data: { user } } = await supabase.auth.getUser();
+    try {
 
-      if (!user) throw new Error("User tidak ditemukan");
+      if (authMode === "login") {
 
-      // 🔥 AUTO LINK LICENSE (INI INTI NYA)
-      await supabase
-        .from("licenses")
-        .update({ user_id: user.id })
-        .eq("email", user.email)
-        .is("user_id", null);
+        /* LOGIN */
 
-      // 🔥 AMBIL PLAN DARI LICENSE (bukan dari table users lagi)
-      const { data: licenses } = await supabase
-        .from("licenses")
-        .select("plan")
-        .eq("user_id", user.id)
-        .eq("status", "active");
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
 
-      let memberStatus = "Gratis";
+        if (loginError) throw loginError;
 
-      if (licenses && licenses.length > 0) {
-        const plans = licenses.map(l => l.plan);
+        /* GET USER */
 
-        if (plans.includes("vip")) memberStatus = "VIP";
-        else if (plans.includes("premium")) memberStatus = "Premium";
-      }
+        const { data: userData, error: userError } = await supabase.auth.getUser();
 
-      const sessionData = {
-        email: email,
-        member: memberStatus,
-        loggedIn: true
-      };
+        if (userError) throw userError;
 
-      localStorage.setItem("userSession", JSON.stringify(sessionData));
+        const user = userData?.user;
 
-      onLogin(sessionData);
+        if (!user) throw new Error("User tidak ditemukan");
 
-      navigate("/dashboard");
+        /* 🔥 AUTO LINK LICENSE */
 
-    } else {
+        const { error: linkError } = await supabase
+          .from("licenses")
+          .update({ user_id: user.id })
+          .eq("email", user.email)
+          .is("user_id", null);
 
-      /* REGISTER USER */
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password
-      });
-
-      if (error) {
-
-        if(error.message.includes("User already registered")){
-          throw new Error(
-            "Akun sudah terdaftar. Silakan klik 'Lupa Kata Sandi' untuk membuat password."
-          )
+        if (linkError) {
+          console.error("Link license error:", linkError);
         }
 
-        throw error;
+        /* 🔥 GET LICENSE */
+
+        const { data: licenses, error: licenseError } = await supabase
+          .from("licenses")
+          .select("plan")
+          .eq("user_id", user.id)
+          .eq("status", "active");
+
+        if (licenseError) {
+          console.error("License fetch error:", licenseError);
+        }
+
+        let memberStatus = "Gratis";
+
+        if (licenses && licenses.length > 0) {
+
+          const plans = licenses.map((l: any) => l.plan);
+
+          if (plans.includes("vip")) memberStatus = "VIP";
+          else if (plans.includes("premium")) memberStatus = "Premium";
+        }
+
+        /* 🔥 SAVE SESSION */
+
+        const sessionData = {
+          user_id: user.id,
+          email: user.email,
+          member: memberStatus,
+          loggedIn: true
+        };
+
+        localStorage.setItem("userSession", JSON.stringify(sessionData));
+
+        onLogin(sessionData);
+
+        navigate("/dashboard");
+
+      } else {
+
+        /* REGISTER */
+
+        const { error: signUpError } = await supabase.auth.signUp({
+          email,
+          password
+        });
+
+        if (signUpError) {
+
+          if (signUpError.message.includes("User already registered")) {
+            throw new Error(
+              "Akun sudah terdaftar. Silakan klik 'Lupa Kata Sandi'."
+            );
+          }
+
+          throw signUpError;
+        }
+
+        /* INSERT USER */
+
+        const { error: insertError } = await supabase
+          .from("users")
+          .upsert({
+            email: email,
+            plan: "free"
+          }, { onConflict: "email" });
+
+        if (insertError) {
+          console.error("Insert user error:", insertError);
+        }
+
+        alert("Registrasi berhasil! Silahkan login.");
+
+        setAuthMode("login");
       }
 
-      /* SIMPAN USER KE DATABASE */
+    } catch (error: any) {
 
-      await supabase
-        .from("users")
-        .upsert({
-          email: email,
-          plan: "free"
-        }, { onConflict: "email" });
+      console.error(error);
+      setError(error.message || "Terjadi kesalahan");
 
-      alert("Registrasi berhasil! Silahkan login.");
+    } finally {
 
-      setAuthMode("login");
-
+      setIsLoading(false);
     }
+  };
 
-  } catch (error: any) {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-black text-white">
 
-    setError(error.message);
+      <div className="w-full max-w-md p-6 bg-zinc-900 rounded-lg">
 
-  } finally {
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          {authMode === "login" ? "Login" : "Register"}
+        </h2>
 
-    setIsLoading(false);
+        {error && (
+          <div className="bg-red-500 p-2 mb-3 rounded text-sm">
+            {error}
+          </div>
+        )}
 
-  }
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full p-2 mb-3 bg-zinc-800 rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-};
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full p-2 mb-3 bg-zinc-800 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button
+          onClick={handleAuth}
+          disabled={isLoading}
+          className="w-full p-2 bg-yellow-500 text-black font-bold rounded"
+        >
+          {isLoading
+            ? "Loading..."
+            : authMode === "login"
+            ? "Login"
+            : "Register"}
+        </button>
+
+        <p className="text-sm mt-4 text-center">
+          {authMode === "login" ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
+          <span
+            className="text-yellow-400 cursor-pointer"
+            onClick={() =>
+              setAuthMode(authMode === "login" ? "register" : "login")
+            }
+          >
+            {authMode === "login" ? "Daftar" : "Login"}
+          </span>
+        </p>
+
+      </div>
+
+    </div>
+  );
+}
+
+export default Login;
