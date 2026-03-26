@@ -45,6 +45,22 @@ function Login({ onLogin }: any) {
         if (!user) throw new Error("User tidak ditemukan");
 
         /* =========================
+           🔥 UPSERT USER (FIX UTAMA)
+        ========================= */
+
+        const { error: upsertError } = await supabase
+          .from("users")
+          .upsert({
+            id: user.id,
+            email: user.email,
+            plan: "free"
+          });
+
+        if (upsertError) {
+          console.error("❌ Upsert user error:", upsertError);
+        }
+
+        /* =========================
            AUTO LINK LICENSE
         ========================= */
 
