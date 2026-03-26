@@ -12,6 +12,35 @@ export async function onRequestGet(context) {
 
     const rows = text.split("\n").slice(1);
 
+    /* =========================
+       🔥 TEST INSERT MANUAL
+    ========================= */
+
+    const testInsert = await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+      body: JSON.stringify({
+        email: "test@gmail.com",
+        product: "test-product",
+        trx_id: "test-123",
+        amount: 1000,
+        created_at: new Date().toISOString()
+      }),
+    });
+
+    if (!testInsert.ok) {
+      const err = await testInsert.text();
+      return new Response("TEST INSERT ERROR: " + err);
+    }
+
+    /* =========================
+       🔄 LOOP DATA SHEET
+    ========================= */
+
     let successCount = 0;
     let skipCount = 0;
     let errorCount = 0;
@@ -55,11 +84,10 @@ export async function onRequestGet(context) {
         body: JSON.stringify(payload),
       });
 
+      /* 🔥 TAMPILKAN ERROR ASLI */
       if (!response.ok) {
         const errText = await response.text();
-        console.log("❌ Insert error:", errText);
-        errorCount++;
-        continue;
+        return new Response("ERROR SUPABASE: " + errText);
       }
 
       successCount++;
@@ -78,7 +106,7 @@ Error: ${errorCount}`
 }
 
 /* =========================
-   FORMAT DATE FIX (WAJIB)
+   FORMAT DATE FIX
 ========================= */
 
 function formatDate(dateStr) {
@@ -87,7 +115,6 @@ function formatDate(dateStr) {
 
   try {
 
-    // contoh: 23-03-2026 19:3
     const [datePart, timePart] = dateStr.split(" ");
 
     if (!datePart || !timePart) {
@@ -105,10 +132,7 @@ function formatDate(dateStr) {
     return new Date(iso).toISOString();
 
   } catch (err) {
-
-    console.log("⚠️ Date parse error:", dateStr);
     return new Date().toISOString();
-
   }
 }
 
