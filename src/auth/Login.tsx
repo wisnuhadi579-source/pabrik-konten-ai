@@ -21,7 +21,9 @@ function Login({ onLogin }: any) {
 
       if (authMode === "login") {
 
-        /* LOGIN */
+        /* =========================
+           LOGIN
+        ========================= */
 
         const { error: loginError } = await supabase.auth.signInWithPassword({
           email,
@@ -30,7 +32,9 @@ function Login({ onLogin }: any) {
 
         if (loginError) throw loginError;
 
-        /* GET USER */
+        /* =========================
+           GET USER
+        ========================= */
 
         const { data: userData, error: userError } = await supabase.auth.getUser();
 
@@ -40,7 +44,9 @@ function Login({ onLogin }: any) {
 
         if (!user) throw new Error("User tidak ditemukan");
 
-        /* 🔥 AUTO LINK LICENSE */
+        /* =========================
+           AUTO LINK LICENSE
+        ========================= */
 
         const { error: linkError } = await supabase
           .from("licenses")
@@ -49,32 +55,43 @@ function Login({ onLogin }: any) {
           .is("user_id", null);
 
         if (linkError) {
-          console.error("Link license error:", linkError);
+          console.error("❌ Link license error:", linkError);
         }
 
-        /* 🔥 GET LICENSE */
+        /* =========================
+           GET LICENSES
+        ========================= */
 
         const { data: licenses, error: licenseError } = await supabase
           .from("licenses")
-          .select("plan")
+          .select("*")
           .eq("user_id", user.id)
           .eq("status", "active");
 
         if (licenseError) {
-          console.error("License fetch error:", licenseError);
+          console.error("❌ License fetch error:", licenseError);
         }
 
-        let memberStatus = "Gratis";
+        /* =========================
+           DETERMINE PLAN
+        ========================= */
+
+        let memberStatus = "free";
 
         if (licenses && licenses.length > 0) {
 
-          const plans = licenses.map((l: any) => l.plan);
-
-          if (plans.includes("vip")) memberStatus = "VIP";
-          else if (plans.includes("premium")) memberStatus = "Premium";
+          if (licenses.some((l: any) => l.plan === "vip")) {
+            memberStatus = "vip";
+          } else if (licenses.some((l: any) => l.plan === "premium")) {
+            memberStatus = "premium";
+          } else {
+            memberStatus = "single";
+          }
         }
 
-        /* 🔥 SAVE SESSION */
+        /* =========================
+           SAVE SESSION
+        ========================= */
 
         const sessionData = {
           user_id: user.id,
@@ -91,7 +108,9 @@ function Login({ onLogin }: any) {
 
       } else {
 
-        /* REGISTER */
+        /* =========================
+           REGISTER
+        ========================= */
 
         const { error: signUpError } = await supabase.auth.signUp({
           email,
@@ -109,7 +128,9 @@ function Login({ onLogin }: any) {
           throw signUpError;
         }
 
-        /* INSERT USER */
+        /* =========================
+           INSERT USER
+        ========================= */
 
         const { error: insertError } = await supabase
           .from("users")
@@ -119,7 +140,7 @@ function Login({ onLogin }: any) {
           }, { onConflict: "email" });
 
         if (insertError) {
-          console.error("Insert user error:", insertError);
+          console.error("❌ Insert user error:", insertError);
         }
 
         alert("Registrasi berhasil! Silahkan login.");
