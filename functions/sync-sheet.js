@@ -3,51 +3,24 @@ export async function onRequestGet(context) {
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTUyhPO0Pcog2W5OuQlXFCzUIZ2r022Eoe6QF-GOSgUDswgxtC8Hfu9MtBO7oXWn4TL2ouGEFqUXS3v/pub?output=csv";
 
   const SUPABASE_URL = context.env.SUPABASE_URL;
-  const SUPABASE_KEY = context.env.SUPABASE_KEY;
+  const SUPABASE_KEY = context.env.SUPABASE_SERVICE_ROLE_KEY; // ✅ FIX
 
   try {
+
+    if (!SUPABASE_KEY) {
+      return new Response("❌ SUPABASE KEY KOSONG!");
+    }
 
     const res = await fetch(SHEET_URL);
     const text = await res.text();
 
     const rows = text.split("\n").slice(1);
 
-    /* =========================
-       🔥 TEST INSERT MANUAL
-    ========================= */
-
-    const testInsert = await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
-      body: JSON.stringify({
-        email: "test@gmail.com",
-        product: "test-product",
-        trx_id: "test-123",
-        amount: 1000,
-        created_at: new Date().toISOString()
-      }),
-    });
-
-    if (!testInsert.ok) {
-      const err = await testInsert.text();
-      return new Response("TEST INSERT ERROR: " + err);
-    }
-
-    /* =========================
-       🔄 LOOP DATA SHEET
-    ========================= */
-
-    let successCount = 0;
-    let skipCount = 0;
-    let errorCount = 0;
+    let success = 0;
+    let error = 0;
+    let skip = 0;
 
     for (const row of rows) {
-
-      if (!row.trim()) continue;
 
       const cols = row.split(",");
 
@@ -58,46 +31,41 @@ export async function onRequestGet(context) {
       const date = cols[4]?.trim();
 
       if (!email || status !== "SUCCESS") {
-        skipCount++;
+        skip++;
         continue;
       }
 
       const product = extractProduct(title);
-      const order_id = email + "-" + date;
+      const trx_id = email + "-" + date;
 
-      const payload = {
-        email,
-        product,
-        trx_id: order_id,
-        amount,
-        created_at: formatDate(date)
-      };
-
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
+      const insert = await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           apikey: SUPABASE_KEY,
           Authorization: `Bearer ${SUPABASE_KEY}`,
-          Prefer: "resolution=merge-duplicates"
+          Prefer: "return=minimal"
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          email,
+          product,
+          trx_id,
+          amount
+        }),
       });
 
-      /* 🔥 TAMPILKAN ERROR ASLI */
-      if (!response.ok) {
-        const errText = await response.text();
-        return new Response("ERROR SUPABASE: " + errText);
+      if (insert.ok) {
+        success++;
+      } else {
+        error++;
+        const errText = await insert.text();
+        console.log("INSERT ERROR:", errText);
       }
 
-      successCount++;
     }
 
     return new Response(
-      `Sync selesai ✅ 
-Success: ${successCount}
-Skip: ${skipCount}
-Error: ${errorCount}`
+      `Sync selesai ✅\nSuccess: ${success}\nSkip: ${skip}\nError: ${error}`
     );
 
   } catch (err) {
@@ -105,42 +73,7 @@ Error: ${errorCount}`
   }
 }
 
-/* =========================
-   FORMAT DATE FIX
-========================= */
-
-function formatDate(dateStr) {
-
-  if (!dateStr) return new Date().toISOString();
-
-  try {
-
-    const [datePart, timePart] = dateStr.split(" ");
-
-    if (!datePart || !timePart) {
-      return new Date().toISOString();
-    }
-
-    const [day, month, year] = datePart.split("-");
-    let [hour, minute] = timePart.split(":");
-
-    hour = hour.padStart(2, "0");
-    minute = minute.padStart(2, "0");
-
-    const iso = `${year}-${month}-${day}T${hour}:${minute}:00`;
-
-    return new Date(iso).toISOString();
-
-  } catch (err) {
-    return new Date().toISOString();
-  }
-}
-
-/* =========================
-   EXTRACT PRODUCT
-========================= */
-
 function extractProduct(title) {
-  const match = title?.match(/\[(.*?)\]/);
+  const match = title.match(/\[(.*?)\]/);
   return match ? match[1] : "unknown";
 }
