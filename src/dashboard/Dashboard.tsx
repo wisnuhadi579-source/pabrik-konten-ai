@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import fallbackTools from "../config/tools.json"
-import { supabase } from "../services/supabaseClient"
+import { supabase, canAccessTool } from "../services/supabaseClient"
 import { Search, ChevronDown, ChevronRight, Play } from "lucide-react"
 
 const TOOL_CATEGORIES = [
@@ -105,8 +105,9 @@ const user = JSON.parse(session)
 
 const { data } = await supabase
 .from("licenses")
-.select("product,plan")
+.select("*")
 .eq("email", user.email)
+.eq("status", "active")
 
 setLicenses(data || [])
 
@@ -116,7 +117,7 @@ loadLicenses()
 
 },[])
 
-/* LOAD TOOLS FROM SUPABASE */
+/* LOAD TOOLS */
 
 useEffect(()=>{
 
@@ -146,7 +147,7 @@ loadTools()
 
 },[])
 
-/* FILTER TOOLS */
+/* FILTER */
 
 const filtered = useMemo(()=>{
 
@@ -165,44 +166,7 @@ return matchSearch && matchCategory
 
 },[search,activeCategory,tools])
 
-/* LICENSE ENGINE */
-
-const licenseProducts = useMemo(()=>{
-
-const set = new Set()
-
-licenses.forEach(l=>{
-if(l?.product){
-set.add(l.product)
-}
-})
-
-return set
-
-},[licenses])
-
-const isPurchased = (tool)=>{
-
-const productId = tool.product || tool.id
-
-if(tool.plan==="Free") return true
-
-if(licenseProducts.has("vip-all")) return true
-
-if(
-licenseProducts.has("premium-all") &&
-tool.plan === "Premium"
-){
-return true
-}
-
-if(licenseProducts.has(productId)) return true
-
-return false
-
-}
-
-/* TRACK TOOL OPEN */
+/* TRACK TOOL */
 
 const trackOpen = async (tool) => {
 
@@ -230,7 +194,7 @@ console.error("Analytics error",e)
 
 }
 
-/* OPEN TOOL WITH TOKEN */
+/* OPEN TOOL */
 
 const openTool = async (tool) => {
 
@@ -316,7 +280,6 @@ className="w-full bg-[#0c0c0c] border border-white/10 rounded-xl pl-9 py-2 focus
 <button
 onClick={()=>setFilterOpen(!filterOpen)}
 className="bg-[#111] border border-white/10 px-6 py-2 rounded-xl text-xs uppercase tracking-widest hover:border-yellow-400 transition"
-
 >
 
 FILTER TOOLS ▾ </button>
@@ -357,7 +320,9 @@ activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
 {filtered.map(tool=>{
 
 const expanded = openCard===tool.id
-const purchased = isPurchased(tool)
+
+// 🔥 NEW ACCESS SYSTEM
+const purchased = canAccessTool(licenses, tool)
 
 return (
 
@@ -446,7 +411,6 @@ await trackOpen(tool)
 await openTool(tool)
 }}
 className="w-full bg-gradient-to-r from-yellow-400 to-amber-600 text-black font-bold text-sm py-3 rounded-xl mt-4 shadow-[0_12px_30px_rgba(255,215,0,0.35)] hover:brightness-110 transition flex items-center justify-center gap-2"
-
 >
 
 BUKA APLIKASI <ChevronRight size={16}/>
@@ -461,7 +425,6 @@ e.stopPropagation()
 setPopup(tool)
 }}
 className="w-full bg-gray-700 text-gray-200 font-bold text-sm py-3 rounded-xl mt-4"
-
 >
 
 BELI AKSES
@@ -473,7 +436,6 @@ BELI AKSES
 <button
 onClick={(e)=>e.stopPropagation()}
 className="w-full bg-red-600 text-white text-sm py-3 rounded-xl mt-3 shadow-[0_10px_25px_rgba(255,0,0,0.35)] hover:bg-red-700 transition flex items-center justify-center gap-2"
-
 >
 
 <Play size={14}/>
