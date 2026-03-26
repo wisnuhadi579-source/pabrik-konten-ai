@@ -18,75 +18,105 @@ export async function onRequestGet(context) {
 
     for (const row of rows) {
 
-      const cols = row.split(",");
+      try {
 
-      const email = cols[0]?.trim();
-      const status = cols[1]?.trim();
-      const title = cols[2]?.trim();
-      const amount = parseFloat(cols[3] || "0");
-      const date = cols[4]?.trim();
+        const cols = row.split(",");
 
-      if (!email || status !== "SUCCESS") {
-        skip++;
-        continue;
+        const email = cols[0]?.trim();
+        const status = cols[1]?.trim();
+        const title = cols[2]?.trim();
+        const amount = parseFloat(cols[3] || "0");
+        const date = cols[4]?.trim();
+
+        if (!email || status !== "SUCCESS") {
+          skip++;
+          continue;
+        }
+
+        const product = extractProduct(title);
+        const order_id = email + "-" + date;
+
+        /* =========================
+           INSERT PAYMENT
+        ========================= */
+
+        await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Prefer: "resolution=ignore-duplicates"
+          },
+          body: JSON.stringify({
+            email,
+            product,
+            trx_id: order_id,
+            amount,
+          }),
+        });
+
+        /* =========================
+           🔥 INSERT LICENSE (INI INTI NYA)
+        ========================= */
+
+        const plan = detectPlan(product);
+
+        await fetch(`${SUPABASE_URL}/rest/v1/licenses`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Prefer: "resolution=ignore-duplicates"
+          },
+          body: JSON.stringify({
+            email,
+            product,
+            plan,
+            status: "active"
+          }),
+        });
+
+        success++;
+
+      } catch (err) {
+        error++;
       }
 
-      const product = extractProduct(title);
-      const trx_id = email + "-" + date;
-
-      /* =========================
-         INSERT PAYMENT
-      ========================= */
-
-      await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          Prefer: "resolution=merge-duplicates"
-        },
-        body: JSON.stringify({
-          email,
-          product,
-          trx_id,
-          amount,
-        }),
-      });
-
-      /* =========================
-         INSERT LICENSE 🔥🔥🔥
-      ========================= */
-
-      await fetch(`${SUPABASE_URL}/rest/v1/licenses`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`,
-          Prefer: "resolution=merge-duplicates"
-        },
-        body: JSON.stringify({
-          email,
-          product,
-          plan: "single",
-          status: "active"
-        }),
-      });
-
-      success++;
     }
 
-    return new Response(
-      `Sync selesai ✅\nSuccess: ${success}\nSkip: ${skip}\nError: ${error}`
-    );
+    return new Response(`
+Sync selesai ✅
+Success: ${success}
+Skip: ${skip}
+Error: ${error}
+`);
 
   } catch (err) {
     return new Response("Error: " + err.message);
   }
 }
 
+/* =========================
+   DETECT PLAN
+========================= */
+
+function detectPlan(product) {
+
+  if (!product) return "single";
+
+  if (product.includes("vip")) return "vip";
+  if (product.includes("premium")) return "premium";
+
+  return "single";
+}
+
+/* =========================
+   EXTRACT PRODUCT
+========================= */
+
 function extractProduct(title) {
   const match = title.match(/\[(.*?)\]/);
-  return match ? match[1] : "unknown";
+  return match ? match[1].toLowerCase() : "unknown";
 }
