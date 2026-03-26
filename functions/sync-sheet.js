@@ -3,22 +3,18 @@ export async function onRequestGet(context) {
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTUyhPO0Pcog2W5OuQlXFCzUIZ2r022Eoe6QF-GOSgUDswgxtC8Hfu9MtBO7oXWn4TL2ouGEFqUXS3v/pub?output=csv";
 
   const SUPABASE_URL = context.env.SUPABASE_URL;
-  const SUPABASE_KEY = context.env.SUPABASE_SERVICE_ROLE_KEY; // ✅ FIX
+  const SUPABASE_KEY = context.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  let success = 0;
+  let skip = 0;
+  let error = 0;
 
   try {
-
-    if (!SUPABASE_KEY) {
-      return new Response("❌ SUPABASE KEY KOSONG!");
-    }
 
     const res = await fetch(SHEET_URL);
     const text = await res.text();
 
     const rows = text.split("\n").slice(1);
-
-    let success = 0;
-    let error = 0;
-    let skip = 0;
 
     for (const row of rows) {
 
@@ -38,30 +34,47 @@ export async function onRequestGet(context) {
       const product = extractProduct(title);
       const trx_id = email + "-" + date;
 
-      const insert = await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
+      /* =========================
+         INSERT PAYMENT
+      ========================= */
+
+      await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           apikey: SUPABASE_KEY,
           Authorization: `Bearer ${SUPABASE_KEY}`,
-          Prefer: "return=minimal"
+          Prefer: "resolution=merge-duplicates"
         },
         body: JSON.stringify({
           email,
           product,
           trx_id,
-          amount
+          amount,
         }),
       });
 
-      if (insert.ok) {
-        success++;
-      } else {
-        error++;
-        const errText = await insert.text();
-        console.log("INSERT ERROR:", errText);
-      }
+      /* =========================
+         INSERT LICENSE 🔥🔥🔥
+      ========================= */
 
+      await fetch(`${SUPABASE_URL}/rest/v1/licenses`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          Prefer: "resolution=merge-duplicates"
+        },
+        body: JSON.stringify({
+          email,
+          product,
+          plan: "single",
+          status: "active"
+        }),
+      });
+
+      success++;
     }
 
     return new Response(
