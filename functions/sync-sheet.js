@@ -41,7 +41,7 @@ export async function onRequestGet(context) {
         product,
         trx_id: order_id,
         amount,
-        created_at: new Date(date).toISOString()
+        created_at: formatDate(date)
       };
 
       const response = await fetch(`${SUPABASE_URL}/rest/v1/payments`, {
@@ -76,6 +76,45 @@ Error: ${errorCount}`
     return new Response("Error: " + err.message);
   }
 }
+
+/* =========================
+   FORMAT DATE FIX (WAJIB)
+========================= */
+
+function formatDate(dateStr) {
+
+  if (!dateStr) return new Date().toISOString();
+
+  try {
+
+    // contoh: 23-03-2026 19:3
+    const [datePart, timePart] = dateStr.split(" ");
+
+    if (!datePart || !timePart) {
+      return new Date().toISOString();
+    }
+
+    const [day, month, year] = datePart.split("-");
+    let [hour, minute] = timePart.split(":");
+
+    hour = hour.padStart(2, "0");
+    minute = minute.padStart(2, "0");
+
+    const iso = `${year}-${month}-${day}T${hour}:${minute}:00`;
+
+    return new Date(iso).toISOString();
+
+  } catch (err) {
+
+    console.log("⚠️ Date parse error:", dateStr);
+    return new Date().toISOString();
+
+  }
+}
+
+/* =========================
+   EXTRACT PRODUCT
+========================= */
 
 function extractProduct(title) {
   const match = title?.match(/\[(.*?)\]/);
