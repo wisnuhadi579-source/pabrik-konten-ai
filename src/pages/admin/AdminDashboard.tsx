@@ -14,15 +14,26 @@ vipUsers:0
 const [latestTools,setLatestTools] = useState<any[]>([])
 const [latestLicenses,setLatestLicenses] = useState<any[]>([])
 
+/* =========================
+   LOAD DASHBOARD
+========================= */
+
 const loadDashboard = async () => {
 
-const { data:tools } = await supabase
+try{
+
+const { data:tools, error:toolsError } = await supabase
 .from("tools")
 .select("*")
 
-const { data:licenses } = await supabase
+const { data:licenses, error:licensesError } = await supabase
 .from("licenses")
 .select("*")
+
+if(toolsError || licensesError){
+console.error("Dashboard load error", toolsError || licensesError)
+return
+}
 
 /* STATS */
 
@@ -35,13 +46,11 @@ const premiumUsers = licenses?.filter(l => l.plan === "premium").length || 0
 const vipUsers = licenses?.filter(l => l.plan === "vip").length || 0
 
 setStats({
-
 tools:toolsCount,
 licenses:licensesCount,
 users:users.size,
 premiumUsers,
 vipUsers
-
 })
 
 /* LATEST TOOLS */
@@ -64,13 +73,63 @@ const { data:latestL } = await supabase
 
 setLatestLicenses(latestL || [])
 
+}catch(err){
+console.error("Dashboard fatal error", err)
 }
+
+}
+
+/* =========================
+   INIT LOAD
+========================= */
+
+useEffect(()=>{
+loadDashboard()
+},[])
+
+/* =========================
+   🔥 REALTIME LISTENER
+========================= */
 
 useEffect(()=>{
 
+const channel = supabase
+.channel("admin-dashboard-realtime")
+.on(
+"postgres_changes",
+{
+event:"*",
+schema:"public",
+table:"licenses"
+},
+()=>{
+console.log("🔥 License change → reload dashboard")
 loadDashboard()
+}
+)
+.on(
+"postgres_changes",
+{
+event:"*",
+schema:"public",
+table:"tools"
+},
+()=>{
+console.log("🔥 Tool change → reload dashboard")
+loadDashboard()
+}
+)
+.subscribe()
+
+return ()=>{
+supabase.removeChannel(channel)
+}
 
 },[])
+
+/* =========================
+   UI
+========================= */
 
 return (
 
@@ -111,7 +170,7 @@ Admin Control Center
 
 </div>
 
-{/* LATEST TOOLS */}
+{/* LATEST */}
 
 <div className="grid md:grid-cols-2 gap-8">
 
@@ -122,17 +181,17 @@ Latest Tools
 </h2>
 
 {latestTools.map(tool=>(
+
 <div key={tool.id} className="border-b border-white/10 py-2">
 
 <p className="font-semibold">{tool.name}</p>
 <p className="text-xs text-gray-400">{tool.plan}</p>
 
 </div>
+
 ))}
 
 </div>
-
-{/* LATEST LICENSES */}
 
 <div className="bg-zinc-900 border border-white/10 rounded-xl p-6">
 
@@ -141,12 +200,14 @@ Latest Licenses
 </h2>
 
 {latestLicenses.map(l=>(
+
 <div key={l.id} className="border-b border-white/10 py-2">
 
 <p className="font-semibold">{l.email}</p>
 <p className="text-xs text-gray-400">{l.plan}</p>
 
 </div>
+
 ))}
 
 </div>

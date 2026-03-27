@@ -12,7 +12,13 @@ vipTools:0,
 
 licenses:0,
 premiumUsers:0,
-vipUsers:0
+vipUsers:0,
+
+/* 🔥 NEW */
+revenue:0,
+orders:0,
+avgOrder:0,
+topProduct:"-"
 
 })
 
@@ -28,16 +34,58 @@ const { data:licenses } = await supabase
 .from("licenses")
 .select("*")
 
+const { data:payments } = await supabase
+.from("payments")
+.select("*")
+
+/* =========================
+   TOOLS
+========================= */
+
 const toolsCount = tools?.length || 0
 
 const freeTools = tools?.filter(t => t.plan === "Free").length || 0
 const premiumTools = tools?.filter(t => t.plan === "Premium").length || 0
 const vipTools = tools?.filter(t => t.plan === "VIP").length || 0
 
+/* =========================
+   LICENSES
+========================= */
+
 const licensesCount = licenses?.length || 0
 
 const premiumUsers = licenses?.filter(l => l.plan === "premium").length || 0
 const vipUsers = licenses?.filter(l => l.plan === "vip").length || 0
+
+/* =========================
+   💰 PAYMENTS ANALYTICS
+========================= */
+
+const orders = payments?.length || 0
+
+const revenue = payments?.reduce((acc, p) => {
+return acc + (p.amount || 0)
+},0) || 0
+
+const avgOrder = orders > 0 ? Math.round(revenue / orders) : 0
+
+/* 🔥 TOP PRODUCT */
+
+const productMap:any = {}
+
+payments?.forEach(p=>{
+if(!productMap[p.product]) productMap[p.product] = 0
+productMap[p.product]++
+})
+
+let topProduct = "-"
+
+if(Object.keys(productMap).length > 0){
+topProduct = Object.entries(productMap)
+.sort((a:any,b:any)=>b[1]-a[1])[0][0]
+}
+
+/* ========================= */
 
 setStats({
 
@@ -48,7 +96,13 @@ vipTools,
 
 licenses:licensesCount,
 premiumUsers,
-vipUsers
+vipUsers,
+
+/* NEW */
+revenue,
+orders,
+avgOrder,
+topProduct
 
 })
 
@@ -104,7 +158,7 @@ Tools Statistics
 License Statistics
 </h2>
 
-<div className="grid md:grid-cols-3 gap-6">
+<div className="grid md:grid-cols-3 gap-6 mb-10">
 
 <div className="card">
 <h3>Total Licenses</h3>
@@ -119,6 +173,36 @@ License Statistics
 <div className="card">
 <h3>VIP Users</h3>
 <p>{stats.vipUsers}</p>
+</div>
+
+</div>
+
+{/* 🔥 NEW SECTION (TAMBAHAN DATA TANPA UBAH STYLE) */}
+
+<h2 className="text-xl font-semibold mb-4">
+Revenue Analytics
+</h2>
+
+<div className="grid md:grid-cols-4 gap-6">
+
+<div className="card">
+<h3>Total Revenue</h3>
+<p>Rp {stats.revenue.toLocaleString()}</p>
+</div>
+
+<div className="card">
+<h3>Total Orders</h3>
+<p>{stats.orders}</p>
+</div>
+
+<div className="card">
+<h3>Avg Order</h3>
+<p>Rp {stats.avgOrder.toLocaleString()}</p>
+</div>
+
+<div className="card">
+<h3>Top Product</h3>
+<p>{stats.topProduct}</p>
 </div>
 
 </div>

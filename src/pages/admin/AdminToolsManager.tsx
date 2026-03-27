@@ -3,32 +3,26 @@ import { supabase } from "../../services/supabaseClient"
 
 export const AdminToolsManager = () => {
 
-const emptyTool = {
-id:"",
-name:"",
-product:"",
-description:"",
-plan:"Free",
-url:"",
-buy_link:"",
-tutorial_link:"",
-images:[""],
-labels:[""],
-features:[""],
-is_coming_soon:false
+const emptyForm = {
+name: "",
+description: "",
+plan: "free",
+product: "",
+images: [""],
+labels: [""],
+features: [""],
+coming_soon: false
 }
 
 const [tools,setTools] = useState<any[]>([])
-const [search,setSearch] = useState("")
-const [editing,setEditing] = useState<any | null>(null)
+const [form,setForm] = useState<any>(emptyForm)
+const [editing,setEditing] = useState<string | null>(null)
 
-const [form,setForm] = useState<any>(emptyTool)
-
-/* LOAD TOOLS */
+/* ================= LOAD ================= */
 
 const loadTools = async ()=>{
 
-const {data} = await supabase
+const { data } = await supabase
 .from("tools")
 .select("*")
 .order("created_at",{ascending:false})
@@ -43,49 +37,104 @@ loadTools()
 
 },[])
 
-/* HANDLE INPUT */
+/* ================= SAFE ARRAY ================= */
 
-const handleChange = (field:string,value:any)=>{
+const safeArray = (arr:any)=>{
+if(!arr) return [""]
+if(Array.isArray(arr)) return arr.length ? arr : [""]
+return [""]
+}
 
-setForm({...form,[field]:value})
+/* ================= START EDIT ================= */
+
+const startEdit = (tool:any)=>{
+
+setEditing(tool.id)
+
+setForm({
+name: tool.name || "",
+description: tool.description || "",
+plan: (tool.plan || "free").toLowerCase(),
+product: tool.product || "",
+images: safeArray(tool.images),
+labels: safeArray(tool.labels),
+features: safeArray(tool.features),
+coming_soon: tool.coming_soon || false
+})
 
 }
 
-/* ARRAY UPDATE */
+/* ================= HANDLE ================= */
 
-const updateArray = (field:string,index:number,value:string)=>{
+const handleChange = (e:any)=>{
 
-const copy=[...form[field]]
-copy[index]=value
-setForm({...form,[field]:copy})
+const { name,value,type,checked } = e.target
+
+setForm((prev:any)=>({
+...prev,
+[name]: type === "checkbox"
+? checked
+: (value || "").toLowerCase()
+}))
 
 }
 
-const addArray = (field:string)=>{
+/* ================= ARRAY ================= */
 
-setForm({...form,[field]:[...form[field],""]})
+const handleArrayChange = (field:string,index:number,value:string)=>{
+
+const updated = [...form[field]]
+updated[index] = value || ""
+
+setForm({
+...form,
+[field]: updated
+})
 
 }
 
-/* CREATE TOOL */
+const addField = (field:string)=>{
 
-const createTool = async ()=>{
+setForm({
+...form,
+[field]: [...form[field],""]
+})
+
+}
+
+/* ================= SAVE ================= */
+
+const saveTool = async ()=>{
+
+const payload = {
+...form,
+plan: form.plan.toLowerCase()
+}
+
+if(editing){
 
 await supabase
 .from("tools")
-.insert(form)
+.update(payload)
+.eq("id",editing)
 
-setForm(emptyTool)
+}else{
 
+await supabase
+.from("tools")
+.insert([payload])
+
+}
+
+setForm(emptyForm)
+setEditing(null)
 loadTools()
 
 }
 
-/* DELETE TOOL */
+/* ================= DELETE ================= */
 
 const deleteTool = async (id:string)=>{
-
-if(!confirm("Delete tool?")) return
 
 await supabase
 .from("tools")
@@ -96,260 +145,165 @@ loadTools()
 
 }
 
-/* EDIT TOOL */
-
-const startEdit = (tool:any)=>{
-
-setEditing(tool.id)
-setForm(tool)
-
-}
-
-const saveEdit = async ()=>{
-
-await supabase
-.from("tools")
-.update(form)
-.eq("id",editing)
-
-setEditing(null)
-setForm(emptyTool)
-
-loadTools()
-
-}
-
-/* FILTER */
-
-const filtered = tools.filter(t =>
-t.name.toLowerCase().includes(search.toLowerCase())
-)
+/* ================= UI ================= */
 
 return (
 
 <div className="max-w-7xl mx-auto p-6">
 
 <h1 className="text-3xl font-bold mb-6">
-Tools Manager ELITE
+Tools Manager
 </h1>
 
-{/* CREATE / EDIT FORM */}
+{/* FORM */}
 
-<div className="bg-zinc-900 border border-white/10 rounded-xl p-6 mb-10">
-
-<h2 className="text-xl font-semibold mb-4">
-
-{editing ? "Edit Tool" : "Create Tool"}
-
-</h2>
-
-<div className="grid md:grid-cols-2 gap-4">
+<div className="bg-zinc-900 p-6 rounded-xl mb-10 space-y-3">
 
 <input
+name="name"
 value={form.name}
-onChange={e=>handleChange("name",e.target.value)}
+onChange={handleChange}
 placeholder="Tool Name"
 className="input"
 />
 
 <input
-value={form.product}
-onChange={e=>handleChange("product",e.target.value)}
-placeholder="Product Slug"
+name="description"
+value={form.description}
+onChange={handleChange}
+placeholder="Description"
 className="input"
 />
 
-<textarea
-value={form.description}
-onChange={e=>handleChange("description",e.target.value)}
-placeholder="Description"
-className="input col-span-2"
+<input
+name="product"
+value={form.product}
+onChange={handleChange}
+placeholder="Product slug"
+className="input"
 />
 
 <select
+name="plan"
 value={form.plan}
-onChange={e=>handleChange("plan",e.target.value)}
+onChange={handleChange}
 className="input"
 >
-<option>Free</option>
-<option>Premium</option>
-<option>VIP</option>
+<option value="free">Free</option>
+<option value="premium">Premium</option>
+<option value="vip">VIP</option>
 </select>
 
+<label className="flex items-center gap-2">
 <input
-value={form.url}
-onChange={e=>handleChange("url",e.target.value)}
-placeholder="Tool URL"
-className="input"
+type="checkbox"
+name="coming_soon"
+checked={form.coming_soon}
+onChange={handleChange}
 />
-
-<input
-value={form.buy_link}
-onChange={e=>handleChange("buy_link",e.target.value)}
-placeholder="Buy Link"
-className="input"
-/>
-
-<input
-value={form.tutorial_link}
-onChange={e=>handleChange("tutorial_link",e.target.value)}
-placeholder="Tutorial Link"
-className="input"
-/>
-
-</div>
+Coming Soon
+</label>
 
 {/* IMAGES */}
 
-<div className="mt-6">
-
-<h3 className="font-semibold mb-2">Images</h3>
-
-{form.images.map((img:string,i:number)=>(
+<div>
+<p className="text-sm mb-1">Images</p>
+{form.images.map((img:any,i:number)=>(
 <input
 key={i}
 value={img}
-onChange={e=>updateArray("images",i,e.target.value)}
-placeholder="Image URL"
-className="input mb-2"
+onChange={(e)=>handleArrayChange("images",i,e.target.value)}
+className="input mb-1"
 />
 ))}
-
-<button onClick={()=>addArray("images")} className="btn-yellow">
-Add Image
+<button onClick={()=>addField("images")} className="text-xs text-yellow-400">
++ Add Image
 </button>
-
 </div>
 
 {/* LABELS */}
 
-<div className="mt-6">
-
-<h3 className="font-semibold mb-2">Labels</h3>
-
-{form.labels.map((label:string,i:number)=>(
+<div>
+<p className="text-sm mb-1">Labels</p>
+{form.labels.map((l:any,i:number)=>(
 <input
 key={i}
-value={label}
-onChange={e=>updateArray("labels",i,e.target.value)}
-placeholder="Label"
-className="input mb-2"
+value={l}
+onChange={(e)=>handleArrayChange("labels",i,e.target.value)}
+className="input mb-1"
 />
 ))}
-
-<button onClick={()=>addArray("labels")} className="btn-yellow">
-Add Label
+<button onClick={()=>addField("labels")} className="text-xs text-yellow-400">
++ Add Label
 </button>
-
 </div>
 
 {/* FEATURES */}
 
-<div className="mt-6">
-
-<h3 className="font-semibold mb-2">Features</h3>
-
-{form.features.map((f:string,i:number)=>(
+<div>
+<p className="text-sm mb-1">Features</p>
+{form.features.map((f:any,i:number)=>(
 <input
 key={i}
 value={f}
-onChange={e=>updateArray("features",i,e.target.value)}
-placeholder="Feature"
-className="input mb-2"
+onChange={(e)=>handleArrayChange("features",i,e.target.value)}
+className="input mb-1"
 />
 ))}
-
-<button onClick={()=>addArray("features")} className="btn-yellow">
-Add Feature
+<button onClick={()=>addField("features")} className="text-xs text-yellow-400">
++ Add Feature
 </button>
-
 </div>
 
-<label className="flex gap-2 mt-4">
-
-<input
-type="checkbox"
-checked={form.is_coming_soon}
-onChange={()=>handleChange("is_coming_soon",!form.is_coming_soon)}
-/>
-
-Coming Soon
-
-</label>
-
-<button
-onClick={editing ? saveEdit : createTool}
-className="btn-yellow mt-6"
->
-
+<button onClick={saveTool} className="btn mt-3">
 {editing ? "Save Changes" : "Create Tool"}
-
 </button>
 
 </div>
 
-{/* TOOL DATABASE */}
+{/* TABLE */}
 
-<h2 className="text-xl font-semibold mb-4">
-Tools Database
-</h2>
+<div className="bg-zinc-900 p-6 rounded-xl">
 
-<input
-value={search}
-onChange={e=>setSearch(e.target.value)}
-placeholder="Search Tool"
-className="input mb-4"
-/>
-
-<div className="bg-zinc-900 border border-white/10 rounded-xl">
+<h2 className="text-xl mb-4">Tools Database</h2>
 
 <table className="w-full text-sm">
 
-<thead className="border-b border-white/10">
-
-<tr className="text-left">
-
-<th className="p-3">Name</th>
+<thead>
+<tr>
+<th>Name</th>
 <th>Plan</th>
 <th>Product</th>
 <th>Coming Soon</th>
-<th>Created</th>
 <th>Action</th>
-
 </tr>
-
 </thead>
 
 <tbody>
 
-{filtered.map(tool=>(
-<tr key={tool.id} className="border-b border-white/5">
+{tools.map(t=>(
 
-<td className="p-3">{tool.name}</td>
-<td>{tool.plan}</td>
-<td>{tool.product}</td>
-<td>{tool.is_coming_soon ? "Yes":"No"}</td>
-<td>{new Date(tool.created_at).toLocaleDateString()}</td>
+<tr key={t.id}>
+
+<td>{t.name}</td>
+<td>{t.plan}</td>
+<td>{t.product}</td>
+<td>{t.coming_soon ? "Yes":"No"}</td>
 
 <td className="flex gap-2">
 
-<button
-onClick={()=>startEdit(tool)}
-className="bg-yellow-500 text-black px-3 py-1 rounded text-xs"
->
+<button onClick={()=>startEdit(t)} className="btn-yellow">
 Edit
 </button>
 
-<button
-onClick={()=>deleteTool(tool.id)}
-className="bg-red-600 px-3 py-1 rounded text-xs"
->
+<button onClick={()=>deleteTool(t.id)} className="btn-red">
 Delete
 </button>
 
 </td>
 
 </tr>
+
 ))}
 
 </tbody>
