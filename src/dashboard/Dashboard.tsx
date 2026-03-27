@@ -143,8 +143,6 @@ return () => {
 
 /* LOAD TOOLS */
 
-useEffect(()=>{
-
 const loadTools = async ()=>{
 
 const { data } = await supabase
@@ -167,7 +165,33 @@ setTools(formatted)
 
 }
 
+useEffect(()=>{
 loadTools()
+},[])
+
+/* 🔥 REALTIME TOOLS UPDATE */
+
+useEffect(()=>{
+
+const channel = supabase
+.channel("tools-realtime")
+.on(
+"postgres_changes",
+{
+event:"*",
+schema:"public",
+table:"tools"
+},
+()=>{
+console.log("🔥 Tools updated → reload")
+loadTools()
+}
+)
+.subscribe()
+
+return ()=>{
+supabase.removeChannel(channel)
+}
 
 },[])
 
