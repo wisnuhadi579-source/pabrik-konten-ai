@@ -17,8 +17,6 @@ const TOOL_CATEGORIES = [
 "Videografer"
 ]
 
-/* IMAGE SLIDER */
-
 const ImageSlider = ({ images }) => {
 
 const [index,setIndex] = useState(0)
@@ -63,8 +61,6 @@ export const Dashboard = () => {
 
 const navigate = useNavigate()
 
-/* STATES */
-
 const [isLoggedIn,setIsLoggedIn] = useState(false)
 const [loading,setLoading] = useState(true)
 const [licenses,setLicenses] = useState([])
@@ -75,6 +71,27 @@ const [filterOpen,setFilterOpen] = useState(false)
 const [activeCategory,setActiveCategory] = useState("Semua Tools")
 const [openCard,setOpenCard] = useState(null)
 const [popup,setPopup] = useState(null)
+
+/* =========================
+   LOAD LICENSES FUNCTION
+========================= */
+
+const loadLicenses = async () => {
+
+const session = localStorage.getItem("userSession")
+if(!session) return
+
+const user = JSON.parse(session)
+
+const { data } = await supabase
+.from("licenses")
+.select("*")
+.eq("email", user.email)
+.eq("status", "active")
+
+setLicenses(data || [])
+
+}
 
 /* SESSION CHECK */
 
@@ -95,25 +112,32 @@ setLoading(false)
 /* LOAD LICENSES */
 
 useEffect(()=>{
-
-const loadLicenses = async ()=>{
-
-const session = localStorage.getItem("userSession")
-if(!session) return
-
-const user = JSON.parse(session)
-
-const { data } = await supabase
-.from("licenses")
-.select("*")
-.eq("email", user.email)
-.eq("status", "active")
-
-setLicenses(data || [])
-
-}
-
 loadLicenses()
+},[])
+
+/* 🔥 REALTIME LISTENER */
+
+useEffect(()=>{
+
+const channel = supabase
+.channel("licenses-realtime")
+.on(
+  "postgres_changes",
+  {
+    event: "*",
+    schema: "public",
+    table: "licenses"
+  },
+  () => {
+    console.log("🔥 License updated → reload")
+    loadLicenses()
+  }
+)
+.subscribe()
+
+return () => {
+  supabase.removeChannel(channel)
+}
 
 },[])
 
@@ -321,37 +345,26 @@ activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
 
 const expanded = openCard===tool.id
 
-// 🔥 FINAL ACCESS SYSTEM (VIP / PREMIUM / SINGLE)
 const purchased = (() => {
 
-  // ✅ FREE = SELALU BISA AKSES
-  if (tool.plan === "Free") return true
+if (tool.plan === "Free") return true
+if (!licenses || licenses.length === 0) return false
 
-  if (!licenses || licenses.length === 0) return false
+const plans = licenses.map(l => l.plan)
 
-  const plans = licenses.map(l => l.plan)
+if (plans.includes("vip")) return true
 
-  // ✅ VIP = akses semua
-  if (plans.includes("vip")) return true
+if (plans.includes("premium")) {
+return tool.plan === "Premium" || tool.plan === "Free"
+}
 
-  // ✅ PREMIUM = akses premium + free
-  if (plans.includes("premium")) {
-    return tool.plan === "Premium" || tool.plan === "Free"
-  }
-
-  // ✅ SINGLE = hanya produk tertentu
-  return licenses.some(l => l.product === (tool.product || tool.id))
+return licenses.some(l => l.product === (tool.product || tool.id))
 
 })()
 
 return (
 
-<div
-key={tool.id}
-className={`group relative rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/25 transition-all duration-500 hover:border-yellow-400/60 hover:shadow-[0_40px_120px_rgba(255,215,0,0.35)] hover:-translate-y-2 ${
-expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1.02]" : ""
-}`}
->
+<div key={tool.id} className={`group relative rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/25 transition-all duration-500 hover:border-yellow-400/60 hover:shadow-[0_40px_120px_rgba(255,215,0,0.35)] hover:-translate-y-2 ${expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1.02]" : ""}`}>
 
 <div onClick={()=>setOpenCard(expanded?null:tool.id)} className="cursor-pointer">
 
@@ -403,9 +416,7 @@ tool.plan==="Free"
 
 </div>
 
-<div className={`grid transition-all duration-500 ${
-expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-}`}>
+<div className={`grid transition-all duration-500 ${expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
 
 <div className="overflow-hidden">
 
@@ -413,10 +424,7 @@ expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
 
 {tool.features?.map((f,i)=>(
 
-<div
-key={i}
-className="bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-sm mb-2 hover:border-yellow-500/30 transition"
->
+<div key={i} className="bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-sm mb-2 hover:border-yellow-500/30 transition">
 {f}
 </div>
 
