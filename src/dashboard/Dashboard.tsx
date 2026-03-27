@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import fallbackTools from "../config/tools.json"
-import { supabase, canAccessTool } from "../services/supabaseClient"
+import { supabase } from "../services/supabaseClient"
 import { Search, ChevronDown, ChevronRight, Play } from "lucide-react"
 
 const TOOL_CATEGORIES = [
@@ -321,8 +321,28 @@ activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
 
 const expanded = openCard===tool.id
 
-// 🔥 NEW ACCESS SYSTEM
-const purchased = canAccessTool(licenses, tool)
+// 🔥 FINAL ACCESS SYSTEM (VIP / PREMIUM / SINGLE)
+const purchased = (() => {
+
+  // ✅ FREE = SELALU BISA AKSES
+  if (tool.plan === "Free") return true
+
+  if (!licenses || licenses.length === 0) return false
+
+  const plans = licenses.map(l => l.plan)
+
+  // ✅ VIP = akses semua
+  if (plans.includes("vip")) return true
+
+  // ✅ PREMIUM = akses premium + free
+  if (plans.includes("premium")) {
+    return tool.plan === "Premium" || tool.plan === "Free"
+  }
+
+  // ✅ SINGLE = hanya produk tertentu
+  return licenses.some(l => l.product === (tool.product || tool.id))
+
+})()
 
 return (
 
