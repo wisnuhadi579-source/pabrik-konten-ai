@@ -34,6 +34,7 @@ export async function onRequestGet(context) {
         }
 
         const product = extractProduct(title);
+        const plan = detectPlan(product);
         const order_id = email + "-" + date;
 
         /* =========================
@@ -57,10 +58,8 @@ export async function onRequestGet(context) {
         });
 
         /* =========================
-           🔥 INSERT LICENSE (INI INTI NYA)
+           INSERT LICENSE
         ========================= */
-
-        const plan = detectPlan(product);
 
         await fetch(`${SUPABASE_URL}/rest/v1/licenses`, {
           method: "POST",
@@ -99,17 +98,27 @@ Error: ${error}
 }
 
 /* =========================
-   DETECT PLAN
+   🔥 PRODUCT → PLAN MAPPING
 ========================= */
 
 function detectPlan(product) {
 
   if (!product) return "single";
 
-  if (product.includes("vip")) return "vip";
-  if (product.includes("premium")) return "premium";
+  // 🔥 MAP MANUAL (SUPER AMAN)
+  const PLAN_MAP = {
+    "bundle-vip": "vip",
+    "vip": "vip",
 
-  return "single";
+    "bundle-premium": "premium",
+    "premium": "premium",
+
+    // SINGLE PRODUCTS
+    "car-restoration": "single",
+    "ai-writer": "single",
+  };
+
+  return PLAN_MAP[product] || "single";
 }
 
 /* =========================
