@@ -45,51 +45,27 @@ function Login({ onLogin }: any) {
         if (!user) throw new Error("User tidak ditemukan");
 
         /* =========================
-           🔥 UPSERT USER (FIX UTAMA)
-        ========================= */
-
-        const { error: upsertError } = await supabase
-          .from("users")
-          .upsert({
-            id: user.id,
-            email: user.email,
-            plan: "free"
-          });
-
-        if (upsertError) {
-          console.error("❌ Upsert user error:", upsertError);
-        }
-
-        /* =========================
            AUTO LINK LICENSE
         ========================= */
 
-        const { error: linkError } = await supabase
+        await supabase
           .from("licenses")
           .update({ user_id: user.id })
           .eq("email", user.email)
           .is("user_id", null);
 
-        if (linkError) {
-          console.error("❌ Link license error:", linkError);
-        }
-
         /* =========================
            GET LICENSES
         ========================= */
 
-        const { data: licenses, error: licenseError } = await supabase
+        const { data: licenses } = await supabase
           .from("licenses")
           .select("*")
           .eq("user_id", user.id)
           .eq("status", "active");
 
-        if (licenseError) {
-          console.error("❌ License fetch error:", licenseError);
-        }
-
         /* =========================
-           DETERMINE PLAN
+           🔥 DETERMINE PLAN (UPGRADED)
         ========================= */
 
         let memberStatus = "free";
@@ -104,6 +80,18 @@ function Login({ onLogin }: any) {
             memberStatus = "single";
           }
         }
+
+        /* =========================
+           🔥 UPDATE USERS TABLE (INI INTI STEP 3)
+        ========================= */
+
+        await supabase
+          .from("users")
+          .upsert({
+            id: user.id,
+            email: user.email,
+            plan: memberStatus
+          });
 
         /* =========================
            SAVE SESSION
@@ -148,16 +136,12 @@ function Login({ onLogin }: any) {
            INSERT USER
         ========================= */
 
-        const { error: insertError } = await supabase
+        await supabase
           .from("users")
           .upsert({
             email: email,
             plan: "free"
           }, { onConflict: "email" });
-
-        if (insertError) {
-          console.error("❌ Insert user error:", insertError);
-        }
 
         alert("Registrasi berhasil! Silahkan login.");
 
