@@ -246,36 +246,15 @@ const openTool = async (tool) => {
 
 try{
 
-const session = localStorage.getItem("userSession")
-if(!session) return
+// track dulu (analytics tetap jalan)
+await trackEvent(tool, "open_tool")
 
-const user = JSON.parse(session)
-
-const res = await fetch("/functions/generate-token",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-email:user.email,
-product:tool.product || tool.id
-})
-})
-
-const data = await res.json()
-
-if(!data.token){
-alert("Access denied")
-return
-}
-
-const url = `${tool.url}?token=${data.token}`
-
-window.open(url)
+// langsung buka tool (tanpa token)
+window.open(tool.url, "_blank")
 
 }catch(err){
 
-console.error("Token error",err)
+console.error("Open tool error",err)
 
 }
 
