@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import fallbackTools from "../config/tools.json"
 import { supabase } from "../services/supabaseClient"
 import { Search, ChevronDown, ChevronRight, Play } from "lucide-react"
 
@@ -150,8 +149,8 @@ const { data } = await supabase
 .select("*")
 
 if(!data || data.length === 0){
-setTools(fallbackTools)
-return
+  setTools([])
+  return
 }
 
 const formatted = data.map(tool => ({
@@ -216,12 +215,11 @@ return matchSearch && matchCategory
 
 /* TRACK TOOL */
 
-const trackOpen = async (tool) => {
+const trackEvent = async (tool, type) => {
 
 try{
 
 const session = localStorage.getItem("userSession")
-
 if(!session) return
 
 const user = JSON.parse(session)
@@ -230,7 +228,7 @@ await supabase.from("tool_events").insert({
 
 tool_id: tool.id,
 user_email: user.email,
-event_type: "open_tool"
+event_type: type
 
 })
 
@@ -465,7 +463,7 @@ tool.plan==="Free"
 <button
 onClick={async (e)=>{
 e.stopPropagation()
-await trackOpen(tool)
+await trackEvent(tool, "open_tool")
 await openTool(tool)
 }}
 className="w-full bg-gradient-to-r from-yellow-400 to-amber-600 text-black font-bold text-sm py-3 rounded-xl mt-4 shadow-[0_12px_30px_rgba(255,215,0,0.35)] hover:brightness-110 transition flex items-center justify-center gap-2"
@@ -478,9 +476,10 @@ BUKA APLIKASI <ChevronRight size={16}/>
 ) : (
 
 <button
-onClick={(e)=>{
+onClick={async (e)=>{
 e.stopPropagation()
-setPopup(tool)
+await trackEvent(tool, "buy_click")
+window.open(tool.buyLink, "_blank")
 }}
 className="w-full bg-gray-700 text-gray-200 font-bold text-sm py-3 rounded-xl mt-4"
 >
@@ -492,7 +491,16 @@ BELI AKSES
 )}
 
 <button
-onClick={(e)=>e.stopPropagation()}
+onClick={async (e)=>{
+e.stopPropagation()
+await trackEvent(tool, "tutorial_click")
+
+if(tool.tutorialLink){
+window.open(tool.tutorialLink, "_blank")
+}else{
+alert("Tutorial belum tersedia")
+}
+}}
 className="w-full bg-red-600 text-white text-sm py-3 rounded-xl mt-3 shadow-[0_10px_25px_rgba(255,0,0,0.35)] hover:bg-red-700 transition flex items-center justify-center gap-2"
 >
 

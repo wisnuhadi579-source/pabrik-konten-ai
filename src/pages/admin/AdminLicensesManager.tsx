@@ -10,7 +10,7 @@ const [search,setSearch] = useState("")
 
 const [email,setEmail] = useState("")
 const [product,setProduct] = useState("")
-const [plan,setPlan] = useState("premium")
+const [plan,setPlan] = useState("single")
 
 /* LOAD LICENSES */
 
@@ -57,7 +57,7 @@ status:"active"
 
 setEmail("")
 setProduct("")
-setPlan("premium")
+setPlan("single")
 
 loadLicenses()
 
@@ -118,15 +118,13 @@ className="input"
 
 <select
 value={plan}
-onChange={e=>setPlan(e.target.value)}
+onChange={(e)=>setPlan(e.target.value)}
 className="input"
 >
-
+<option value="single">Single</option>
 <option value="premium">Premium</option>
 <option value="vip">VIP</option>
-
 </select>
-
 <button
 onClick={addLicense}
 className="btn-yellow"
