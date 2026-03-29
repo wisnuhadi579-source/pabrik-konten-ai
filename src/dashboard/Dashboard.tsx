@@ -374,18 +374,24 @@ const purchased = (() => {
 if (tool.plan === "Free") return true
 if (!licenses || licenses.length === 0) return false
 
-const plans = licenses.map(l => l.plan)
+// normalize
+const userPlans = licenses.map(l => l.plan?.toLowerCase())
+const toolPlan = tool.plan?.toLowerCase()
 
-if (plans.includes("vip")) return true
+// 🔥 VIP → akses semua
+if (userPlans.includes("vip")) return true
 
-if (plans.includes("premium")) {
-return tool.plan === "Premium" || tool.plan === "Free"
+// 🔥 PREMIUM → akses premium + free
+if (userPlans.includes("premium")) {
+return toolPlan === "premium" || toolPlan === "free"
 }
 
-return licenses.some(l => l.product === (tool.product || tool.id))
+// 🔥 SINGLE → hanya tool tertentu
+return licenses.some(l => 
+l.product === (tool.product || tool.id)
+)
 
 })()
-
 return (
 
 <div key={tool.id} className={`group relative rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/25 transition-all duration-500 hover:border-yellow-400/60 hover:shadow-[0_40px_120px_rgba(255,215,0,0.35)] hover:-translate-y-2 ${expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1.02]" : ""}`}>
