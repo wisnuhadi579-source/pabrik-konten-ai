@@ -11,6 +11,7 @@ totalEvents:0,
 openTool:0,
 buyClick:0,
 tutorialClick:0,
+purchase:0,
 users:0,
 conversion:0
 })
@@ -23,6 +24,9 @@ const [topUsers,setTopUsers] = useState<any[]>([])
 
 /* DAILY */
 const [daily,setDaily] = useState<any[]>([])
+
+/* 🔥 FUNNEL */
+const [funnels,setFunnels] = useState<any[]>([])
 
 /* LOAD DATA */
 
@@ -40,9 +44,14 @@ const { data:licenses } = await supabase
 .from("licenses")
 .select("*")
 
-/* TOOLS (🔥 NEW) */
+/* TOOLS */
 const { data:tools } = await supabase
 .from("tools")
+.select("*")
+
+/* 🔥 PAYMENTS (NEW SOURCE OF TRUTH) */
+const { data:payments } = await supabase
+.from("payments")
 .select("*")
 
 /* KPI */
@@ -53,11 +62,14 @@ const openTool = events?.filter(e => e.event_type === "open_tool").length || 0
 const buyClick = events?.filter(e => e.event_type === "buy_click").length || 0
 const tutorialClick = events?.filter(e => e.event_type === "tutorial_click").length || 0
 
+/* 🔥 FIX PURCHASE */
+const purchase = payments?.length || 0
+
 const users = new Set(events?.map(e => e.user_email)).size || 0
 
-/* 🔥 CONVERSION RATE */
+/* 🔥 FIX CONVERSION */
 const conversion = buyClick > 0
-? ((licenses?.length || 0) / buyClick * 100)
+? ((purchase / buyClick) * 100)
 : 0
 
 setKpi({
@@ -65,12 +77,13 @@ totalEvents,
 openTool,
 buyClick,
 tutorialClick,
+purchase,
 users,
 conversion: Number(conversion.toFixed(1))
 })
 
 /* =====================
-   TOP TOOLS (FIXED)
+   TOP TOOLS
 ===================== */
 
 const toolMap:any = {}
@@ -122,11 +135,8 @@ setTopUsers(topUsersArr)
 const dayMap:any = {}
 
 events?.forEach(e=>{
-
 const date = new Date(e.created_at).toLocaleDateString()
-
 dayMap[date] = (dayMap[date] || 0) + 1
-
 })
 
 const dailyArr = Object.entries(dayMap)
@@ -134,6 +144,77 @@ const dailyArr = Object.entries(dayMap)
 .sort((a:any,b:any)=> new Date(a.date).getTime() - new Date(b.date).getTime())
 
 setDaily(dailyArr)
+
+/* =====================
+   🔥 FUNNEL PER TOOL (FIX TOTAL)
+===================== */
+
+const funnelMap:any = {}
+
+/* STEP 1: EVENTS */
+events?.forEach(e=>{
+
+if(!funnelMap[e.tool_id]){
+funnelMap[e.tool_id] = {
+views:0,
+buy:0,
+purchase:0,
+revenue:0
+}
+}
+
+if(e.event_type === "open_tool") funnelMap[e.tool_id].views++
+if(e.event_type === "buy_click") funnelMap[e.tool_id].buy++
+
+})
+
+/* 🔥 STEP 2: PAYMENTS (REAL PURCHASE + REVENUE) */
+
+payments?.forEach(p=>{
+
+// cari tool_id dari product
+const tool = tools?.find(t => t.product === p.product)
+
+const toolId = tool?.id || p.product
+
+if(!funnelMap[toolId]){
+funnelMap[toolId] = {
+views:0,
+buy:0,
+purchase:0,
+revenue:0
+}
+}
+
+funnelMap[toolId].purchase++
+funnelMap[toolId].revenue += p.amount || 0
+
+})
+
+const funnelArr = Object.entries(funnelMap)
+.map(([tool_id,data]:any)=>{
+
+const tool = tools?.find(t => t.id === tool_id)
+
+const conversion = data.buy > 0
+? (data.purchase / data.buy * 100)
+: 0
+
+return {
+tool_id,
+name: tool?.name || tool_id,
+plan: tool?.plan || "-",
+views:data.views,
+buy:data.buy,
+purchase:data.purchase,
+conversion:Number(conversion.toFixed(1)),
+revenue:data.revenue
+}
+
+})
+.sort((a:any,b:any)=>b.revenue - a.revenue)
+
+setFunnels(funnelArr)
 
 setLoading(false)
 
@@ -184,6 +265,36 @@ Analytics Dashboard PRO
 <h3>Conversion</h3>
 <p>{kpi.conversion}%</p>
 </div>
+
+</div>
+
+{/* 🔥 FUNNEL */}
+
+<div className="bg-zinc-900 p-6 rounded-xl mb-10">
+
+<h2 className="text-xl font-semibold mb-4">
+Funnel per Tool
+</h2>
+
+{funnels.length === 0 && (
+<p className="text-gray-400">No data yet</p>
+)}
+
+{funnels.map(f=>(
+<div key={f.tool_id} className="border-b border-white/10 py-3">
+
+<div className="font-semibold">{f.name} ({f.plan})</div>
+
+<div className="text-sm text-gray-300">
+Views: {f.views} | Buy: {f.buy} | Purchase: {f.purchase}
+</div>
+
+<div className="text-sm text-yellow-400">
+Conversion: {f.conversion}% | Revenue: Rp {f.revenue.toLocaleString()}
+</div>
+
+</div>
+))}
 
 </div>
 

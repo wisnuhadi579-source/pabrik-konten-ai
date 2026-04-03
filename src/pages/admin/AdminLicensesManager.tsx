@@ -12,6 +12,9 @@ const [email,setEmail] = useState("")
 const [product,setProduct] = useState("")
 const [plan,setPlan] = useState("single")
 
+/* 🔥 NEW: SIMPAN TOOLS */
+const [tools,setTools] = useState<any[]>([])
+
 /* LOAD LICENSES */
 
 const loadLicenses = async () => {
@@ -29,9 +32,22 @@ setLoading(false)
 
 }
 
+/* 🔥 LOAD TOOLS (PENTING) */
+
+const loadTools = async () => {
+
+const { data } = await supabase
+.from("tools")
+.select("*")
+
+setTools(data || [])
+
+}
+
 useEffect(()=>{
 
 loadLicenses()
+loadTools()
 
 },[])
 
@@ -44,16 +60,50 @@ alert("Email & product required")
 return
 }
 
-await supabase
+/* =========================
+   🔥 CARI TOOL ID DARI PRODUCT
+========================= */
+
+const tool = tools.find(t => t.product === product)
+
+if(!tool){
+alert("Product tidak ditemukan di tabel tools")
+return
+}
+
+const toolId = tool.id
+
+/* =========================
+   INSERT LICENSE
+========================= */
+
+const { error:licenseError } = await supabase
 .from("licenses")
 .insert({
-
 email,
 product,
 plan,
 status:"active"
-
 })
+
+if(licenseError){
+alert("Gagal insert license")
+return
+}
+
+/* =========================
+   🔥 TRACK PURCHASE (FIXED)
+========================= */
+
+await supabase
+.from("tool_events")
+.insert({
+event_type:"purchase",
+tool_id: toolId, // 🔥 FIXED (UUID)
+user_email: email
+})
+
+/* ========================= */
 
 setEmail("")
 setProduct("")
@@ -125,6 +175,7 @@ className="input"
 <option value="premium">Premium</option>
 <option value="vip">VIP</option>
 </select>
+
 <button
 onClick={addLicense}
 className="btn-yellow"
