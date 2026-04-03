@@ -3,115 +3,144 @@ import { supabase } from "../../services/supabaseClient"
 
 export const AdminAnalytics = () => {
 
-const [stats,setStats] = useState({
+const [loading,setLoading] = useState(true)
 
-tools:0,
-freeTools:0,
-premiumTools:0,
-vipTools:0,
-
-licenses:0,
-premiumUsers:0,
-vipUsers:0,
-
-/* 🔥 NEW */
-revenue:0,
-orders:0,
-avgOrder:0,
-topProduct:"-"
-
+/* KPI */
+const [kpi,setKpi] = useState({
+totalEvents:0,
+openTool:0,
+buyClick:0,
+tutorialClick:0,
+users:0,
+conversion:0
 })
 
-/* LOAD ANALYTICS */
+/* TOP TOOLS */
+const [topTools,setTopTools] = useState<any[]>([])
+
+/* TOP USERS */
+const [topUsers,setTopUsers] = useState<any[]>([])
+
+/* DAILY */
+const [daily,setDaily] = useState<any[]>([])
+
+/* LOAD DATA */
 
 const loadAnalytics = async () => {
 
-const { data:tools } = await supabase
-.from("tools")
+setLoading(true)
+
+/* EVENTS */
+const { data:events } = await supabase
+.from("tool_events")
 .select("*")
 
+/* LICENSES */
 const { data:licenses } = await supabase
 .from("licenses")
 .select("*")
 
-const { data:payments } = await supabase
-.from("payments")
+/* TOOLS (🔥 NEW) */
+const { data:tools } = await supabase
+.from("tools")
 .select("*")
 
-/* =========================
-   TOOLS
-========================= */
+/* KPI */
 
-const toolsCount = tools?.length || 0
+const totalEvents = events?.length || 0
 
-const freeTools = tools?.filter(t => t.plan === "Free").length || 0
-const premiumTools = tools?.filter(t => t.plan === "Premium").length || 0
-const vipTools = tools?.filter(t => t.plan === "VIP").length || 0
+const openTool = events?.filter(e => e.event_type === "open_tool").length || 0
+const buyClick = events?.filter(e => e.event_type === "buy_click").length || 0
+const tutorialClick = events?.filter(e => e.event_type === "tutorial_click").length || 0
 
-/* =========================
-   LICENSES
-========================= */
+const users = new Set(events?.map(e => e.user_email)).size || 0
 
-const licensesCount = licenses?.length || 0
+/* 🔥 CONVERSION RATE */
+const conversion = buyClick > 0
+? ((licenses?.length || 0) / buyClick * 100)
+: 0
 
-const premiumUsers = licenses?.filter(l => l.plan === "premium").length || 0
-const vipUsers = licenses?.filter(l => l.plan === "vip").length || 0
-
-/* =========================
-   💰 PAYMENTS ANALYTICS
-========================= */
-
-const orders = payments?.length || 0
-
-const revenue = payments?.reduce((acc, p) => {
-return acc + (p.amount || 0)
-},0) || 0
-
-const avgOrder = orders > 0 ? Math.round(revenue / orders) : 0
-
-/* 🔥 TOP PRODUCT */
-
-const productMap:any = {}
-
-payments?.forEach(p=>{
-if(!productMap[p.product]) productMap[p.product] = 0
-productMap[p.product]++
+setKpi({
+totalEvents,
+openTool,
+buyClick,
+tutorialClick,
+users,
+conversion: Number(conversion.toFixed(1))
 })
 
-let topProduct = "-"
+/* =====================
+   TOP TOOLS (FIXED)
+===================== */
 
-if(Object.keys(productMap).length > 0){
-topProduct = Object.entries(productMap)
-.sort((a:any,b:any)=>b[1]-a[1])[0][0]
+const toolMap:any = {}
+
+events?.forEach(e=>{
+if(e.event_type === "open_tool"){
+toolMap[e.tool_id] = (toolMap[e.tool_id] || 0) + 1
+}
+})
+
+const topToolsArr = Object.entries(toolMap)
+.map(([tool_id,count])=>{
+
+const tool = tools?.find(t => t.id === tool_id)
+
+return {
+tool_id,
+name: tool?.name || tool_id,
+count
 }
 
-/* ========================= */
+})
+.sort((a:any,b:any)=>b.count - a.count)
+.slice(0,5)
 
-setStats({
+setTopTools(topToolsArr)
 
-tools:toolsCount,
-freeTools,
-premiumTools,
-vipTools,
+/* =====================
+   TOP USERS
+===================== */
 
-licenses:licensesCount,
-premiumUsers,
-vipUsers,
+const userMap:any = {}
 
-/* NEW */
-revenue,
-orders,
-avgOrder,
-topProduct
+events?.forEach(e=>{
+userMap[e.user_email] = (userMap[e.user_email] || 0) + 1
+})
+
+const topUsersArr = Object.entries(userMap)
+.map(([email,count])=>({email,count}))
+.sort((a:any,b:any)=>b.count - a.count)
+.slice(0,5)
+
+setTopUsers(topUsersArr)
+
+/* =====================
+   DAILY ACTIVITY
+===================== */
+
+const dayMap:any = {}
+
+events?.forEach(e=>{
+
+const date = new Date(e.created_at).toLocaleDateString()
+
+dayMap[date] = (dayMap[date] || 0) + 1
 
 })
+
+const dailyArr = Object.entries(dayMap)
+.map(([date,count])=>({date,count}))
+.sort((a:any,b:any)=> new Date(a.date).getTime() - new Date(b.date).getTime())
+
+setDaily(dailyArr)
+
+setLoading(false)
 
 }
 
 useEffect(()=>{
-
 loadAnalytics()
-
 },[])
 
 return (
@@ -119,91 +148,105 @@ return (
 <div className="max-w-7xl mx-auto p-6">
 
 <h1 className="text-3xl font-bold mb-8">
-Platform Analytics
+Analytics Dashboard PRO
 </h1>
 
-{/* TOOLS */}
+{/* KPI */}
+
+<div className="grid md:grid-cols-6 gap-6 mb-10">
+
+<div className="card">
+<h3>Total Events</h3>
+<p>{kpi.totalEvents}</p>
+</div>
+
+<div className="card">
+<h3>Open Tool</h3>
+<p>{kpi.openTool}</p>
+</div>
+
+<div className="card">
+<h3>Buy Click</h3>
+<p>{kpi.buyClick}</p>
+</div>
+
+<div className="card">
+<h3>Tutorial Click</h3>
+<p>{kpi.tutorialClick}</p>
+</div>
+
+<div className="card">
+<h3>Active Users</h3>
+<p>{kpi.users}</p>
+</div>
+
+<div className="card">
+<h3>Conversion</h3>
+<p>{kpi.conversion}%</p>
+</div>
+
+</div>
+
+{/* TOP TOOLS */}
+
+<div className="bg-zinc-900 p-6 rounded-xl mb-10">
 
 <h2 className="text-xl font-semibold mb-4">
-Tools Statistics
+Top Tools
 </h2>
 
-<div className="grid md:grid-cols-4 gap-6 mb-10">
+{topTools.length === 0 && (
+<p className="text-gray-400">No data yet</p>
+)}
 
-<div className="card">
-<h3>Total Tools</h3>
-<p>{stats.tools}</p>
+{topTools.map(t=>(
+<div key={t.tool_id} className="flex justify-between border-b border-white/10 py-2">
+<span>{t.name}</span>
+<span>{t.count} opens</span>
 </div>
-
-<div className="card">
-<h3>Free Tools</h3>
-<p>{stats.freeTools}</p>
-</div>
-
-<div className="card">
-<h3>Premium Tools</h3>
-<p>{stats.premiumTools}</p>
-</div>
-
-<div className="card">
-<h3>VIP Tools</h3>
-<p>{stats.vipTools}</p>
-</div>
+))}
 
 </div>
 
-{/* LICENSES */}
+{/* TOP USERS */}
+
+<div className="bg-zinc-900 p-6 rounded-xl mb-10">
 
 <h2 className="text-xl font-semibold mb-4">
-License Statistics
+Top Users
 </h2>
 
-<div className="grid md:grid-cols-3 gap-6 mb-10">
+{topUsers.length === 0 && (
+<p className="text-gray-400">No data yet</p>
+)}
 
-<div className="card">
-<h3>Total Licenses</h3>
-<p>{stats.licenses}</p>
+{topUsers.map(u=>(
+<div key={u.email} className="flex justify-between border-b border-white/10 py-2">
+<span>{u.email}</span>
+<span>{u.count} actions</span>
 </div>
-
-<div className="card">
-<h3>Premium Users</h3>
-<p>{stats.premiumUsers}</p>
-</div>
-
-<div className="card">
-<h3>VIP Users</h3>
-<p>{stats.vipUsers}</p>
-</div>
+))}
 
 </div>
 
-{/* 🔥 NEW SECTION (TAMBAHAN DATA TANPA UBAH STYLE) */}
+{/* DAILY */}
+
+<div className="bg-zinc-900 p-6 rounded-xl">
 
 <h2 className="text-xl font-semibold mb-4">
-Revenue Analytics
+Daily Activity
 </h2>
 
-<div className="grid md:grid-cols-4 gap-6">
+{daily.length === 0 && (
+<p className="text-gray-400">No data yet</p>
+)}
 
-<div className="card">
-<h3>Total Revenue</h3>
-<p>Rp {stats.revenue.toLocaleString()}</p>
+{daily.map(d=>(
+<div key={d.date} className="flex justify-between border-b border-white/10 py-2">
+<span>{d.date}</span>
+<span>{d.count} events</span>
 </div>
-
-<div className="card">
-<h3>Total Orders</h3>
-<p>{stats.orders}</p>
-</div>
-
-<div className="card">
-<h3>Avg Order</h3>
-<p>Rp {stats.avgOrder.toLocaleString()}</p>
-</div>
-
-<div className="card">
-<h3>Top Product</h3>
-<p>{stats.topProduct}</p>
-</div>
+))}
 
 </div>
 
