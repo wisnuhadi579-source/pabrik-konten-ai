@@ -402,6 +402,14 @@ Analytics
 
 </button>
 
+<button
+onClick={()=>navigate("/admin/revenue")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400 hover:text-yellow-300"
+>
+<BarChart3 size={14}/>
+Revenue
+</button>
+
 </div>
 
 )}
