@@ -16,6 +16,7 @@ import { AdminToolsManager } from "./pages/admin/AdminToolsManager"
 import { AdminLicensesManager } from "./pages/admin/AdminLicensesManager"
 import { AdminUsersManager } from "./pages/admin/AdminUsersManager"
 import { AdminAnalytics } from "./pages/admin/AdminAnalytics"
+import { AdminRevenue } from "./pages/admin/AdminRevenue"
 
 /* ADMIN EMAIL */
 
@@ -182,6 +183,17 @@ path="/admin/analytics"
 element={
 <AdminRoute user={user}>
 <AdminAnalytics />
+</AdminRoute>
+}
+/>
+
+{/* REVENUE */}
+
+<Route
+path="/admin/revenue"
+element={
+<AdminRoute user={user}>
+<AdminRevenue />
 </AdminRoute>
 }
 />
