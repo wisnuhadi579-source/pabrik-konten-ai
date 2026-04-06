@@ -9,6 +9,9 @@ import { Landing } from "./pages/Landing"
 import { Tutorial } from "./pages/Tutorial"
 import { Pricing } from "./pages/Pricing"
 
+/* TAMBAHAN IMPORT BARU */
+import SuperGrokSharing from "./pages/accounts/supergrok-sharing"
+
 /* ADMIN MODULES */
 
 import { AdminDashboard } from "./pages/admin/AdminDashboard"
@@ -128,6 +131,16 @@ path="/dashboard"
 element={
 <ProtectedRoute user={user}>
 <Dashboard />
+</ProtectedRoute>
+}
+/>
+
+{/* TAMBAHAN ROUTE BARU */}
+<Route
+path="/supergrok-sharing"
+element={
+<ProtectedRoute user={user}>
+<SuperGrokSharing />
 </ProtectedRoute>
 }
 />

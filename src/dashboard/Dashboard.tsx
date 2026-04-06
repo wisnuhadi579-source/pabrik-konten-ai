@@ -246,36 +246,16 @@ const openTool = async (tool) => {
 
 try{
 
-const session = localStorage.getItem("userSession")
-if(!session) return
-
-const user = JSON.parse(session)
-
-const res = await fetch("/functions/generate-token",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-email:user.email,
-product:tool.product || tool.id
-})
-})
-
-const data = await res.json()
-
-if(!data.token){
-alert("Access denied")
+if(!tool.url){
+alert("Link tool tidak tersedia")
 return
 }
 
-const url = `${tool.url}?token=${data.token}`
-
-window.open(url)
+window.open(tool.url, "_blank")
 
 }catch(err){
 
-console.error("Token error",err)
+console.error("Open tool error",err)
 
 }
 
@@ -369,7 +349,7 @@ const expanded = openCard===tool.id
 
 const purchased = (() => {
 
-if (tool.plan === "Free") return true
+if (tool.plan === "free") return true
 if (!licenses || licenses.length === 0) return false
 
 // normalize
@@ -405,7 +385,7 @@ return (
 <ImageSlider images={tool.images}/>
 
 <div className={`absolute top-2 left-2 text-[10px] px-3 py-1 rounded-full font-bold ${
-tool.plan==="Free"
+tool.plan==="free"
 ? "bg-red-600"
 : tool.plan==="Premium"
 ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
@@ -463,8 +443,23 @@ tool.plan==="Free"
 <button
 onClick={async (e)=>{
 e.stopPropagation()
+
 await trackEvent(tool, "open_tool")
-await openTool(tool)
+
+if(tool.type === "course"){
+
+  if(tool.tutorialLink){
+    window.open(tool.tutorialLink, "_blank")
+  }else{
+    alert("Video belum tersedia")
+  }
+
+}else{
+
+  await openTool(tool)
+
+}
+
 }}
 className="w-full bg-gradient-to-r from-yellow-400 to-amber-600 text-black font-bold text-sm py-3 rounded-xl mt-4 shadow-[0_12px_30px_rgba(255,215,0,0.35)] hover:brightness-110 transition flex items-center justify-center gap-2"
 >
