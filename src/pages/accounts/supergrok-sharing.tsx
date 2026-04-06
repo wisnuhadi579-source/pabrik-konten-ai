@@ -15,10 +15,19 @@ export default function SuperGrokSharing() {
   // 🔒 PROTEKSI LOGIN + LICENSE
   useEffect(() => {
     async function checkAccess() {
-      const email = localStorage.getItem("user_email");
+      const session = localStorage.getItem("userSession");
+
+      let email = null;
+
+      if (session) {
+        try {
+          const data = JSON.parse(session);
+          email = data?.email;
+        } catch {}
+      }
 
       if (!email) {
-        window.location.href = "/";
+        window.location.hash = "#/login";
         return;
       }
 
@@ -35,7 +44,7 @@ export default function SuperGrokSharing() {
 
       if (!data.length) {
         alert("Anda belum memiliki akses Grok Premium");
-        window.location.href = "/";
+        window.location.hash = "#/dashboard";
       }
     }
 
@@ -74,7 +83,7 @@ export default function SuperGrokSharing() {
       <div className="sticky top-0 z-50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-center items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-3">
           <div
-            onClick={() => (window.location.href = "/")}
+            onClick={() => (window.location.hash = "#/")}
             className="cursor-pointer relative inline-flex items-center"
           >
             <div className="bg-gradient-to-b from-red-500 to-red-700 px-2 py-[2px] rounded-sm">
