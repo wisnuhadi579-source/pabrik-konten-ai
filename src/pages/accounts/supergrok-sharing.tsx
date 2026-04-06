@@ -8,6 +8,9 @@ type Account = {
   status: string;
 };
 
+const SUPABASE_URL = "https://ajtefnkjdzavwacgqkri.supabase.co";
+const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqdGVmbmtqZHphdndhY2dxa3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzE2NjIsImV4cCI6MjA4NTIwNzY2Mn0.KjQDTGLPuaDsZM5dSipNYZcfr45CuRooFNSCRXDdGuY";
+
 export default function SuperGrokSharing() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,10 +35,11 @@ export default function SuperGrokSharing() {
       }
 
       const res = await fetch(
-        `https://YOUR_SUPABASE_URL/rest/v1/licenses?email=eq.${email}&product=eq.grok_premium`,
+        `${SUPABASE_URL}/rest/v1/licenses?email=eq.${email}&product=eq.grok_premium`,
         {
           headers: {
-            apikey: "YOUR_ANON_KEY",
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
           },
         }
       );
@@ -54,17 +58,26 @@ export default function SuperGrokSharing() {
   // 🔥 FETCH ACCOUNT DARI SUPABASE
   useEffect(() => {
     async function fetchAccounts() {
-      const res = await fetch(
-        `https://YOUR_SUPABASE_URL/rest/v1/accounts?product=eq.grok_premium&status=eq.active`,
-        {
-          headers: {
-            apikey: "YOUR_ANON_KEY",
-          },
-        }
-      );
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/accounts?product=eq.grok_premium&status=eq.active`,
+          {
+            headers: {
+              apikey: API_KEY,
+              Authorization: `Bearer ${API_KEY}`,
+            },
+          }
+        );
 
-      const data = await res.json();
-      setAccounts(data);
+        const data = await res.json();
+
+        console.log("ACCOUNTS:", data); // DEBUG
+
+        setAccounts(data || []);
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
+      }
+
       setLoading(false);
     }
 
@@ -101,8 +114,8 @@ export default function SuperGrokSharing() {
       {/* HERO */}
       <div className="pt-16 pb-24 px-6 text-center">
         <h1 className="text-5xl md:text-7xl font-extrabold mb-6 uppercase">
-          Akses Eksklusif <br />
-          <span className="text-amber-400">Grok AI Premium</span>
+          AKSES EKSKLUSIF <br />
+          <span className="text-amber-400">GROK AI PREMIUM</span>
         </h1>
         <p className="text-gray-400 max-w-xl mx-auto">
           Gunakan akun sharing untuk akses Grok Premium langsung.
@@ -127,6 +140,14 @@ export default function SuperGrokSharing() {
                 <tr>
                   <td colSpan={4} className="p-6 text-center">
                     Loading...
+                  </td>
+                </tr>
+              )}
+
+              {!loading && accounts.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="p-6 text-center text-red-400">
+                    Tidak ada akun ditemukan
                   </td>
                 </tr>
               )}
@@ -156,7 +177,7 @@ export default function SuperGrokSharing() {
                   </td>
 
                   <td className="p-4 text-sm text-gray-400">
-                    {acc.expired_at}
+                    {acc.expired_at || "-"}
                   </td>
 
                   <td className="p-4 text-right">
