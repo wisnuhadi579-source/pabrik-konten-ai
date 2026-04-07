@@ -77,95 +77,181 @@ export default function SuperGrokSharing() {
     );
   }
 
-  return (
-    <div className="bg-[#050505] text-white min-h-screen font-sans">
-      
-      {/* HERO */}
-      <div className="text-center pt-24 pb-16 px-6">
+  const cardStyle =
+  "bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl";
 
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
-          <span className="text-sm font-semibold">🚀 SuperGrok PRO</span>
-        </div>
+const glowStyle =
+  "shadow-[0_0_40px_rgba(217,119,6,0.15)] border border-yellow-500/20";
+  
+ return (
+<div className="bg-[#050505] text-white min-h-screen">
 
-        <h1 className="text-5xl md:text-7xl font-extrabold mb-6 uppercase">
-          AKSES EKSKLUSIF <br />
-          <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            GROK AI PREMIUM
-          </span>
-        </h1>
+  {/* HERO */}
+  <div className="text-center pt-24 pb-16 px-6">
 
-        <p className="text-gray-400 max-w-xl mx-auto mb-8">
-          Akses akun Grok Premium tanpa biaya mahal.
+    <div className="inline-flex items-center gap-2 px-5 py-2 mb-6 bg-white/5 border border-white/10 rounded-full">
+      🚀 <span className="font-bold">SuperGrok PRO</span>
+    </div>
+
+    <h1 className="text-5xl md:text-7xl font-extrabold uppercase">
+      AKSES EKSKLUSIF <br />
+      <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+        GROK AI PREMIUM
+      </span>
+    </h1>
+
+    <p className="text-gray-400 mt-6 max-w-xl mx-auto">
+      Dapatkan kredensial instan tanpa biaya mahal.
+    </p>
+
+    <div className="flex justify-center gap-4 mt-8">
+      <a href="#akun" className="px-6 py-3 bg-orange-500 rounded-xl font-bold">
+        Lihat Daftar Akun
+      </a>
+      <button className="px-6 py-3 border border-white/20 rounded-xl">
+        Hubungi Kami
+      </button>
+    </div>
+
+  </div>
+
+  {/* TABLE */}
+  <div id="akun" className="max-w-6xl mx-auto px-6">
+
+    <div className="flex justify-between mb-6">
+      <div>
+        <h2 className="text-2xl font-bold">DAFTAR AKUN PREMIUM</h2>
+        <p className="text-gray-400 text-sm">
+          Gunakan kredensial berikut
         </p>
-
       </div>
 
-      {/* TABLE */}
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="flex items-center gap-2 text-green-400 text-sm">
+        ● SISTEM ONLINE
+      </div>
+    </div>
 
-        <div className="flex justify-between mb-4">
-          <h2 className="font-bold">DAFTAR AKUN PREMIUM</h2>
-          <span className="text-green-400">● ONLINE</span>
+    <div className={`${cardStyle} ${glowStyle} overflow-hidden`}>
+
+      <table className="w-full">
+        <thead className="bg-white/5 text-gray-300 text-sm">
+          <tr>
+            <th className="p-4 text-left">EMAIL AKUN</th>
+            <th className="p-4">PASSWORD</th>
+            <th className="p-4">MASA BERLAKU</th>
+            <th className="p-4 text-right">STATUS</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {accounts.map((acc) => (
+            <tr key={acc.id} className="border-t border-white/5">
+
+              {/* EMAIL */}
+              <td className="p-4">
+                <div className="flex items-center gap-3">
+
+                  <div className="w-9 h-9 bg-yellow-500/10 rounded-lg flex items-center justify-center">
+                    📧
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold">{acc.email}</span>
+                    <button
+                      onClick={() => copy(acc.email, "Email")}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      copy
+                    </button>
+                  </div>
+
+                </div>
+              </td>
+
+              {/* PASSWORD */}
+              <td className="p-4 text-center">
+                <span className="bg-yellow-500/20 px-3 py-1 rounded">
+                  {acc.password}
+                </span>
+              </td>
+
+              {/* EXPIRED */}
+              <td className="p-4 text-center text-sm">
+                {acc.expired_at}
+              </td>
+
+              {/* STATUS */}
+              <td className="p-4 text-right">
+                <span className="bg-green-500 px-3 py-1 rounded-xl text-xs font-bold">
+                  AKTIF
+                </span>
+              </td>
+
+            </tr>
+          ))}
+
+        </tbody>
+      </table>
+    </div>
+
+    {/* ALERT */}
+    <div className="mt-6 p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-sm">
+      <span className="text-red-500 font-bold">PERHATIAN :</span>{" "}
+      DILARANG KERAS MENGUBAH PASSWORD AKUN (AKAN DI BLACKLIST)
+    </div>
+
+  </div>
+
+  {/* UPSELL */}
+  <div className="max-w-6xl mx-auto px-6 mt-24">
+
+    <h2 className="text-center text-xl font-bold mb-10">
+      TINGKATKAN AKSES AI ANDA
+    </h2>
+
+    <div className="grid md:grid-cols-3 gap-6">
+
+      {/* CARD 1 */}
+      <div className={`${cardStyle} p-6 text-center`}>
+        <h3 className="font-bold mb-3">AKUN PRIVAT</h3>
+        <p className="text-gray-400 text-sm mb-6">
+          Tanpa sharing, full milik Anda
+        </p>
+        <button className="w-full bg-white text-black py-2 rounded-lg">
+          Cek Dashboard
+        </button>
+      </div>
+
+      {/* CARD 2 */}
+      <div className={`${cardStyle} p-6 text-center relative`}>
+        <div className="absolute top-2 right-[-30px] rotate-45 bg-orange-500 px-8 text-xs">
+          HEMAT
         </div>
 
-        <div className="border border-yellow-500/20 rounded-2xl overflow-hidden">
+        <h3 className="font-bold mb-3">TUTORIAL SUPERGROK</h3>
+        <p className="text-gray-400 text-sm mb-6">
+          Buat akun sendiri unlimited
+        </p>
+        <button className="w-full bg-orange-500 py-2 rounded-lg">
+          Cek Dashboard
+        </button>
+      </div>
 
-          <table className="w-full">
-            <thead className="bg-yellow-500/10">
-              <tr>
-                <th className="p-4">EMAIL</th>
-                <th className="p-4">PASSWORD</th>
-                <th className="p-4">EXPIRED</th>
-                <th className="p-4 text-right">STATUS</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {loading && (
-                <tr>
-                  <td colSpan="4" className="p-6 text-center">
-                    Loading...
-                  </td>
-                </tr>
-              )}
-
-              {!loading && accounts.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="p-6 text-center">
-                    Tidak ada akun
-                  </td>
-                </tr>
-              )}
-
-              {accounts.map((acc) => (
-                <tr key={acc.id}>
-                  <td className="p-4">{acc.email}</td>
-
-                  <td className="p-4">
-                    <span className="bg-yellow-500/20 px-2 py-1 rounded">
-                      {acc.password}
-                    </span>
-                  </td>
-
-                  <td className="p-4">{acc.expired_at}</td>
-
-                  <td className="p-4 text-right">
-                    <span className="bg-green-500 px-2 py-1 rounded">
-                      AKTIF
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-6 text-red-400 text-sm">
-          ⚠️ Dilarang mengubah password akun
-        </div>
-
+      {/* CARD 3 */}
+      <div className={`${cardStyle} p-6 text-center`}>
+        <h3 className="font-bold mb-3">TOOLS AI</h3>
+        <p className="text-gray-400 text-sm mb-6">
+          Generator konten otomatis
+        </p>
+        <button className="w-full border border-white/20 py-2 rounded-lg">
+          Cek Dashboard
+        </button>
       </div>
 
     </div>
-  );
-}
+
+  </div>
+
+</div>
+)
