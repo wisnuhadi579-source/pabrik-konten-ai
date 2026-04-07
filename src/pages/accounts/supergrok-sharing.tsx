@@ -172,10 +172,21 @@ export default function SuperGrokSharing() {
                   </td>
 
                   <td className="p-4 text-center">
-                    <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
-                      {acc.password}
-                    </span>
-                  </td>
+  <div className="flex items-center justify-center gap-2">
+
+    <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
+      {acc.password}
+    </span>
+
+    <button
+      onClick={() => copy(acc.password, "Password")}
+      className="text-gray-400 hover:text-white text-xs"
+    >
+      copy
+    </button>
+
+  </div>
+</td>
 
                   <td className="p-4 text-center text-sm">
                     {acc.expired_at || "-"}
@@ -215,9 +226,12 @@ export default function SuperGrokSharing() {
           <div className={`${cardStyle} p-6 text-center`}>
             <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
             <p className="text-gray-400 text-sm mb-6">
-              Gak mau pakai akun sharing? beli akun privat aja, harga terjangkau, mulai dari 2rb aja. akses full milik Anda sendiri tanpa sharing
+              Gak mau pakai akun sharing? beli akun privat aja, lebih stabil, harga terjangkau, mulai dari 2rb aja. akses full milik Anda sendiri tanpa sharing akun
             </p>
-            <button className="w-full bg-white text-black py-2 rounded-lg font-bold">
+           <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-white text-black py-2 rounded-lg font-bold"
+            >
               Cek Dashboard
             </button>
           </div>
@@ -231,7 +245,10 @@ export default function SuperGrokSharing() {
             <p className="text-gray-400 text-sm mb-6">
               Mau lebih hemat? Buat akun sendiri aja, unlimited tanpa harus beli-beli akun lagi, bahkan kamu bisa dapet cuan dari jualan akun SuperGrok 
             </p>
-            <button className="w-full bg-orange-500 py-2 rounded-lg font-bold">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-white text-black py-2 rounded-lg font-bold"
+            >
               Cek Dashboard
             </button>
           </div>
@@ -241,7 +258,10 @@ export default function SuperGrokSharing() {
             <p className="text-gray-400 text-sm mb-6">
              Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
             </p>
-            <button className="w-full border border-white/20 py-2 rounded-lg font-bold">
+           <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-white text-black py-2 rounded-lg font-bold"
+            >
               Cek Dashboard
             </button>
           </div>
