@@ -1,14 +1,77 @@
 import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import {
+  supabase,
+  getUserLicenses,
+  canAccessTool,
+} from "../../services/supabaseClient"
 
 export default function SuperGrokCourse() {
-
   const navigate = useNavigate()
+
+  const [loading, setLoading] = useState(true)
+  const [hasAccess, setHasAccess] = useState(false)
 
   const cardStyle =
     "bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl"
 
   const glowStyle =
     "shadow-[0_0_40px_rgba(217,119,6,0.15)] border border-yellow-500/20"
+
+  // 🔐 CHECK ACCESS
+  useEffect(() => {
+    const checkAccess = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        navigate("/login")
+        return
+      }
+
+      const licenses = await getUserLicenses(user.id)
+
+      const allowed = canAccessTool(licenses, {
+        id: "supergrok-course",
+        product: "supergrok-course",
+        plan: "Single",
+      })
+
+      setHasAccess(allowed)
+      setLoading(false)
+    }
+
+    checkAccess()
+  }, [navigate])
+
+  // ⏳ LOADING SCREEN
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading...
+      </div>
+    )
+  }
+
+  // 🔒 BLOCK AKSES
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-white text-center px-6 bg-[#050505]">
+        <h2 className="text-3xl font-bold mb-4">🔒 Akses Terkunci</h2>
+        <p className="text-gray-400 mb-6">
+          Anda belum membeli akses course ini
+        </p>
+
+        <button
+          onClick={() => navigate("/pricing")}
+          className="px-6 py-3 rounded-xl font-semibold text-black bg-gradient-to-r from-yellow-400 to-orange-500 hover:scale-105 transition"
+        >
+          Beli Akses
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="bg-[#050505] text-white min-h-screen">
@@ -45,41 +108,39 @@ export default function SuperGrokCourse() {
         </p>
 
         <div className="flex items-center justify-center gap-4 mt-6">
-<button
-  onClick={() => {
-    const el = document.getElementById("course")
-    if (el) {
-      const y = el.getBoundingClientRect().top + window.scrollY - 80
-      window.scrollTo({ top: y, behavior: "smooth" })
-    }
-  }}
-  className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-black bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 shadow-lg hover:shadow-yellow-500/30 hover:scale-105"
->
-  Mulai Belajar
-</button>
-          <a
-  href="https://wa.me/6285738477737?text=Halo%20Pakar%20Digital,%20saya%20mau%20nanya"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-green-500/30 bg-green-600/10 text-white font-semibold hover:bg-green-500 hover:text-white transition-all duration-300 shadow-lg hover:shadow-green-500/30"
->
-  {/* ICON WHATSAPP */}
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 32 32"
-    className="w-5 h-5 fill-current"
-  >
-    <path d="M16.04 2.003c-7.732 0-14 6.268-14 14 0 2.47.645 4.877 1.87 6.999L2 30l7.202-1.888a13.93 13.93 0 006.838 1.78h.006c7.732 0 14-6.268 14-14s-6.268-14-14.006-14zm7.985 19.63c-.337.945-1.985 1.82-2.74 1.94-.703.11-1.58.157-2.548-.15-.587-.186-1.34-.435-2.31-.84-4.07-1.757-6.73-6.08-6.937-6.36-.206-.28-1.66-2.21-1.66-4.22 0-2.01 1.05-3 1.42-3.41.37-.41.81-.51 1.08-.51.27 0 .54.002.78.014.25.012.59-.095.92.69.34.79 1.15 2.73 1.25 2.93.1.2.17.44.03.71-.14.27-.21.44-.41.67-.2.23-.42.51-.6.68-.2.2-.41.42-.18.82.23.4 1.03 1.7 2.21 2.76 1.52 1.36 2.8 1.78 3.2 1.98.4.2.63.17.86-.1.23-.27.97-1.13 1.23-1.52.26-.39.53-.32.89-.19.36.13 2.28 1.08 2.67 1.28.39.2.65.3.75.46.1.16.1.93-.24 1.88z"/>
-  </svg>
 
-  Hubungi Kami
-</a>
+          {/* BUTTON SCROLL */}
+          <button
+            onClick={() => {
+              const el = document.getElementById("course")
+              if (el) {
+                const y = el.getBoundingClientRect().top + window.scrollY - 80
+                window.scrollTo({ top: y, behavior: "smooth" })
+              }
+            }}
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-black bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 shadow-lg hover:shadow-yellow-500/30 hover:scale-105"
+          >
+            Mulai Belajar
+          </button>
+
+          {/* WHATSAPP */}
+          <a
+            href="https://wa.me/6285738477737?text=Halo%20Pakar%20Digital,%20saya%20mau%20nanya"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-green-500/30 bg-green-600/10 text-white font-semibold hover:bg-green-500 hover:text-white transition-all duration-300 shadow-lg hover:shadow-green-500/30"
+          >
+            <svg viewBox="0 0 32 32" className="w-5 h-5 fill-current">
+              <path d="M16.04 2.003c-7.732 0-14 6.268-14 14 0 2.47.645 4.877 1.87 6.999L2 30l7.202-1.888a13.93 13.93 0 006.838 1.78h.006c7.732 0 14-6.268 14-14s-6.268-14-14.006-14z"/>
+            </svg>
+            Hubungi Kami
+          </a>
 
         </div>
 
       </div>
 
-      {/* COURSE (GANTI TABLE) */}
+      {/* COURSE */}
       <div id="course" className="max-w-6xl mx-auto px-6">
 
         <div className="flex justify-between mb-6 flex-col md:flex-row gap-4">
@@ -97,22 +158,20 @@ export default function SuperGrokCourse() {
 
         <div className={`${cardStyle} ${glowStyle} overflow-hidden p-4`}>
 
-          {/* VIDEO EMBED */}
-<div className="relative w-full h-[500px] overflow-hidden rounded-xl border border-yellow-500/20">
-  
-  <iframe
-    className="w-full h-full"
-    src="https://www.youtube.com/embed/sMTQeD8ClpM?rel=0&modestbranding=1&controls=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0"
-    title="SuperGrok Course"
-    allowFullScreen
-  />
+          {/* VIDEO */}
+          <div className="relative w-full h-[500px] overflow-hidden rounded-xl border border-yellow-500/20">
 
-  {/* 🔥 Overlay untuk nutup tombol bawah */}
-  <div className="absolute bottom-0 left-0 w-full h-[60px] bg-black/90 backdrop-blur-md pointer-events-none"></div>
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/sMTQeD8ClpM?rel=0&modestbranding=1&controls=1&showinfo=0&iv_load_policy=3&disablekb=1&fs=0"
+              title="SuperGrok Course"
+              allowFullScreen
+            />
 
-</div>
+            <div className="absolute bottom-0 left-0 w-full h-[60px] bg-black/90 backdrop-blur-md pointer-events-none"></div>
 
-          {/* DESKRIPSI */}
+          </div>
+
           <div className="mt-6">
             <h3 className="font-bold text-lg mb-2">
               🎓 Tutorial SuperGrok Full Guide
@@ -133,7 +192,7 @@ export default function SuperGrokCourse() {
 
       </div>
 
-      {/* UPSELL (TETAP SAMA) */}
+      {/* UPSELL */}
       <div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
 
         <h2 className="text-center text-xl font-bold mb-10 uppercase">
