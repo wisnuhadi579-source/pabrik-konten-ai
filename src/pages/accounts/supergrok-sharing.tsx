@@ -234,60 +234,113 @@ export default function SuperGrokSharing() {
       </div>
 
       {/* UPSELL */}
-      <div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
+<div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
 
-        <h2 className="text-center text-xl font-bold mb-10 uppercase">
-          TINGKATKAN AKSES SUPERGROK ANDA
-        </h2>
+  <h2 className="text-center text-5xl font-black upercase mb-12 uppercase">
+    PILIH AKSES SUPERGROK
+  </h2>
 
-        <div className="grid md:grid-cols-3 gap-6">
+  <div className="grid md:grid-cols-3 gap-6">
 
-          <div className={`${cardStyle} p-6 text-center`}>
-            <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
-            <p className="text-gray-400 text-sm mb-6">
-              Gak mau pakai akun sharing? beli akun privat aja, lebih stabil, harga terjangkau, mulai dari 2rb aja. akses full milik Anda sendiri tanpa sharing akun
-            </p>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full bg-white text-black py-2 rounded-lg font-bold"
-            >
-              Cek Dashboard
-            </button>
-          </div>
+    {/* GRATIS */}
+    <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 text-left hover:border-white/20 transition">
 
-          <div className={`${cardStyle} p-6 text-center relative overflow-hidden`}>
-            <div className="absolute top-3 right-[-35px] rotate-45 bg-orange-500 px-8 text-xs font-bold">
-              HEMAT
-            </div>
+      <h3 className="text-5xl font-black upercase italic mb-2">GRATIS</h3>
+      <p className="text-gray-400 text-sm mb-6">
+        Untuk coba-coba (Akun Sharing)
+      </p>
 
-            <h3 className="font-bold mb-3 uppercase">TUTORIAL SUPERGROK</h3>
-            <p className="text-gray-400 text-sm mb-6">
-              Mau lebih hemat? Buat akun sendiri aja, unlimited tanpa harus beli-beli akun lagi, bahkan kamu bisa dapet cuan dari jualan akun SuperGrok 
-            </p>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full bg-white text-black py-2 rounded-lg font-bold"
-            >
-              Cek Dashboard
-            </button>
-          </div>
+      <h1 className="text-3xl font-bold mb-6">Rp 0</h1>
 
-          <div className={`${cardStyle} p-6 text-center`}>
-            <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
-            <p className="text-gray-400 text-sm mb-6">
-              Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
-            </p>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full bg-white text-black py-2 rounded-lg font-bold"
-            >
-              Cek Dashboard
-            </button>
-          </div>
+      <ul className="text-sm text-gray-300 space-y-3 mb-8">
+        <li>✔ Akses akun sharing</li>
+        <li>✔ Bisa dipakai gratis</li>
+        <li>✔ Cocok untuk coba</li>
+        <li className="opacity-40">✖ Akun privat</li>
+        <li className="opacity-40">✖ No Garansi</li>
+        <li className="opacity-40">✖ Prioritas akses</li>
+      </ul>
 
-        </div>
+             <div className="flex items-center justify-center gap-4 mt-6">
+<button
+  onClick={() => {
+    const el = document.getElementById("akun")
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.scrollY - 80
+      window.scrollTo({ top: y, behavior: "smooth" })
+    }
+  }}
+  className="w-full inline-flex justify-center py-3 rounded-xl font-bold text-black bg-gradient-to-r from-yellow-400 to-orange-500 hover:scale-105 transition"
+ >
+  GUNAKAN GRATIS
+</button>
+   </div>
+    </div>
 
+    {/* PREMIUM (PALING LARIS) */}
+    <div className="bg-[#0a0a0a] border border-purple-500/20 rounded-2xl p-6 text-left hover:border-purple-500/40 transition">
+
+      <h3 className="text-5xl font-black upercase italic mb-2 text-yellow-400">PRIVATE</h3>
+      <p className="text-gray-400 text-sm mb-6">
+        Akses akun privat full
+      </p>
+
+      <h1 className="text-3xl font-bold mb-6">Rp 2rb</h1>
+
+      <ul className="text-sm text-gray-300 space-y-3 mb-8">
+        <li>✔ 1 akun privat</li>
+        <li>✔ Tidak sharing</li>
+        <li>✔ Lebih stabil</li>
+        <li>✔ Full akses</li>
+        <li>✔ Full Garansi</li>
+        <li>✔ Masa aktif 3 hari</li>
+      </ul>
+
+      <a
+        href="http://lynk.id/oririch.id/0wey5qo5ov6r"
+        target="_blank"
+        className="w-full inline-flex justify-center py-3 rounded-xl font-bold text-black bg-gradient-to-r from-yellow-400 to-orange-500 hover:scale-105 transition"
+      >
+        BELI SEKARANG
+      </a>
+
+    </div>
+
+    {/* VIP / UPSELL */}  
+    <div className="relative bg-[#0a0a0a] border border-yellow-500/30 rounded-2xl p-6 text-left shadow-[0_0_40px_rgba(234,179,8,0.2)]"> 
+      
+      <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-xs px-4 py-1 rounded-full font-bold">
+        PALING POPULER
       </div>
+
+      <h3 className="text-5xl font-black upercase italic mb-2 text-purple-400">TUTORIAL</h3>
+      <p className="text-gray-400 text-sm mb-6">
+        Tutorial bikin akun sendiri 100% Gratis
+      </p>
+
+      <h1 className="text-3xl font-bold mb-6">Rp 49rb</h1>
+
+      <ul className="text-sm text-gray-300 space-y-3 mb-8">
+        <li>✔ Bikin akun Unlimited</li>
+        <li>✔ SuperGrok akun 3 hari</li>
+        <li>✔ SuperGrok akun 1 bulan</li>
+        <li>✔ SuperGrok akun 1 tahun</li>
+        <li>✔ Lebih hemat jangka panjang</li>
+        <li>✔ Bisa cuan dari jualan akun SuperGrok</li>
+      </ul>
+
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:scale-105 transition"
+      >
+        CEK DASHBOARD
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
     </div>
   )
