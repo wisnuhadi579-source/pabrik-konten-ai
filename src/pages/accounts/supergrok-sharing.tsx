@@ -9,31 +9,36 @@ type Account = {
 };
 
 const SUPABASE_URL = "https://ajtefnkjdzavwacgqkri.supabase.co";
-const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqdGVmbmtqZHphdndhY2dxa3JpIiwicm9sZSI:ImFub24iLCJpYXQiOjE3Njk2MzE2NjIsImV4cCI6MjA4NTIwNzY2Mn0.KjQDTGLPuaDsZM5dSipNYZcfr45CuRooFNSCRXDdGuY";
+const API_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqdGVmbmtqZHphdndhY2dxa3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzE2NjIsImV4cCI6MjA4NTIwNzY2Mn0.KjQDTGLPuaDsZM5dSipNYZcfr45CuRooFNSCRXDdGuY";
 
 export default function SuperGrokSharing() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // 🔒 HANYA CEK LOGIN (FREE ACCESS)
+  // 🔒 CEK LOGIN SAJA (FREE ACCESS)
   useEffect(() => {
-    const session = localStorage.getItem("userSession");
+    try {
+      const session = localStorage.getItem("userSession");
 
-    let email = null;
+      let email = null;
 
-    if (session) {
-      try {
+      if (session) {
         const data = JSON.parse(session);
         email = data?.email;
-      } catch {}
-    }
+      }
 
-    if (!email) {
+      if (!email) {
+        window.location.hash = "#/login";
+      }
+    } catch (err) {
+      console.error("SESSION ERROR:", err);
       window.location.hash = "#/login";
     }
   }, []);
 
-  // 🔥 FETCH ACCOUNT
+  // 🔥 FETCH ACCOUNT DARI SUPABASE
   useEffect(() => {
     async function fetchAccounts() {
       try {
@@ -51,9 +56,14 @@ export default function SuperGrokSharing() {
 
         console.log("ACCOUNTS:", data);
 
-        setAccounts(data || []);
-      } catch (err) {
+        if (!Array.isArray(data)) {
+          throw new Error("Response bukan array");
+        }
+
+        setAccounts(data);
+      } catch (err: any) {
         console.error("FETCH ERROR:", err);
+        setError("Gagal mengambil data akun");
       }
 
       setLoading(false);
@@ -68,9 +78,18 @@ export default function SuperGrokSharing() {
     alert(label + " disalin");
   };
 
+  // ❌ ERROR UI
+  if (error) {
+    return (
+      <div className="text-white p-10 text-center">
+        <h2 className="text-red-400 text-xl font-bold mb-4">ERROR</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#050505] text-white min-h-screen font-sans">
-      
       {/* NAVBAR */}
       <div className="sticky top-0 z-50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-center items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-3">
@@ -125,8 +144,8 @@ export default function SuperGrokSharing() {
 
               {!loading && accounts.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-6 text-center text-red-400">
-                    Tidak ada akun ditemukan
+                  <td colSpan={4} className="p-6 text-center text-yellow-400">
+                    Belum ada akun tersedia
                   </td>
                 </tr>
               )}
