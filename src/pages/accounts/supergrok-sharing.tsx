@@ -354,7 +354,13 @@ const copy = (text: string) => {
         Cek Dashboard
       </button>
 
-    </div>
+     </div>
+          ))}
 
-  </div>
-</section>
+        </div>
+
+      </section>
+
+    </div>
+  )
+}
