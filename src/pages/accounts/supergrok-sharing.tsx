@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom" // ✅ TAMBAHAN
 
 export default function SuperGrokSharing() {
 
   const [accounts, setAccounts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  const navigate = useNavigate() // ✅ TAMBAHAN
 
   const SUPABASE_URL = "https://ajtefnkjdzavwacgqkri.supabase.co"
   const API_KEY =
@@ -29,7 +32,6 @@ export default function SuperGrokSharing() {
 
       console.log("SUPABASE RESPONSE:", data)
 
-      // 🔥 FIX UTAMA: VALIDASI ARRAY
       if (Array.isArray(data)) {
         setAccounts(data)
       } else {
@@ -64,22 +66,20 @@ export default function SuperGrokSharing() {
 
         <div className="inline-flex items-center gap-2.5 px-5 py-2 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl hover:border-white/20 transition-all duration-500 group">
 
-  {/* ICON */}
-  <div className="w-6 h-6 group-hover:scale-110 transition-transform duration-500 text-white">
-    <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
-      <path d="M50,10 C27.9,10 10,27.9 10,50 C10,55 11,60 13,64 L 0,90 L 26,78 C32,85 41,90 50,90 C72.1,90 90,72.1 90,50 C90,45 89,40 87,36 L 100,10 L 74,22 C68,15 59,10 50,10 Z M50,22 C58,22 65,26 69,32 L 64,36 C61,31 56,28 50,28 C37.8,28 28,37.8 28,50 C28,56 31,61 36,64 L 32,69 C26,65 22,58 22,50 C22,34.5 34.5,22 50,22 Z" />
-    </svg>
-  </div>
+          <div className="w-6 h-6 group-hover:scale-110 transition-transform duration-500 text-white">
+            <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
+              <path d="M50,10 C27.9,10 10,27.9 10,50 C10,55 11,60 13,64 L 0,90 L 26,78 C32,85 41,90 50,90 C72.1,90 90,72.1 90,50 C90,45 89,40 87,36 L 100,10 L 74,22 C68,15 59,10 50,10 Z M50,22 C58,22 65,26 69,32 L 64,36 C61,31 56,28 50,28 C37.8,28 28,37.8 28,50 C28,56 31,61 36,64 L 32,69 C26,65 22,58 22,50 C22,34.5 34.5,22 50,22 Z" />
+            </svg>
+          </div>
 
-  {/* TEXT */}
-  <span className="text-2xl md:text-3xl font-black tracking-widest text-white flex items-center">
-    SuperGrok
-    <span className="ml-1 text-sm md:text-base align-top opacity-70">
-      PRO
-    </span>
-  </span>
+          <span className="text-2xl md:text-3xl font-black tracking-widest text-white flex items-center">
+            SuperGrok
+            <span className="ml-1 text-sm md:text-base align-top opacity-70">
+              PRO
+            </span>
+          </span>
 
-</div>
+        </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold uppercase leading-tight">
           AKSES EKSKLUSIF <br />
@@ -172,21 +172,18 @@ export default function SuperGrokSharing() {
                   </td>
 
                   <td className="p-4 text-center">
-  <div className="flex items-center justify-center gap-2">
-
-    <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
-      {acc.password}
-    </span>
-
-    <button
-      onClick={() => copy(acc.password, "Password")}
-      className="text-gray-400 hover:text-white text-xs"
-    >
-      copy
-    </button>
-
-  </div>
-</td>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
+                        {acc.password}
+                      </span>
+                      <button
+                        onClick={() => copy(acc.password, "Password")}
+                        className="text-gray-400 hover:text-white text-xs"
+                      >
+                        copy
+                      </button>
+                    </div>
+                  </td>
 
                   <td className="p-4 text-center text-sm">
                     {acc.expired_at || "-"}
@@ -206,10 +203,9 @@ export default function SuperGrokSharing() {
           </table>
         </div>
 
-        {/* ALERT */}
         <div className="mt-6 p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-sm uppercase tracking-wide">
           <span className="text-red-500 font-bold">PERHATIAN :</span>{" "}
-         DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
+          DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
         </div>
 
       </div>
@@ -228,7 +224,7 @@ export default function SuperGrokSharing() {
             <p className="text-gray-400 text-sm mb-6">
               Gak mau pakai akun sharing? beli akun privat aja, lebih stabil, harga terjangkau, mulai dari 2rb aja. akses full milik Anda sendiri tanpa sharing akun
             </p>
-           <button
+            <button
               onClick={() => navigate("/dashboard")}
               className="w-full bg-white text-black py-2 rounded-lg font-bold"
             >
@@ -256,9 +252,9 @@ export default function SuperGrokSharing() {
           <div className={`${cardStyle} p-6 text-center`}>
             <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
             <p className="text-gray-400 text-sm mb-6">
-             Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
+              Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
             </p>
-           <button
+            <button
               onClick={() => navigate("/dashboard")}
               className="w-full bg-white text-black py-2 rounded-lg font-bold"
             >
