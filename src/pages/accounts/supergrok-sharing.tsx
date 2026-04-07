@@ -62,9 +62,24 @@ export default function SuperGrokSharing() {
       {/* HERO */}
       <div className="text-center pt-24 pb-16 px-6">
 
-        <div className="inline-flex items-center gap-2 px-15 py-2 mb-6 bg-white/5 border border-white/10 rounded-full">
-          🚀 <span className="font-bold">SuperGrok PRO</span>
-        </div>
+        <div className="inline-flex items-center gap-2.5 px-5 py-2 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl hover:border-white/20 transition-all duration-500 group">
+
+  {/* ICON */}
+  <div className="w-6 h-6 group-hover:scale-110 transition-transform duration-500 text-white">
+    <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
+      <path d="M50,10 C27.9,10 10,27.9 10,50 C10,55 11,60 13,64 L 0,90 L 26,78 C32,85 41,90 50,90 C72.1,90 90,72.1 90,50 C90,45 89,40 87,36 L 100,10 L 74,22 C68,15 59,10 50,10 Z M50,22 C58,22 65,26 69,32 L 64,36 C61,31 56,28 50,28 C37.8,28 28,37.8 28,50 C28,56 31,61 36,64 L 32,69 C26,65 22,58 22,50 C22,34.5 34.5,22 50,22 Z" />
+    </svg>
+  </div>
+
+  {/* TEXT */}
+  <span className="text-2xl md:text-3xl font-black tracking-widest text-white flex items-center">
+    SuperGrok
+    <span className="ml-1 text-sm md:text-base align-top opacity-70">
+      PRO
+    </span>
+  </span>
+
+</div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold uppercase leading-tight">
           AKSES EKSKLUSIF <br />
