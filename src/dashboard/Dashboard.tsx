@@ -244,23 +244,27 @@ console.error("Analytics error",e)
 
 const openTool = async (tool) => {
 
-try{
+  try {
 
-if(!tool.url){
-alert("Link tool tidak tersedia")
-return
+    if (!tool.url) {
+      alert("Link tool tidak tersedia")
+      return
+    }
+
+    // 🔥 BEDAKAN INTERNAL vs EXTERNAL
+    if (tool.url.startsWith("http")) {
+      window.open(tool.url, "_blank")
+    } else {
+      navigate(tool.url)
+    }
+
+  } catch (err) {
+
+    console.error("Open tool error", err)
+
+  }
+
 }
-
-window.open(tool.url, "_blank")
-
-}catch(err){
-
-console.error("Open tool error",err)
-
-}
-
-}
-
 if(loading) return null
 if(!isLoggedIn) return null
 
