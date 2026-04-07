@@ -200,7 +200,7 @@ export default function SuperGrokSharing() {
           <div className={`${cardStyle} p-6 text-center`}>
             <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
             <p className="text-gray-400 text-sm mb-6">
-              Gak mau pakai akun sharing? beli akun privat sekarang, full milik Anda sendiri
+              Gak mau pakai akun sharing? beli akun privat aja, harga terjangkau, mulai dari 2rb aja. akses full milik Anda sendiri tanpa sharing
             </p>
             <button className="w-full bg-white text-black py-2 rounded-lg font-bold">
               Cek Dashboard
