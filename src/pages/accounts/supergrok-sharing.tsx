@@ -7,6 +7,7 @@ export default function SuperGrokSharing() {
 
   const [accounts, setAccounts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState<string | null>(null)
 
   const SUPABASE_URL = "https://ajtefnkjdzavwacgqkri.supabase.co"
   const API_KEY =
@@ -43,7 +44,42 @@ export default function SuperGrokSharing() {
 
   const copy = (text: string) => {
     navigator.clipboard.writeText(text)
+    setCopied(text)
+
+    setTimeout(() => {
+      setCopied(null)
+    }, 1500)
   }
+
+  // 🔥 COMPONENT COPY BUTTON
+  const CopyButton = ({ value }: { value: string }) => (
+    <div className="relative group">
+      <button
+        onClick={() => copy(value)}
+        className="p-1 text-gray-400 hover:text-white transition"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" />
+          <rect x="2" y="2" width="13" height="13" rx="2" />
+        </svg>
+      </button>
+
+      <div className="absolute -top-8 left-1/2 -translate-x-1/2 
+        bg-black text-white text-xs px-2 py-1 rounded 
+        opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 
+        transition-all duration-200 pointer-events-none">
+        
+        {copied === value ? "Berhasil!" : "Copy"}
+      </div>
+    </div>
+  )
 
   return (
     <div className="bg-[#050505] text-white min-h-screen">
@@ -78,7 +114,7 @@ export default function SuperGrokSharing() {
       </div>
 
       {/* TABLE */}
-      <div id="akun" className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
 
         <div className="flex justify-between mb-6 flex-col md:flex-row gap-4">
           <div>
@@ -93,7 +129,6 @@ export default function SuperGrokSharing() {
           </div>
         </div>
 
-        {/* CARD */}
         <div className="rounded-2xl overflow-hidden border border-yellow-500/20 shadow-[0_0_80px_rgba(234,179,8,0.15)]">
 
           <table className="w-full">
@@ -124,20 +159,13 @@ export default function SuperGrokSharing() {
                   {/* EMAIL */}
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-
                       <div className="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center text-yellow-400">
                         ✉️
                       </div>
 
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{acc.email}</span>
-
-                        <button
-                          onClick={() => copy(acc.email)}
-                          className="text-gray-400 hover:text-white"
-                        >
-                          📋
-                        </button>
+                        <CopyButton value={acc.email} />
                       </div>
                     </div>
                   </td>
@@ -148,13 +176,7 @@ export default function SuperGrokSharing() {
                       <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
                         {acc.password}
                       </span>
-
-                      <button
-                        onClick={() => copy(acc.password)}
-                        className="text-gray-400 hover:text-white"
-                      >
-                        📋
-                      </button>
+                      <CopyButton value={acc.password} />
                     </div>
                   </td>
 
@@ -200,7 +222,6 @@ export default function SuperGrokSharing() {
 
         <div className="grid md:grid-cols-3 gap-8">
 
-          {/* CARD */}
           <div className="group bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-yellow-500/40 hover:shadow-[0_0_60px_rgba(234,179,8,0.2)] transition">
 
             <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
@@ -221,7 +242,6 @@ export default function SuperGrokSharing() {
             </button>
           </div>
 
-          {/* CARD 2 */}
           <div className="relative bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-8 text-center shadow-[0_0_60px_rgba(234,179,8,0.2)]">
 
             <div className="absolute top-3 right-[-30px] rotate-45 bg-orange-500 px-6 text-xs font-bold">
@@ -246,7 +266,6 @@ export default function SuperGrokSharing() {
             </button>
           </div>
 
-          {/* CARD */}
           <div className="group bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-yellow-500/40 hover:shadow-[0_0_60px_rgba(234,179,8,0.2)] transition">
 
             <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
