@@ -16,7 +16,7 @@ export default function SuperGrokSharing() {
   const fetchAccounts = async () => {
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/accounts?type=eq.sharing&is_active=eq.true`,
+        `${SUPABASE_URL}/rest/v1/accounts`,
         {
           headers: {
             apikey: API_KEY,
@@ -26,9 +26,20 @@ export default function SuperGrokSharing() {
       )
 
       const data = await res.json()
-      setAccounts(data || [])
+
+      console.log("SUPABASE RESPONSE:", data)
+
+      // 🔥 FIX UTAMA: VALIDASI ARRAY
+      if (Array.isArray(data)) {
+        setAccounts(data)
+      } else {
+        console.error("Bukan array:", data)
+        setAccounts([])
+      }
+
     } catch (err) {
-      console.error(err)
+      console.error("FETCH ERROR:", err)
+      setAccounts([])
     } finally {
       setLoading(false)
     }
@@ -115,12 +126,20 @@ export default function SuperGrokSharing() {
                 </tr>
               )}
 
-              {!loading && accounts.map((acc) => (
-                <tr key={acc.id} className="border-t border-white/5 hover:bg-white/5 transition">
+              {!loading && accounts.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="text-center p-6 text-yellow-400">
+                    Tidak ada data akun
+                  </td>
+                </tr>
+              )}
+
+              {!loading && Array.isArray(accounts) && accounts.map((acc: any) => (
+
+                <tr key={acc.id || acc.email} className="border-t border-white/5 hover:bg-white/5 transition">
 
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-
                       <div className="w-9 h-9 bg-yellow-500/10 rounded-lg flex items-center justify-center">
                         📧
                       </div>
@@ -134,7 +153,6 @@ export default function SuperGrokSharing() {
                           copy
                         </button>
                       </div>
-
                     </div>
                   </td>
 
@@ -145,7 +163,7 @@ export default function SuperGrokSharing() {
                   </td>
 
                   <td className="p-4 text-center text-sm">
-                    {acc.expired_at}
+                    {acc.expired_at || "-"}
                   </td>
 
                   <td className="p-4 text-right">
@@ -155,6 +173,7 @@ export default function SuperGrokSharing() {
                   </td>
 
                 </tr>
+
               ))}
 
             </tbody>
