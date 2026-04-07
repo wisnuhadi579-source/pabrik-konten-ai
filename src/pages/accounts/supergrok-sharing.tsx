@@ -42,22 +42,31 @@ export default function SuperGrokSharing() {
     }
   }
 
-  const copy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    setCopied(text)
+const copy = (text: string) => {
+  navigator.clipboard.writeText(text)
 
-    setTimeout(() => {
-      setCopied(null)
-    }, 1500)
-  }
+  setCopied(text)
+
+  setTimeout(() => {
+    setCopied(null)
+  }, 1500)
+}
 
   // 🔥 COMPONENT COPY BUTTON
-  const CopyButton = ({ value }: { value: string }) => (
-    <div className="relative group">
+ const CopyButton = ({ value }: { value: string }) => {
+
+  const isCopied = copied === value
+
+  return (
+    <div className="relative flex items-center">
+
       <button
         onClick={() => copy(value)}
+        onMouseEnter={() => setCopied((prev) => prev === value ? prev : "hover-" + value)}
+        onMouseLeave={() => setCopied(null)}
         className="p-1 text-gray-400 hover:text-white transition"
       >
+        {/* ICON FIX */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-5 h-5"
@@ -71,15 +80,18 @@ export default function SuperGrokSharing() {
         </svg>
       </button>
 
-      <div className="absolute -top-8 left-1/2 -translate-x-1/2 
-        bg-black text-white text-xs px-2 py-1 rounded 
-        opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100 
-        transition-all duration-200 pointer-events-none">
-        
-        {copied === value ? "Berhasil!" : "Copy"}
-      </div>
+      {/* TOOLTIP FIX (STATE BASED) */}
+      {(copied === value || copied === "hover-" + value) && (
+        <div className="absolute -top-9 left-1/2 -translate-x-1/2 
+          bg-black text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap z-50">
+          
+          {isCopied ? "Berhasil disalin" : "Copy"}
+        </div>
+      )}
+
     </div>
   )
+}
 
   return (
     <div className="bg-[#050505] text-white min-h-screen">
@@ -124,7 +136,7 @@ export default function SuperGrokSharing() {
             </p>
           </div>
 
-          <div className="bg-green-500/10 border border-green-500/30 px-4 py-1 rounded-full text-green-400 text-sm">
+          <div className="bg-green-500/10 border border-green-500/10 px-4 py-1 rounded-full text-green-500 text-sm">
             ● SISTEM ONLINE
           </div>
         </div>
@@ -214,82 +226,135 @@ export default function SuperGrokSharing() {
       </div>
 
       {/* UPSELL */}
-      <div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
+     <section className="mt-20 text-center">
 
-        <h2 className="text-center text-xl font-bold mb-10 uppercase">
-          TINGKATKAN AKSES AI ANDA
-        </h2>
+  <h2 className="text-2xl font-bold mb-2">
+    TINGKATKAN AKSES AI ANDA
+  </h2>
 
-        <div className="grid md:grid-cols-3 gap-8">
+  <p className="text-gray-400 mb-10">
+    Dapatkan solusi eksklusif untuk pengalaman digital yang tak terbatas.
+  </p>
 
-          <div className="group bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-yellow-500/40 hover:shadow-[0_0_60px_rgba(234,179,8,0.2)] transition">
+  <div className="grid md:grid-cols-3 gap-6">
 
-            <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
-              👤
-            </div>
+    {/* CARD 1 */}
+    <div className="group relative rounded-2xl border border-white/10 
+    bg-gradient-to-b from-white/5 to-white/0 
+    p-8 transition-all duration-500 
+    hover:scale-[1.03] hover:border-yellow-500/30 
+    hover:shadow-[0_0_40px_rgba(255,170,0,0.15)]">
 
-            <h3 className="font-bold mb-3">AKUN PRIVAT</h3>
+      {/* ICON */}
+      <div className="mb-6 flex justify-center">
+        <div className="w-16 h-16 flex items-center justify-center 
+        rounded-full bg-yellow-500/10 
+        border border-yellow-500/20 
+        shadow-inner shadow-yellow-500/10">
 
-            <p className="text-gray-400 text-sm mb-6">
-              Miliki akun sendiri tanpa sharing, lebih aman dan stabil.
-            </p>
-
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full bg-white text-black py-2 rounded-lg font-bold"
-            >
-              Cek Dashboard
-            </button>
-          </div>
-
-          <div className="relative bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-8 text-center shadow-[0_0_60px_rgba(234,179,8,0.2)]">
-
-            <div className="absolute top-3 right-[-30px] rotate-45 bg-orange-500 px-6 text-xs font-bold">
-              HEMAT
-            </div>
-
-            <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300">
-              🎓
-            </div>
-
-            <h3 className="font-bold mb-3">TUTORIAL SUPERGROK</h3>
-
-            <p className="text-gray-300 text-sm mb-6">
-              Buat akun sendiri tanpa batas dan bisa dijadikan bisnis.
-            </p>
-
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full bg-orange-500 py-2 rounded-lg font-bold"
-            >
-              Cek Dashboard
-            </button>
-          </div>
-
-          <div className="group bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-yellow-500/40 hover:shadow-[0_0_60px_rgba(234,179,8,0.2)] transition">
-
-            <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
-              ✨
-            </div>
-
-            <h3 className="font-bold mb-3">TOOLS AI GENERATOR</h3>
-
-            <p className="text-gray-400 text-sm mb-6">
-              Generate konten otomatis tanpa mikir prompt.
-            </p>
-
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="w-full border border-white/20 py-2 rounded-lg font-bold"
-            >
-              Cek Dashboard
-            </button>
-          </div>
+          <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M12 12c2.5 0 4-1.5 4-3.5S14.5 5 12 5s-4 1.5-4 3.5S9.5 12 12 12z"/>
+            <path d="M4 20c0-3 3-5 8-5s8 2 8 5"/>
+          </svg>
 
         </div>
-
       </div>
 
+      <h3 className="text-lg font-bold mb-2">AKUN PRIVAT</h3>
+
+      <p className="text-gray-400 text-sm mb-6">
+        Miliki akun sendiri tanpa sharing, lebih aman dan stabil.
+      </p>
+
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="w-full py-3 rounded-lg bg-white text-black font-semibold 
+        hover:bg-gray-200 transition">
+        Cek Dashboard
+      </button>
+
     </div>
-  )
-}
+
+
+    {/* CARD 2 (HIGHLIGHT) */}
+    <div className="group relative rounded-2xl border border-yellow-500/30 
+    bg-gradient-to-b from-yellow-500/10 to-transparent 
+    p-8 transition-all duration-500 
+    hover:scale-[1.05] 
+    shadow-[0_0_60px_rgba(255,170,0,0.2)]">
+
+      {/* RIBBON */}
+      <div className="absolute top-0 right-0 bg-orange-500 text-xs px-3 py-1 
+      rounded-bl-lg font-bold tracking-wide shadow-lg">
+        HEMAT
+      </div>
+
+      {/* ICON */}
+      <div className="mb-6 flex justify-center">
+        <div className="w-18 h-18 flex items-center justify-center 
+        rounded-full bg-yellow-500/20 
+        border border-yellow-500/40 
+        shadow-[0_0_30px_rgba(255,170,0,0.3)]">
+
+          <svg className="w-9 h-9 text-yellow-300" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M12 2L15 8l6 .9-4.5 4.4 1 6.7L12 17l-5.5 3 1-6.7L3 8.9 9 8z"/>
+          </svg>
+
+        </div>
+      </div>
+
+      <h3 className="text-lg font-bold mb-2">TUTORIAL SUPERGROK</h3>
+
+      <p className="text-gray-300 text-sm mb-6">
+        Buat akun sendiri tanpa batas dan bisa dijadikan bisnis.
+      </p>
+
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="w-full py-3 rounded-lg 
+        bg-gradient-to-r from-orange-500 to-yellow-500 
+        text-black font-bold 
+        hover:brightness-110 transition shadow-lg">
+        Cek Dashboard
+      </button>
+
+    </div>
+
+
+    {/* CARD 3 */}
+    <div className="group relative rounded-2xl border border-white/10 
+    bg-gradient-to-b from-white/5 to-transparent 
+    p-8 transition-all duration-500 
+    hover:scale-[1.03] hover:border-yellow-500/30 
+    hover:shadow-[0_0_40px_rgba(255,170,0,0.15)]">
+
+      {/* ICON */}
+      <div className="mb-6 flex justify-center">
+        <div className="w-16 h-16 flex items-center justify-center 
+        rounded-full bg-yellow-500/10 
+        border border-yellow-500/20">
+
+          <svg className="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M5 12h14M12 5v14"/>
+          </svg>
+
+        </div>
+      </div>
+
+      <h3 className="text-lg font-bold mb-2">TOOLS AI GENERATOR</h3>
+
+      <p className="text-gray-400 text-sm mb-6">
+        Generate konten otomatis tanpa mikir prompt.
+      </p>
+
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="w-full py-3 rounded-lg border border-white/20 
+        hover:border-yellow-500/50 hover:bg-white/5 transition">
+        Cek Dashboard
+      </button>
+
+    </div>
+
+  </div>
+</section>
