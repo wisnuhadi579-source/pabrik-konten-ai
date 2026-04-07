@@ -183,7 +183,7 @@ export default function SuperGrokSharing() {
         {/* ALERT */}
         <div className="mt-6 p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-sm uppercase tracking-wide">
           <span className="text-red-500 font-bold">PERHATIAN :</span>{" "}
-          DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
+         DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
         </div>
 
       </div>
@@ -192,52 +192,43 @@ export default function SuperGrokSharing() {
       <div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
 
         <h2 className="text-center text-xl font-bold mb-10 uppercase">
-          TINGKATKAN AKSES AI ANDA
+          TINGKATKAN AKSES SUPERGROK ANDA
         </h2>
 
         <div className="grid md:grid-cols-3 gap-6">
 
-         <div class="glass-card upsell-card p-8 flex flex-col items-center text-center group">
-                        <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20 group-hover:scale-110 transition-transform">
-                            <i data-lucide="user-check" class="text-amber-500 w-8 h-8"></i>
-                        </div>
-                        <h3 class="text-xl font-extrabold mb-4 uppercase tracking-wide">Akun Privat</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed mb-8">
-                            Lelah berbagi dengan orang lain? Miliki kontrol penuh dengan <span class="text-white font-semibold">Akun Privat</span>. Tanpa gangguan, tanpa limit sharing, murni milik Anda sendiri selamanya.
-                        </p>
-                        <a href="#" class="mt-auto w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest">
+          <div className={`${cardStyle} p-6 text-center`}>
+            <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Gak mau pakai akun sharing? beli akun privat sekarang, full milik Anda sendiri
+            </p>
+           <a href="#" class="mt-auto w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest">
                             Cek DiDashboard
                         </a>
-                    </div>
 
-         <div class="glass-card upsell-card p-8 flex flex-col items-center text-center group relative overflow-hidden">
-                        <!-- Hot Badge -->
-                        <div class="absolute top-4 right-[-35px] bg-amber-600 text-white text-[10px] font-black py-1 px-10 rotate-45 uppercase tracking-widest">HEMAT</div>
-                        
-                        <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20 group-hover:scale-110 transition-transform">
-                            <i data-lucide="graduation-cap" class="text-amber-500 w-8 h-8"></i>
-                        </div>
-                        <h3 class="text-xl font-extrabold mb-4 uppercase tracking-wide">Tutorial SuperGrok</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed mb-8">
-                            Mau lebih hemat? <span class="text-white font-semibold">Bikin akun sendiri sepuasnya</span> gratis! Cukup modal sekali untuk tutorial eksklusif ini, dan Anda tak perlu beli akun lagi selamanya.
-                        </p>
-                        <a href="#" class="mt-auto w-full py-3 bg-amber-600 text-white font-bold rounded-xl text-sm hover:bg-amber-500 transition-all shadow-lg shadow-amber-600/20 uppercase tracking-widest">
-                            Cek diDashboard
-                        </a>
-                    </div>
+          <div className={`${cardStyle} p-6 text-center relative overflow-hidden`}>
+            <div className="absolute top-3 right-[-35px] rotate-45 bg-orange-500 px-8 text-xs font-bold">
+              HEMAT
+            </div>
 
-         <div class="glass-card upsell-card p-8 flex flex-col items-center text-center group">
-                        <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/20 group-hover:scale-110 transition-transform">
-                            <i data-lucide="sparkles" class="text-amber-400 w-8 h-8"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-4 uppercase tracking-wide">Tools AI Generator</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed mb-8">
-                            Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai <span class="text-white font-semibold">Tools Generator Otomatis</span>. Sekali klik, konten viral Anda siap tayang tanpa pusing!
-                        </p>
-                        <a href="#" class="mt-auto w-full py-3 border border-white/20 text-white font-bold rounded-xl text-sm hover:bg-white hover:text-black transition-all uppercase tracking-widest">
-                            Cek diDashboard
+            <h3 className="font-bold mb-3 uppercase">TUTORIAL SUPERGROK</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Mau lebih hemat? Buat akun sendiri aja, unlimited tanpa harus beli-beli akun lagi, bahkan kamu bisa dapet cuan dari jualan akun SuperGrok 
+            </p>
+           <a href="#" class="mt-auto w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest">
+                            Cek DiDashboard
                         </a>
-                    </div>
+          </div>
+
+          <div className={`${cardStyle} p-6 text-center`}>
+            <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
+            <p className="text-gray-400 text-sm mb-6">
+             Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
+            </p>
+           <a href="#" class="mt-auto w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest">
+                            Cek DiDashboard
+                        </a>
+          </div>
 
         </div>
 
