@@ -188,65 +188,53 @@ export default function SuperGrokSharing() {
 
       </div>
 
-    {/* UPSELL */}
-<div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
+      {/* UPSELL */}
+      <div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
 
-  <h2 className="text-center text-xl font-bold mb-10 uppercase">
-    TINGKATKAN AKSES SUPERGROK ANDA
-  </h2>
+        <h2 className="text-center text-xl font-bold mb-10 uppercase">
+          TINGKATKAN AKSES SUPERGROK ANDA
+        </h2>
 
-  <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
 
-    {/* CARD 1 */}
-    <div className={`${cardStyle} p-6 text-center`}>
-      <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
-      <p className="text-gray-400 text-sm mb-6">
-        Gak mau pakai akun sharing? beli akun privat sekarang, full milik Anda sendiri
-      </p>
+          <div className={`${cardStyle} p-6 text-center`}>
+            <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Gak mau pakai akun sharing? beli akun privat sekarang, full milik Anda sendiri
+            </p>
+            <button className="w-full bg-white text-black py-2 rounded-lg font-bold">
+              Cek Dashboard
+            </button>
+          </div>
 
-      <a
-        href="#"
-        className="block w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest"
-      >
-        Cek DiDashboard
-      </a>
-    </div>
+          <div className={`${cardStyle} p-6 text-center relative overflow-hidden`}>
+            <div className="absolute top-3 right-[-35px] rotate-45 bg-orange-500 px-8 text-xs font-bold">
+              HEMAT
+            </div>
 
-    {/* CARD 2 */}
-    <div className={`${cardStyle} p-6 text-center relative overflow-hidden`}>
+            <h3 className="font-bold mb-3 uppercase">TUTORIAL SUPERGROK</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              Mau lebih hemat? Buat akun sendiri aja, unlimited tanpa harus beli-beli akun lagi, bahkan kamu bisa dapet cuan dari jualan akun SuperGrok 
+            </p>
+            <button className="w-full bg-orange-500 py-2 rounded-lg font-bold">
+              Cek Dashboard
+            </button>
+          </div>
 
-      <div className="absolute top-3 right-[-35px] rotate-45 bg-orange-500 px-8 text-xs font-bold">
-        HEMAT
+          <div className={`${cardStyle} p-6 text-center`}>
+            <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
+            <p className="text-gray-400 text-sm mb-6">
+             Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
+            </p>
+            <button className="w-full border border-white/20 py-2 rounded-lg font-bold">
+              Cek Dashboard
+            </button>
+          </div>
+
+        </div>
+
       </div>
 
-      <h3 className="font-bold mb-3 uppercase">TUTORIAL SUPERGROK</h3>
-      <p className="text-gray-400 text-sm mb-6">
-        Mau lebih hemat? Buat akun sendiri aja, unlimited tanpa harus beli-beli akun lagi, bahkan kamu bisa dapet cuan dari jualan akun SuperGrok
-      </p>
-
-      <a
-        href="#"
-        className="block w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest"
-      >
-        Cek DiDashboard
-      </a>
     </div>
-
-    {/* CARD 3 */}
-    <div className={`${cardStyle} p-6 text-center`}>
-      <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
-      <p className="text-gray-400 text-sm mb-6">
-        Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
-      </p>
-
-      <a
-        href="#"
-        className="block w-full py-3 bg-white text-black font-bold rounded-xl text-sm hover:bg-amber-500 hover:text-white transition-all uppercase tracking-widest"
-      >
-        Cek DiDashboard
-      </a>
-    </div>
-
-  </div>
-
-</div>
+  )
+}
