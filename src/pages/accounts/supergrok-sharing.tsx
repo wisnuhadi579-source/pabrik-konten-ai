@@ -83,7 +83,7 @@ export default function SuperGrokSharing() {
 const glowStyle =
   "shadow-[0_0_40px_rgba(217,119,6,0.15)] border border-yellow-500/20";
   
- return (
+return (
 <div className="bg-[#050505] text-white min-h-screen">
 
   {/* HERO */}
@@ -254,4 +254,3 @@ const glowStyle =
   </div>
 
 </div>
-)
