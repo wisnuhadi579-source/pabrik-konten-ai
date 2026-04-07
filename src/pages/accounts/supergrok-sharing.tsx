@@ -9,53 +9,31 @@ type Account = {
 };
 
 const SUPABASE_URL = "https://ajtefnkjdzavwacgqkri.supabase.co";
-const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqdGVmbmtqZHphdndhY2dxa3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzE2NjIsImV4cCI6MjA4NTIwNzY2Mn0.KjQDTGLPuaDsZM5dSipNYZcfr45CuRooFNSCRXDdGuY";
+const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqdGVmbmtqZHphdndhY2dxa3JpIiwicm9sZSI:ImFub24iLCJpYXQiOjE3Njk2MzE2NjIsImV4cCI6MjA4NTIwNzY2Mn0.KjQDTGLPuaDsZM5dSipNYZcfr45CuRooFNSCRXDdGuY";
 
 export default function SuperGrokSharing() {
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔒 PROTEKSI LOGIN + LICENSE
+  // 🔒 HANYA CEK LOGIN (FREE ACCESS)
   useEffect(() => {
-    async function checkAccess() {
-      const session = localStorage.getItem("userSession");
+    const session = localStorage.getItem("userSession");
 
-      let email = null;
+    let email = null;
 
-      if (session) {
-        try {
-          const data = JSON.parse(session);
-          email = data?.email;
-        } catch {}
-      }
-
-      if (!email) {
-        window.location.hash = "#/login";
-        return;
-      }
-
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/licenses?email=eq.${email}&product=eq.grok_premium`,
-        {
-          headers: {
-            apikey: API_KEY,
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (!data.length) {
-        alert("Anda belum memiliki akses Grok Premium");
-        window.location.hash = "#/dashboard";
-      }
+    if (session) {
+      try {
+        const data = JSON.parse(session);
+        email = data?.email;
+      } catch {}
     }
 
-    checkAccess();
+    if (!email) {
+      window.location.hash = "#/login";
+    }
   }, []);
 
-  // 🔥 FETCH ACCOUNT DARI SUPABASE
+  // 🔥 FETCH ACCOUNT
   useEffect(() => {
     async function fetchAccounts() {
       try {
@@ -71,7 +49,7 @@ export default function SuperGrokSharing() {
 
         const data = await res.json();
 
-        console.log("ACCOUNTS:", data); // DEBUG
+        console.log("ACCOUNTS:", data);
 
         setAccounts(data || []);
       } catch (err) {
@@ -84,7 +62,7 @@ export default function SuperGrokSharing() {
     fetchAccounts();
   }, []);
 
-  // 📋 COPY FUNCTION
+  // 📋 COPY
   const copy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     alert(label + " disalin");
@@ -92,6 +70,7 @@ export default function SuperGrokSharing() {
 
   return (
     <div className="bg-[#050505] text-white min-h-screen font-sans">
+      
       {/* NAVBAR */}
       <div className="sticky top-0 z-50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-center items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-3">
