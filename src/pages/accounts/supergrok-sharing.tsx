@@ -62,7 +62,7 @@ export default function SuperGrokSharing() {
       {/* HERO */}
       <div className="text-center pt-24 pb-16 px-6">
 
-        <div className="inline-flex items-center gap-2 px-5 py-2 mb-6 bg-white/5 border border-white/10 rounded-full">
+        <div className="inline-flex items-center gap-2 px-15 py-2 mb-6 bg-white/5 border border-white/10 rounded-full">
           🚀 <span className="font-bold">SuperGrok PRO</span>
         </div>
 
