@@ -11,6 +11,7 @@ import { Pricing } from "./pages/Pricing"
 
 /* TAMBAHAN IMPORT BARU */
 import SuperGrokSharing from "./pages/accounts/supergrok-sharing"
+import SuperGrokCourse from "./pages/course/supergrok-course"
 
 /* ADMIN MODULES */
 
@@ -135,7 +136,17 @@ element={
 }
 />
 
-{/* TAMBAHAN ROUTE BARU */}
+{/* SUPERGROK-COURSE */}
+<Route
+  path="/supergrok-course"
+  element={
+    <ProtectedRoute user={user}>
+      <SuperGrokCourse />
+    </ProtectedRoute>
+  }
+/>
+
+{/* SUPERGROK-SHARING */}
 <Route
 path="/supergrok-sharing"
 element={
