@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function SuperGrokSharing() {
+
+  const navigate = useNavigate()
 
   const [accounts, setAccounts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -15,46 +18,32 @@ export default function SuperGrokSharing() {
 
   const fetchAccounts = async () => {
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/accounts`,
-        {
-          headers: {
-            apikey: API_KEY,
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        }
-      )
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/accounts`, {
+        headers: {
+          apikey: API_KEY,
+          Authorization: `Bearer ${API_KEY}`,
+        },
+      })
 
       const data = await res.json()
 
-      console.log("SUPABASE RESPONSE:", data)
-
-      // 🔥 FIX UTAMA: VALIDASI ARRAY
       if (Array.isArray(data)) {
         setAccounts(data)
       } else {
-        console.error("Bukan array:", data)
         setAccounts([])
       }
 
     } catch (err) {
-      console.error("FETCH ERROR:", err)
+      console.error(err)
       setAccounts([])
     } finally {
       setLoading(false)
     }
   }
 
-  const copy = (text: string, label: string) => {
+  const copy = (text: string) => {
     navigator.clipboard.writeText(text)
-    alert(label + " disalin")
   }
-
-  const cardStyle =
-    "bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl"
-
-  const glowStyle =
-    "shadow-[0_0_40px_rgba(217,119,6,0.15)] border border-yellow-500/20"
 
   return (
     <div className="bg-[#050505] text-white min-h-screen">
@@ -62,26 +51,20 @@ export default function SuperGrokSharing() {
       {/* HERO */}
       <div className="text-center pt-24 pb-16 px-6">
 
-        <div className="inline-flex items-center gap-2.5 px-5 py-2 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-2xl hover:border-white/20 transition-all duration-500 group">
+        <div className="inline-flex items-center gap-3 px-6 py-3 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full shadow-xl">
+          <div className="w-6 h-6 text-white">
+            <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
+              <path d="M50,10 C27.9,10 10,27.9 10,50 C10,55 11,60 13,64 L 0,90 L 26,78 C32,85 41,90 50,90 C72.1,90 90,72.1 90,50 C90,45 89,40 87,36 L 100,10 L 74,22 C68,15 59,10 50,10 Z" />
+            </svg>
+          </div>
 
-  {/* ICON */}
-  <div className="w-6 h-6 group-hover:scale-110 transition-transform duration-500 text-white">
-    <svg viewBox="0 0 100 100" className="w-full h-full fill-current">
-      <path d="M50,10 C27.9,10 10,27.9 10,50 C10,55 11,60 13,64 L 0,90 L 26,78 C32,85 41,90 50,90 C72.1,90 90,72.1 90,50 C90,45 89,40 87,36 L 100,10 L 74,22 C68,15 59,10 50,10 Z M50,22 C58,22 65,26 69,32 L 64,36 C61,31 56,28 50,28 C37.8,28 28,37.8 28,50 C28,56 31,61 36,64 L 32,69 C26,65 22,58 22,50 C22,34.5 34.5,22 50,22 Z" />
-    </svg>
-  </div>
+          <span className="text-2xl md:text-4xl font-black tracking-widest">
+            SuperGrok
+            <span className="ml-1 text-sm opacity-70">PRO</span>
+          </span>
+        </div>
 
-  {/* TEXT */}
-  <span className="text-2xl md:text-3xl font-black tracking-widest text-white flex items-center">
-    SuperGrok
-    <span className="ml-1 text-sm md:text-base align-top opacity-70">
-      PRO
-    </span>
-  </span>
-
-</div>
-
-        <h1 className="text-5xl md:text-7xl font-extrabold uppercase leading-tight">
+        <h1 className="text-5xl md:text-7xl font-extrabold">
           AKSES EKSKLUSIF <br />
           <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             GROK AI PREMIUM
@@ -92,15 +75,6 @@ export default function SuperGrokSharing() {
           Dapatkan kredensial instan untuk Grok Premium tanpa biaya mahal.
         </p>
 
-        <div className="flex justify-center gap-4 mt-8">
-          <a href="#akun" className="px-6 py-3 bg-orange-500 hover:bg-orange-400 rounded-xl font-bold">
-            Lihat Daftar Akun
-          </a>
-          <button className="px-6 py-3 border border-white/20 rounded-xl hover:bg-white hover:text-black transition">
-            Hubungi Kami
-          </button>
-        </div>
-
       </div>
 
       {/* TABLE */}
@@ -110,19 +84,21 @@ export default function SuperGrokSharing() {
           <div>
             <h2 className="text-2xl font-bold uppercase">DAFTAR AKUN PREMIUM</h2>
             <p className="text-gray-400 text-sm">
-              Gunakan kredensial berikut untuk akses Grok Premium
+              Gunakan kredensial di bawah ini untuk akses Grok Premium
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-green-400 text-sm">
+          <div className="bg-green-500/10 border border-green-500/30 px-4 py-1 rounded-full text-green-400 text-sm">
             ● SISTEM ONLINE
           </div>
         </div>
 
-        <div className={`${cardStyle} ${glowStyle} overflow-hidden`}>
+        {/* CARD */}
+        <div className="rounded-2xl overflow-hidden border border-yellow-500/20 shadow-[0_0_80px_rgba(234,179,8,0.15)]">
 
           <table className="w-full">
-            <thead className="bg-white/5 text-gray-300 text-sm">
+
+            <thead className="bg-gradient-to-r from-yellow-500/20 to-orange-500/10 text-sm">
               <tr>
                 <th className="p-4 text-left">EMAIL AKUN</th>
                 <th className="p-4 text-center">PASSWORD</th>
@@ -141,49 +117,61 @@ export default function SuperGrokSharing() {
                 </tr>
               )}
 
-              {!loading && accounts.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="text-center p-6 text-yellow-400">
-                    Tidak ada data akun
-                  </td>
-                </tr>
-              )}
+              {!loading && accounts.map((acc: any) => (
 
-              {!loading && Array.isArray(accounts) && accounts.map((acc: any) => (
+                <tr key={acc.id || acc.email} className="border-t border-white/5 hover:bg-white/5">
 
-                <tr key={acc.id || acc.email} className="border-t border-white/5 hover:bg-white/5 transition">
-
+                  {/* EMAIL */}
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-yellow-500/10 rounded-lg flex items-center justify-center">
-                        📧
+
+                      <div className="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center text-yellow-400">
+                        ✉️
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="font-bold">{acc.email}</span>
+                        <span className="font-semibold">{acc.email}</span>
+
                         <button
-                          onClick={() => copy(acc.email, "Email")}
-                          className="text-gray-400 hover:text-white text-xs"
+                          onClick={() => copy(acc.email)}
+                          className="text-gray-400 hover:text-white"
                         >
-                          copy
+                          📋
                         </button>
                       </div>
                     </div>
                   </td>
 
+                  {/* PASSWORD */}
                   <td className="p-4 text-center">
-                    <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
-                      {acc.password}
-                    </span>
+                    <div className="flex items-center justify-center gap-2">
+                      <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
+                        {acc.password}
+                      </span>
+
+                      <button
+                        onClick={() => copy(acc.password)}
+                        className="text-gray-400 hover:text-white"
+                      >
+                        📋
+                      </button>
+                    </div>
                   </td>
 
+                  {/* MASA BERLAKU */}
                   <td className="p-4 text-center text-sm">
-                    {acc.expired_at || "-"}
+                    <div>
+                      <div>30 Hari</div>
+                      <div className="text-gray-500 text-xs">
+                        {acc.expired_at || "-"}
+                      </div>
+                    </div>
                   </td>
 
+                  {/* STATUS */}
                   <td className="p-4 text-right">
-                    <span className="bg-green-500 px-3 py-1 rounded-xl text-xs font-bold">
-                      AKTIF
+                    <span className="bg-green-500 px-4 py-1 rounded-full text-xs font-bold">
+                      ● AKTIF
                     </span>
                   </td>
 
@@ -196,9 +184,9 @@ export default function SuperGrokSharing() {
         </div>
 
         {/* ALERT */}
-        <div className="mt-6 p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-sm uppercase tracking-wide">
-          <span className="text-red-500 font-bold">PERHATIAN :</span>{" "}
-         DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
+        <div className="mt-6 p-4 border border-red-500/30 bg-red-500/10 rounded-xl text-sm">
+          <span className="text-red-400 font-bold">⚠ PERHATIAN :</span>{" "}
+          DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
         </div>
 
       </div>
@@ -207,41 +195,74 @@ export default function SuperGrokSharing() {
       <div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
 
         <h2 className="text-center text-xl font-bold mb-10 uppercase">
-          TINGKATKAN AKSES SUPERGROK ANDA
+          TINGKATKAN AKSES AI ANDA
         </h2>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8">
 
-          <div className={`${cardStyle} p-6 text-center`}>
-            <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
+          {/* CARD */}
+          <div className="group bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-yellow-500/40 hover:shadow-[0_0_60px_rgba(234,179,8,0.2)] transition">
+
+            <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
+              👤
+            </div>
+
+            <h3 className="font-bold mb-3">AKUN PRIVAT</h3>
+
             <p className="text-gray-400 text-sm mb-6">
-              Gak mau pakai akun sharing? beli akun privat aja, harga terjangkau, mulai dari 2rb aja. akses full milik Anda sendiri tanpa sharing
+              Miliki akun sendiri tanpa sharing, lebih aman dan stabil.
             </p>
-            <button className="w-full bg-white text-black py-2 rounded-lg font-bold">
+
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-white text-black py-2 rounded-lg font-bold"
+            >
               Cek Dashboard
             </button>
           </div>
 
-          <div className={`${cardStyle} p-6 text-center relative overflow-hidden`}>
-            <div className="absolute top-3 right-[-35px] rotate-45 bg-orange-500 px-8 text-xs font-bold">
+          {/* CARD 2 */}
+          <div className="relative bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-8 text-center shadow-[0_0_60px_rgba(234,179,8,0.2)]">
+
+            <div className="absolute top-3 right-[-30px] rotate-45 bg-orange-500 px-6 text-xs font-bold">
               HEMAT
             </div>
 
-            <h3 className="font-bold mb-3 uppercase">TUTORIAL SUPERGROK</h3>
-            <p className="text-gray-400 text-sm mb-6">
-              Mau lebih hemat? Buat akun sendiri aja, unlimited tanpa harus beli-beli akun lagi, bahkan kamu bisa dapet cuan dari jualan akun SuperGrok 
+            <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/20 rounded-full flex items-center justify-center text-yellow-300">
+              🎓
+            </div>
+
+            <h3 className="font-bold mb-3">TUTORIAL SUPERGROK</h3>
+
+            <p className="text-gray-300 text-sm mb-6">
+              Buat akun sendiri tanpa batas dan bisa dijadikan bisnis.
             </p>
-            <button className="w-full bg-orange-500 py-2 rounded-lg font-bold">
+
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-orange-500 py-2 rounded-lg font-bold"
+            >
               Cek Dashboard
             </button>
           </div>
 
-          <div className={`${cardStyle} p-6 text-center`}>
-            <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
+          {/* CARD */}
+          <div className="group bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-yellow-500/40 hover:shadow-[0_0_60px_rgba(234,179,8,0.2)] transition">
+
+            <div className="w-14 h-14 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400">
+              ✨
+            </div>
+
+            <h3 className="font-bold mb-3">TOOLS AI GENERATOR</h3>
+
             <p className="text-gray-400 text-sm mb-6">
-             Mau ngonten jadi lebih gampang tanpa mikir prompt? Pakai Tools Generator Otomatis. Sekali klik, konten viral Anda siap tayang tanpa pusing!
+              Generate konten otomatis tanpa mikir prompt.
             </p>
-            <button className="w-full border border-white/20 py-2 rounded-lg font-bold">
+
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full border border-white/20 py-2 rounded-lg font-bold"
+            >
               Cek Dashboard
             </button>
           </div>
