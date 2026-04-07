@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
-import { supabase } from "../../lib/supabaseClient"
 
 export default function SuperGrokSharing() {
 
   const [accounts, setAccounts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  const SUPABASE_URL = "https://ajtefnkjdzavwacgqkri.supabase.co"
+  const API_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqdGVmbmtqZHphdndhY2dxa3JpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzE2NjIsImV4cCI6MjA4NTIwNzY2Mn0.KjQDTGLPuaDsZM5dSipNYZcfr45CuRooFNSCRXDdGuY"
 
   useEffect(() => {
     fetchAccounts()
@@ -12,14 +15,17 @@ export default function SuperGrokSharing() {
 
   const fetchAccounts = async () => {
     try {
-      const { data, error } = await supabase
-        .from("accounts")
-        .select("*")
-        .eq("type", "sharing")
-        .eq("is_active", true)
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/accounts?type=eq.sharing&is_active=eq.true`,
+        {
+          headers: {
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        }
+      )
 
-      if (error) throw error
-
+      const data = await res.json()
       setAccounts(data || [])
     } catch (err) {
       console.error(err)
@@ -112,7 +118,6 @@ export default function SuperGrokSharing() {
               {!loading && accounts.map((acc) => (
                 <tr key={acc.id} className="border-t border-white/5 hover:bg-white/5 transition">
 
-                  {/* EMAIL */}
                   <td className="p-4">
                     <div className="flex items-center gap-3">
 
@@ -133,19 +138,16 @@ export default function SuperGrokSharing() {
                     </div>
                   </td>
 
-                  {/* PASSWORD */}
                   <td className="p-4 text-center">
                     <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
                       {acc.password}
                     </span>
                   </td>
 
-                  {/* EXPIRED */}
                   <td className="p-4 text-center text-sm">
                     {acc.expired_at}
                   </td>
 
-                  {/* STATUS */}
                   <td className="p-4 text-right">
                     <span className="bg-green-500 px-3 py-1 rounded-xl text-xs font-bold">
                       AKTIF
@@ -176,7 +178,6 @@ export default function SuperGrokSharing() {
 
         <div className="grid md:grid-cols-3 gap-6">
 
-          {/* CARD 1 */}
           <div className={`${cardStyle} p-6 text-center`}>
             <h3 className="font-bold mb-3 uppercase">AKUN PRIVAT</h3>
             <p className="text-gray-400 text-sm mb-6">
@@ -187,9 +188,7 @@ export default function SuperGrokSharing() {
             </button>
           </div>
 
-          {/* CARD 2 */}
           <div className={`${cardStyle} p-6 text-center relative overflow-hidden`}>
-
             <div className="absolute top-3 right-[-35px] rotate-45 bg-orange-500 px-8 text-xs font-bold">
               HEMAT
             </div>
@@ -203,7 +202,6 @@ export default function SuperGrokSharing() {
             </button>
           </div>
 
-          {/* CARD 3 */}
           <div className={`${cardStyle} p-6 text-center`}>
             <h3 className="font-bold mb-3 uppercase">TOOLS AI</h3>
             <p className="text-gray-400 text-sm mb-6">
