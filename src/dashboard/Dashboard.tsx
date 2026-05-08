@@ -153,14 +153,34 @@ if(!data || data.length === 0){
   return
 }
 
+/* =========================
+   FORMAT DATA
+========================= */
+
 const formatted = data.map(tool => ({
-...tool,
-buyLink: tool.buy_link,
-tutorialLink: tool.tutorial_link,
-isComingSoon: tool.is_coming_soon
+  ...tool,
+  buyLink: tool.buy_link,
+  tutorialLink: tool.tutorial_link,
+  isComingSoon: tool.is_coming_soon
 }))
 
-setTools(formatted)
+/* =========================
+   SORT TOOLS
+========================= */
+
+const sortedTools = formatted.sort((a:any, b:any) => {
+
+  const order:any = {
+    free: 1,
+    premium: 2,
+    vip: 3
+  }
+
+  return order[a.plan?.toLowerCase()] - order[b.plan?.toLowerCase()]
+
+})
+
+setTools(sortedTools)
 
 }
 
