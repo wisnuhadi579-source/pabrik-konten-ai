@@ -33,7 +33,7 @@ export async function onRequestGet(context) {
        const amount =
   Number(
     (cols[3] || "0")
-      .replace(/[^\d]/g, "")
+     .replace(/[^0-9.]/g, "")
   ) || 0;
         const date = cols[4]?.trim();
 
