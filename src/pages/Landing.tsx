@@ -111,8 +111,7 @@ export const Landing = () => {
           HERO SECTION
       ========================= */}
 
-      <div className="relative pt-24 pb-32 overflow-hidden">
-
+      <div className="relative pt-16 pb-16 md:pt-24 md:pb-32 overflow-hidden">
         {/* GLOW */}
 
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-yellow-500/5 blur-[120px] pointer-events-none rounded-full"></div>
@@ -184,11 +183,10 @@ export const Landing = () => {
           BENEFITS
       ========================= */}
 
-      <div className="py-24 border-y border-white/5 bg-[#050505]">
-
+      <div className="py-14 md:py-24 border-y border-white/5 bg-[#050505]">
         <div className="max-w-6xl mx-auto px-6">
 
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-6 md:gap-12">
 
             {/* BENEFIT 1 */}
 
@@ -274,12 +272,11 @@ export const Landing = () => {
           TOOLS PREVIEW
       ========================= */}
 
-      <div className="py-32">
+      <div className="py-14 md:py-24">
 
         <div className="max-w-6xl mx-auto px-6 text-center">
 
-          <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter mb-16">
-
+          <h2 className="text-3xl md:text-5xl font-black italic uppercase tracking-tighter mb-8 md:mb-16">
             TOOLS <span className="text-yellow-400">PALING FAVORIT</span>
 
           </h2>
@@ -387,13 +384,13 @@ export const Landing = () => {
           PRICING SECTION
       ========================= */}
 
-      <div className="py-32 bg-[#050505] border-t border-white/5">
+      <div className="py-16 md:py-28 bg-[#050505] border-t border-white/5">
 
         <div className="max-w-6xl mx-auto px-6">
 
           {/* HEADER */}
 
-          <div className="text-center mb-20">
+          <div className="text-center mb-8 md:mb-20">
 
             <h2 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter mb-5">
 
