@@ -1,6 +1,6 @@
 export async function onRequestGet(context) {
 
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTUyhPO0Pcog2W5OuQlXFCzUIZ2r022Eoe6QF-GOSgUDswgxtC8Hfu9MtBO7oXWn4TL2ouGEFqUXS3v/pub?output=csv";
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTUyhPO0Pcog2W5OuQlXFCzUIZ2r022Eoe6QF-GOSgUDswgxtC8Hfu9MtBO7oXWn4TL2ouGEFqUXS3v/pub?gid=1107070122&single=true&output=csv";
 
   const SUPABASE_URL = context.env.SUPABASE_URL;
   const SUPABASE_KEY = context.env.SUPABASE_SERVICE_ROLE_KEY;
