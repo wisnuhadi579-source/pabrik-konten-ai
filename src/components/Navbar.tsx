@@ -175,136 +175,208 @@ return (
 
 <div className="sticky top-0 z-[100] backdrop-blur-md bg-black/70 border-b border-white/10">
 
-<div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+<div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6 py-4">
 
-{/* LEFT */}
-<div onClick={() => navigate("/")} className="cursor-pointer relative inline-flex items-center">
+{/* ================= LEFT ================= */}
 
-  {/* Logo utama */}
-  <div className="bg-gradient-to-b from-red-500 to-red-700 px-2 py-[2px] rectangle-sm">
-    <span className="text-gray-100 font-black text-sm">
-      Pakar Digital
-    </span>
-  </div>
+<div
+onClick={() => navigate("/")}
+className="cursor-pointer relative inline-flex items-center"
+>
 
-  {/* Badge APP (nempel kanan atas) */}
-  <span className="
-    absolute
-    -top-0.5
-    -right-8
-    text-[10px]
-    text-yellow-400
-    border border-yellow-400
-    rounded
-    px-1
-    font-bold
-    bg-black
-  ">
-    APP
-  </span>
+<div className="bg-gradient-to-b from-red-500 to-red-700 px-2 py-[2px] rectangle-sm">
+
+<span className="text-gray-100 font-black text-sm">
+Pakar Digital
+</span>
 
 </div>
 
-{/* MENU */}
+<span className="
+absolute
+-top-0.5
+-right-8
+text-[10px]
+text-yellow-400
+border border-yellow-400
+rounded
+px-1
+font-bold
+bg-black
+">
+APP
+</span>
+
+</div>
+
+{/* ================= DESKTOP MENU ================= */}
+
 <div className="hidden md:flex items-center gap-8">
 
 {menuItems.map((item) => (
+
 <div
 key={item.path}
 onClick={() => handleNavClick(item.path)}
-className={`text-sm cursor-pointer ${
+className={`text-sm cursor-pointer transition ${
 location.pathname === item.path
 ? "text-yellow-400"
 : "text-zinc-400 hover:text-yellow-400"
 }`}
 >
+
 {item.name}
+
 </div>
+
 ))}
 
 </div>
 
-{/* RIGHT */}
-<div className="relative flex items-center gap-3">
+{/* ================= RIGHT ================= */}
+
+<div className="flex items-center gap-3">
+
+{/* DESKTOP ACCOUNT */}
+
+<div className="hidden md:block relative">
 
 {isLoggedIn ? (
+
 <button
 onClick={() => setDropdownOpen(!dropdownOpen)}
 className="bg-[#111] border border-white/10 px-4 py-2 rounded-xl hover:border-yellow-400 flex items-center gap-2 text-sm"
 >
+
 Akun Saya
 <ChevronDown size={14}/>
+
 </button>
+
 ) : (
-<>
-<button onClick={() => navigate("/login")} className="text-zinc-400">Login</button>
-<button className="bg-yellow-400 text-black px-4 py-2 rounded-xl text-sm">Daftar</button>
-</>
+
+<div className="flex items-center gap-3">
+
+<button
+onClick={() => navigate("/login")}
+className="text-zinc-400"
+>
+Login
+</button>
+
+<button className="bg-yellow-400 text-black px-4 py-2 rounded-xl text-sm">
+Daftar
+</button>
+
+</div>
+
 )}
 
-{/* DROPDOWN */}
+{/* ================= DESKTOP DROPDOWN ================= */}
+
 {dropdownOpen && (
 
-<div ref={dropdownRef} className="absolute right-0 top-full mt-3 w-72 rounded-xl bg-zinc-900 border border-white/10 shadow-xl z-50 p-5">
+<div
+ref={dropdownRef}
+className="absolute right-0 top-full mt-3 w-72 rounded-xl bg-zinc-900 border border-white/10 shadow-xl z-50 p-5"
+>
 
 <div className="space-y-4">
 
 {/* USER */}
+
 <div className="flex items-center gap-3 pb-3 border-b border-white/5">
+
 <User size={20} className="text-yellow-400"/>
+
 <div>
-<p className="text-xs text-white">{userEmail}</p>
+
+<p className="text-xs text-white">
+{userEmail}
+</p>
+
 </div>
+
 </div>
 
 {/* ROLE */}
+
 <div>
 
-<p className="text-[10px] text-zinc-500 uppercase mb-1">Member Status</p>
+<p className="text-[10px] text-zinc-500 uppercase mb-1">
+Member Status
+</p>
 
 <div className="flex items-center gap-2">
 
 {userRole === "VIP" ? (
+
 <Crown size={14} className="text-fuchsia-400"/>
+
 ) : userRole === "Premium" ? (
+
 <Zap size={14} className="text-yellow-400"/>
+
 ) : (
+
 <ShieldCheck size={14} className="text-zinc-400"/>
+
 )}
 
-<span className="text-sm font-bold text-yellow-400">{userRole}</span>
+<span className="text-sm font-bold text-yellow-400">
+{userRole}
+</span>
 
 </div>
 
 </div>
 
 {/* ADMIN MENU */}
+
 {isAdmin && (
 
 <div className="pt-3 border-t border-white/5 space-y-2">
 
-<button onClick={()=>go("/admin")} className="w-full flex items-center gap-2 text-sm text-yellow-400">
+<button
+onClick={()=>go("/admin")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400"
+>
 <Settings size={14}/> Admin Dashboard
 </button>
 
-<button onClick={()=>go("/admin/tools")} className="w-full flex items-center gap-2 text-sm text-yellow-400">
+<button
+onClick={()=>go("/admin/tools")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400"
+>
 <Wrench size={14}/> Tools Manager
 </button>
 
-<button onClick={()=>go("/admin/licenses")} className="w-full flex items-center gap-2 text-sm text-yellow-400">
+<button
+onClick={()=>go("/admin/licenses")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400"
+>
 <KeyRound size={14}/> Licenses Manager
 </button>
 
-<button onClick={()=>go("/admin/users")} className="w-full flex items-center gap-2 text-sm text-yellow-400">
+<button
+onClick={()=>go("/admin/users")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400"
+>
 <Users size={14}/> Users Manager
 </button>
 
-<button onClick={()=>go("/admin/analytics")} className="w-full flex items-center gap-2 text-sm text-yellow-400">
+<button
+onClick={()=>go("/admin/analytics")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400"
+>
 <BarChart3 size={14}/> Analytics
 </button>
 
-<button onClick={()=>go("/admin/revenue")} className="w-full flex items-center gap-2 text-sm text-yellow-400">
-<BarChart3 size={14}/> Revenue
+<button
+onClick={()=>go("/admin/revenue")}
+className="w-full flex items-center gap-2 text-sm text-yellow-400"
+>
+<Zap size={14}/> Revenue
 </button>
 
 </div>
@@ -312,17 +384,22 @@ Akun Saya
 )}
 
 {/* ACTION */}
+
 <div className="pt-2 space-y-2">
 
 <button
 onClick={handleResetPassword}
 className="text-zinc-400 hover:text-amber-500 text-sm"
 >
+
 {resetLoading ? "Mengirim..." : "Reset Password"}
+
 </button>
 
 {resetMessage && (
-<div className="text-xs text-emerald-400">{resetMessage}</div>
+<div className="text-xs text-emerald-400">
+{resetMessage}
+</div>
 )}
 
 <button
@@ -337,6 +414,213 @@ className="w-full flex items-center justify-center gap-2 text-xs text-zinc-500 h
 </div>
 
 </div>
+
+</div>
+
+)}
+
+</div>
+
+{/* ================= MOBILE MENU BUTTON ================= */}
+
+<button
+onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+className="
+md:hidden
+w-11 h-11
+rounded-xl
+bg-[#111]
+border border-white/10
+flex items-center justify-center
+"
+>
+
+{mobileMenuOpen ? (
+<X size={20}/>
+) : (
+<Menu size={20}/>
+)}
+
+</button>
+
+</div>
+
+</div>
+
+{/* ================= MOBILE MENU ================= */}
+
+<div
+className={`
+md:hidden
+overflow-hidden
+transition-all duration-300
+bg-black/95 backdrop-blur-xl
+border-t border-white/5
+
+${mobileMenuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"}
+`}
+>
+
+<div className="px-4 py-4 space-y-2">
+
+{/* MENU */}
+
+{menuItems.map((item) => (
+
+<button
+key={item.path}
+onClick={() => {
+handleNavClick(item.path)
+setMobileMenuOpen(false)
+}}
+className={`
+w-full text-left
+px-4 py-3
+rounded-xl
+text-sm
+transition
+
+${location.pathname === item.path
+? "bg-yellow-500 text-black font-bold"
+: "bg-[#111] text-zinc-300 hover:bg-[#181818]"
+}
+`}
+>
+
+{item.name}
+
+</button>
+
+))}
+
+{/* ACCOUNT */}
+
+{isLoggedIn && (
+
+<div className="mt-4 rounded-2xl bg-[#111] border border-white/5 p-4">
+
+<div className="flex items-center gap-3">
+
+<User size={18} className="text-yellow-400"/>
+
+<div>
+
+<p className="text-xs text-zinc-500">
+Login sebagai
+</p>
+
+<p className="text-sm truncate">
+{userEmail}
+</p>
+
+</div>
+
+</div>
+
+<div className="mt-4 flex items-center gap-2">
+
+{userRole === "VIP" ? (
+<Crown size={14} className="text-fuchsia-400"/>
+) : userRole === "Premium" ? (
+<Zap size={14} className="text-yellow-400"/>
+) : (
+<ShieldCheck size={14} className="text-zinc-400"/>
+)}
+
+<span className="text-sm font-bold text-yellow-400">
+{userRole}
+</span>
+
+</div>
+
+{/* MOBILE ADMIN */}
+
+{isAdmin && (
+
+<div className="mt-4 border-t border-white/5 pt-4 space-y-2">
+
+<button
+onClick={()=>go("/admin")}
+className="w-full text-left text-sm text-yellow-400"
+>
+Admin Dashboard
+</button>
+
+<button
+onClick={()=>go("/admin/tools")}
+className="w-full text-left text-sm text-yellow-400"
+>
+Tools Manager
+</button>
+
+<button
+onClick={()=>go("/admin/licenses")}
+className="w-full text-left text-sm text-yellow-400"
+>
+Licenses Manager
+</button>
+
+<button
+onClick={()=>go("/admin/users")}
+className="w-full text-left text-sm text-yellow-400"
+>
+Users Manager
+</button>
+
+<button
+onClick={()=>go("/admin/analytics")}
+className="w-full text-left text-sm text-yellow-400"
+>
+Analytics
+</button>
+
+</div>
+
+)}
+
+<div className="mt-4 pt-4 border-t border-white/5 space-y-2">
+
+<button
+onClick={handleResetPassword}
+className="w-full text-left text-sm text-zinc-400"
+>
+{resetLoading ? "Mengirim..." : "Reset Password"}
+</button>
+
+<button
+onClick={handleLogout}
+className="w-full text-left text-sm text-red-400"
+>
+Logout
+</button>
+
+</div>
+
+</div>
+
+)}
+
+{/* LOGIN MOBILE */}
+
+{!isLoggedIn && (
+
+<div className="space-y-2 pt-2">
+
+<button
+onClick={()=>{
+navigate("/login")
+setMobileMenuOpen(false)
+}}
+className="w-full py-3 rounded-xl bg-[#111] text-white"
+>
+Login
+</button>
+
+<button
+className="w-full py-3 rounded-xl bg-yellow-400 text-black font-bold"
+>
+Daftar
+</button>
 
 </div>
 
