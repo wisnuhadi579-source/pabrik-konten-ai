@@ -72,7 +72,15 @@ export default function SuperGrokSharing() {
             </svg>
           </div>
 
-          <span className="text-2xl md:text-3xl font-black tracking-widest text-white flex items-center">
+          <span className="
+text-lg
+sm:text-xl
+md:text-3xl
+font-black
+tracking-wide
+text-white
+flex items-center
+">
             SuperGrok
             <span className="ml-1 text-sm md:text-base align-top opacity-70">
               PRO
@@ -81,7 +89,15 @@ export default function SuperGrokSharing() {
 
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold uppercase leading-tight">
+        <h1 className="
+text-3xl
+sm:text-4xl
+md:text-6xl
+font-extrabold
+uppercase
+leading-[1.05]
+tracking-tight
+">
           AKSES EKSKLUSIF <br />
           <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             GROK AI PREMIUM
@@ -92,7 +108,13 @@ export default function SuperGrokSharing() {
           Dapatkan kredensial instan untuk Grok Premium tanpa biaya mahal.
         </p>
 
-       <div className="flex items-center justify-center gap-4 mt-6">
+       <div className="
+flex flex-col sm:flex-row
+items-center justify-center
+gap-3
+mt-6
+w-full
+">
 <button
   onClick={() => {
     const el = document.getElementById("akun")
@@ -131,7 +153,14 @@ export default function SuperGrokSharing() {
 
         <div className="flex justify-between mb-6 flex-col md:flex-row gap-4">
           <div>
-            <h2 className="text-2xl font-bold uppercase">DAFTAR AKUN PREMIUM</h2>
+            <h2 className="
+text-lg
+sm:text-xl
+md:text-2xl
+font-bold
+uppercase
+leading-tight
+">DAFTAR AKUN PREMIUM</h2>
             <p className="text-gray-400 text-sm">
               Gunakan kredensial berikut untuk akses Grok Premium
             </p>
@@ -142,9 +171,14 @@ export default function SuperGrokSharing() {
           </div>
         </div>
 
-        <div className={`${cardStyle} ${glowStyle} overflow-hidden`}>
+        <div className={`
+${cardStyle}
+${glowStyle}
+overflow-x-auto
+w-full
+`}>
 
-          <table className="w-full">
+          <table className="w-full min-w-[760px]">
             <thead className="bg-white/5 text-gray-300 text-sm">
               <tr>
                 <th className="p-4 text-left">EMAIL AKUN</th>
@@ -234,18 +268,38 @@ export default function SuperGrokSharing() {
       </div>
 
       {/* UPSELL */}
-<div className="max-w-6xl mx-auto px-6 mt-24 mb-24">
+<div className="
+max-w-6xl
+mx-auto
+px-4 md:px-6
+mt-20
+mb-24
+">
 
-  <h2 className="text-center text-5xl font-black upercase mb-12 uppercase">
+  <h2 className="
+text-center
+text-3xl
+sm:text-4xl
+md:text-5xl
+font-black
+uppercase
+mb-10
+leading-tight
+">
     PILIH AKSES SUPERGROK
   </h2>
 
-  <div className="grid md:grid-cols-3 gap-6">
+  <div className="
+grid
+grid-cols-1
+md:grid-cols-3
+gap-5
+">
 
     {/* GRATIS */}
     <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-6 text-left hover:border-white/20 transition">
 
-      <h3 className="text-5xl font-black upercase italic mb-2">GRATIS</h3>
+      <h3 className="text-3xl md:text-5xl font-black upercase italic mb-2">GRATIS</h3>
       <p className="text-gray-400 text-sm mb-6">
         Untuk coba-coba (Akun Sharing)
       </p>
@@ -280,7 +334,7 @@ export default function SuperGrokSharing() {
     {/* PREMIUM (PALING LARIS) */}
     <div className="bg-[#0a0a0a] border border-purple-500/20 rounded-2xl p-6 text-left hover:border-purple-500/40 transition">
 
-      <h3 className="text-5xl font-black upercase italic mb-2 text-yellow-400">PRIVATE</h3>
+      <h3 className="text-3xl md:text-5xl font-black upercase italic mb-2 text-yellow-400">PRIVATE</h3>
       <p className="text-gray-400 text-sm mb-6">
         Akses akun privat full
       </p>
@@ -313,7 +367,7 @@ export default function SuperGrokSharing() {
         PALING POPULER
       </div>
 
-      <h3 className="text-5xl font-black upercase italic mb-2 text-purple-400">TUTORIAL</h3>
+      <h3 className="text-3xl md:text-5xl font-black upercase italic mb-2 text-purple-400">TUTORIAL</h3>
       <p className="text-gray-400 text-sm mb-6">
         Tutorial bikin akun sendiri 100% Gratis
       </p>
