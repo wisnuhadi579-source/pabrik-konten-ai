@@ -70,6 +70,10 @@ const [filterOpen,setFilterOpen] = useState(false)
 const [activeCategory,setActiveCategory] = useState("Semua Tools")
 const [openCard,setOpenCard] = useState(null)
 const [popup,setPopup] = useState(null)
+const [accessCode,setAccessCode] = useState("")
+const [claimLoading,setClaimLoading] = useState(false)
+const [claimMessage,setClaimMessage] = useState("")
+const [userPlan,setUserPlan] = useState("free")
 
 /* =========================
    LOAD LICENSES FUNCTION
@@ -89,6 +93,28 @@ const { data } = await supabase
 .eq("status", "active")
 
 setLicenses(data || [])
+
+}
+/* =========================
+   LOAD USER PLAN
+========================= */
+
+const loadUserPlan = async () => {
+
+const session = localStorage.getItem("userSession")
+if(!session) return
+
+const user = JSON.parse(session)
+
+const { data } = await supabase
+.from("users")
+.select("plan")
+.eq("email", user.email)
+.single()
+
+if(data){
+setUserPlan(data.plan || "free")
+}
 
 }
 
@@ -112,6 +138,7 @@ setLoading(false)
 
 useEffect(()=>{
 loadLicenses()
+loadUserPlan()
 },[])
 
 /* 🔥 REALTIME LISTENER */
@@ -285,6 +312,125 @@ const openTool = async (tool) => {
   }
 
 }
+/* =========================
+   CLAIM ACCESS CODE
+========================= */
+
+const claimAccessCode = async () => {
+
+try{
+
+setClaimLoading(true)
+setClaimMessage("")
+
+const session = localStorage.getItem("userSession")
+if(!session) return
+
+const user = JSON.parse(session)
+
+if(!accessCode){
+setClaimMessage("Masukkan kode akses")
+return
+}
+
+/* =========================
+   CHECK CODE
+========================= */
+
+const { data: codeData, error: codeError } = await supabase
+.from("access_codes")
+.select("*")
+.eq("code", accessCode.trim().toUpperCase())
+.single()
+
+if(codeError || !codeData){
+setClaimMessage("Kode akses tidak valid")
+return
+}
+
+/* =========================
+   CHECK USED
+========================= */
+
+if(codeData.is_used){
+setClaimMessage("Kode sudah digunakan")
+return
+}
+
+/* =========================
+   INSERT LICENSE
+========================= */
+
+await supabase
+.from("licenses")
+.insert({
+
+email: user.email,
+product: `${codeData.plan}-bundle`,
+plan: codeData.plan,
+status: "active"
+
+})
+
+/* =========================
+   UPDATE USER PLAN
+========================= */
+
+await supabase
+.from("users")
+.update({
+plan: codeData.plan
+})
+.eq("email", user.email)
+
+/* =========================
+   MARK CODE USED
+========================= */
+
+await supabase
+.from("access_codes")
+.update({
+is_used: true,
+used_by: user.email,
+used_at: new Date().toISOString()
+})
+.eq("id", codeData.id)
+
+/* =========================
+   UPDATE SESSION
+========================= */
+
+const updatedSession = {
+...user,
+member: codeData.plan
+}
+
+localStorage.setItem(
+"userSession",
+JSON.stringify(updatedSession)
+)
+
+/* =========================
+   RELOAD
+========================= */
+
+await loadLicenses()
+await loadUserPlan()
+
+setClaimMessage("Berhasil membuka akses 🔥")
+
+}catch(err){
+
+console.error(err)
+setClaimMessage("Terjadi kesalahan")
+
+}finally{
+
+setClaimLoading(false)
+
+}
+
+}
 if(loading) return null
 if(!isLoggedIn) return null
 
@@ -307,6 +453,126 @@ iklan, dan automation lebih cepat dengan sistem AI terintegrasi.
 </p>
 
 </div>
+{/* =========================
+   PREMIUM CLAIM BOX
+========================= */}
+
+{userPlan === "free" && (
+
+<div className="max-w-3xl mx-auto mb-8 px-4">
+
+<div className="relative overflow-hidden rounded-2xl border border-yellow-500/20 bg-[#0b0b0b] shadow-[0_0_80px_rgba(255,180,0,0.12)]">
+
+{/* glow */}
+
+<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,200,0,0.15),transparent_60%)] pointer-events-none"></div>
+
+{/* top line */}
+
+<div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[3px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
+
+<div className="relative z-10 px-5 md:px-6 py-4">
+
+{/* title */}
+
+<div className="text-center">
+
+<h2 className="text-lg md:text-xl font-black italic uppercase tracking-wide text-white">
+
+💎 Buka Semua Akses Premium
+
+</h2>
+
+<p className="text-zinc-400 text-sm mt-2">
+Masukkan kode akses Premium/VIP untuk membuka seluruh tools eksklusif.
+</p>
+
+</div>
+
+{/* input */}
+
+<div className="mt-3 flex flex-col md:flex-row gap-3">
+
+<input
+value={accessCode}
+onChange={(e)=>setAccessCode(e.target.value)}
+placeholder="Ketik kode akses..."
+className="
+flex-1
+bg-black
+border
+border-yellow-500/20
+rounded-2xl
+px-5
+py-2
+text-white
+placeholder:text-zinc-500
+outline-none
+focus:border-yellow-400
+"
+/>
+
+<button
+onClick={claimAccessCode}
+disabled={claimLoading}
+className="
+px-6
+py-2
+rounded-2xl
+font-black
+uppercase
+tracking-wide
+bg-gradient-to-r
+from-yellow-400
+to-orange-500
+text-black
+shadow-[0_10px_30px_rgba(255,180,0,0.35)]
+hover:brightness-110
+transition-all
+"
+>
+
+{claimLoading ? "Loading..." : "Klaim"}
+
+</button>
+
+</div>
+
+{/* message */}
+
+{claimMessage && (
+
+<div className="mt-4 text-center text-sm font-medium text-yellow-300">
+{claimMessage}
+</div>
+
+)}
+
+{/* footer */}
+
+<div className="mt-5 text-center text-xs text-zinc-500">
+
+Belum punya kode akses?
+
+<a
+href="https://lynk.id/USERNAMEKAMU"
+target="_blank"
+className="text-yellow-400 ml-1 hover:underline font-semibold"
+>
+
+Beli Paket Premium
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+)}
 
 <div className="flex justify-center">
 
@@ -409,10 +675,12 @@ return (
 <ImageSlider images={tool.images}/>
 
 <div className={`absolute top-2 left-2 text-[10px] px-3 py-1 rounded-full font-bold ${
-tool.plan==="free"
+tool.plan?.toLowerCase()==="free"
 ? "bg-red-600"
-: tool.plan==="Premium"
+
+: tool.plan?.toLowerCase()==="premium"
 ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-black"
+
 : "bg-purple-600"
 }`}>
 {tool.plan?.toUpperCase()}
