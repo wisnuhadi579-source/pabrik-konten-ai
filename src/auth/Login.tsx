@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff, X } from "lucide-react";
 import { supabase } from "../services/supabaseClient";
 
 function Login({ onLogin }: any) {
@@ -11,6 +12,12 @@ function Login({ onLogin }: any) {
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  /* =========================
+     SHOW / HIDE PASSWORD
+  ========================= */
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleAuth = async () => {
 
@@ -65,7 +72,7 @@ function Login({ onLogin }: any) {
           .eq("status", "active");
 
         /* =========================
-           🔥 DETERMINE PLAN (UPGRADED)
+           DETERMINE PLAN
         ========================= */
 
         let memberStatus = "free";
@@ -82,7 +89,7 @@ function Login({ onLogin }: any) {
         }
 
         /* =========================
-           🔥 UPDATE USERS TABLE (INI INTI STEP 3)
+           UPDATE USERS TABLE
         ========================= */
 
         await supabase
@@ -160,63 +167,174 @@ function Login({ onLogin }: any) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
 
-      <div className="w-full max-w-md p-6 bg-zinc-900 rounded-lg">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
 
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          {authMode === "login" ? "Login" : "Register"}
+      {/* CARD */}
+
+      <div className="relative w-full max-w-sm rounded-3xl border border-zinc-800 bg-[#0f1017] p-7 shadow-[0_0_40px_rgba(255,180,0,0.08)]">
+
+        {/* CLOSE BUTTON */}
+
+        <button
+          className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-all"
+        >
+          <X size={18} />
+        </button>
+
+        {/* LOGO */}
+
+        <div className="flex justify-center mb-6">
+
+          <img
+            src="/logo-pakar-digital.png"
+            alt="Pakar Digital"
+            className="h-12 object-contain"
+          />
+
+        </div>
+
+        {/* TITLE */}
+
+        <h2 className="text-3xl font-bold text-white text-center mb-2">
+          {authMode === "login" ? "Selamat Datang" : "Daftar Akun"}
         </h2>
 
+        {/* SUBTITLE */}
+
+        <p className="text-zinc-400 text-sm text-center mb-6">
+
+          {authMode === "login"
+            ? "Silahkan masuk dengan Emailmu"
+            : "Buat akun gratis untuk mulai akses tools"}
+
+        </p>
+
+        {/* ERROR */}
+
         {error && (
-          <div className="bg-red-500 p-2 mb-3 rounded text-sm">
+          <div className="bg-red-500 text-white text-sm p-3 rounded-lg mb-4">
             {error}
           </div>
         )}
 
+        {/* EMAIL */}
+
         <input
           type="email"
-          placeholder="Email"
-          className="w-full p-2 mb-3 bg-zinc-800 rounded"
+          placeholder="Masukkan email"
+          className="w-full bg-[#e9edf5] text-black rounded-xl px-4 py-3 mb-4 outline-none"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-2 mb-3 bg-zinc-800 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        {/* PASSWORD */}
+
+        <div className="relative mb-3">
+
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Masukkan password"
+            className="w-full bg-[#e9edf5] text-black rounded-xl px-4 py-3 pr-12 outline-none"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500"
+          >
+
+            {showPassword ? (
+              <EyeOff size={20} />
+            ) : (
+              <Eye size={20} />
+            )}
+
+          </button>
+
+        </div>
+
+        {/* FORGOT PASSWORD */}
+
+        {authMode === "login" && (
+
+          <div className="text-right mb-5">
+
+            <span
+              className="text-[11px] text-yellow-400 font-semibold cursor-pointer hover:underline"
+              onClick={() => navigate("/forgot-password")}
+            >
+              LUPA KATA SANDI?
+            </span>
+
+          </div>
+
+        )}
+
+        {/* BUTTON */}
 
         <button
           onClick={handleAuth}
           disabled={isLoading}
-          className="w-full p-2 bg-yellow-500 text-black font-bold rounded"
+          className="w-full rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition-all"
         >
+
           {isLoading
             ? "Loading..."
             : authMode === "login"
-            ? "Login"
-            : "Register"}
+            ? "Masuk Sekarang"
+            : "Daftar Sekarang"}
+
         </button>
 
-        <p className="text-sm mt-4 text-center">
-          {authMode === "login" ? "Belum punya akun?" : "Sudah punya akun?"}{" "}
-          <span
-            className="text-yellow-400 cursor-pointer"
-            onClick={() =>
-              setAuthMode(authMode === "login" ? "register" : "login")
-            }
-          >
-            {authMode === "login" ? "Daftar" : "Login"}
-          </span>
-        </p>
+        {/* FOOTER */}
+
+        <div className="mt-6 text-center">
+
+          {authMode === "login" ? (
+
+            <>
+
+              <p className="text-zinc-500 text-sm mb-2">
+                Belum punya akun?
+              </p>
+
+              <span
+                className="text-yellow-400 font-bold text-sm cursor-pointer hover:underline"
+                onClick={() => setAuthMode("register")}
+              >
+                Daftar di sini (Gratis)
+              </span>
+
+            </>
+
+          ) : (
+
+            <>
+
+              <p className="text-zinc-500 text-sm mb-2">
+                Sudah punya akun?
+              </p>
+
+              <span
+                className="text-yellow-400 font-bold text-sm cursor-pointer hover:underline"
+                onClick={() => setAuthMode("login")}
+              >
+                LOGIN DISINI
+              </span>
+
+            </>
+
+          )}
+
+        </div>
 
       </div>
 
     </div>
+
   );
 }
 
