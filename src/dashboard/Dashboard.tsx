@@ -450,19 +450,7 @@ return (
 
 <div className="absolute left-1/2 top-[450px] -translate-x-1/2 w-[900px] h-[400px] bg-yellow-500/10 blur-[200px] pointer-events-none"></div>
 
-<div className="text-center mt-14 mb-10">
-
-<h1 className="text-3xl md:text-4xl font-black tracking-tight">
-Build Content Faster With
-<span className="text-yellow-400"> AI Tools</span>
-</h1>
-
-<p className="text-zinc-500 text-sm mt-3 max-w-xl mx-auto">
-Creator, Affiliator, dan Digital Builder dapat membuat konten,
-iklan, dan automation lebih cepat dengan sistem AI terintegrasi.
-</p>
-
-</div>
+<div className="h-3"></div>
 {/* =========================
    PREMIUM CLAIM BOX
 ========================= */}
@@ -564,15 +552,14 @@ transition-all
 
 Belum punya kode akses?
 
-<a
-href="https://lynk.id/USERNAMEKAMU"
-target="_blank"
+<button
+onClick={() => navigate("/pricing")}
 className="text-yellow-400 ml-1 hover:underline font-semibold"
 >
 
 Beli Paket Premium
 
-</a>
+</button>
 
 </div>
 
