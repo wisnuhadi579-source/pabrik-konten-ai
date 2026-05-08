@@ -659,15 +659,29 @@ l.product === (tool.product || tool.id)
 })()
 return (
 
-<div key={tool.id} className={`group relative rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/25 transition-all duration-500 hover:border-yellow-400/60 hover:shadow-[0_40px_120px_rgba(255,215,0,0.35)] hover:-translate-y-2 ${expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1.02]" : ""}`}>
+<div
+key={tool.id}
+className={`group relative rounded-3xl overflow-hidden bg-[#0a0a0a]
+border transition-all duration-500
 
+${expanded
+? "border-yellow-400/60 shadow-[0_0_80px_rgba(255,215,0,0.22)] scale-[1.02] z-30"
+: "border-white/10 hover:border-yellow-400/30 hover:shadow-[0_25px_80px_rgba(255,215,0,0.12)]"
+}`}
+>
 <div onClick={()=>setOpenCard(expanded?null:tool.id)} className="cursor-pointer">
 
 <div className="p-2 relative">
 
 <div className="relative border border-white/15 rounded-xl overflow-hidden">
 
-<div className="relative h-32 md:h-40 overflow-hidden">
+<div
+className={`relative h-32 md:h-40 overflow-hidden transition-all duration-500
+${expanded
+? "scale-[1.02] shadow-[0_0_35px_rgba(255,215,0,0.25)]"
+: ""
+}`}
+>
 
 <ImageSlider images={tool.images}/>
 
@@ -695,7 +709,15 @@ tool.plan?.toLowerCase()==="free"
 
 <div>
 
-<h3 className="font-black italic uppercase tracking-normal leading-tight text-lg md:text-xl text-white">
+<h3 className="
+font-black italic uppercase
+tracking-tight
+leading-tight
+text-lg md:text-2xl
+text-white
+group-hover:text-yellow-300
+transition-colors duration-300
+">
 {tool.name}
 </h3>
 
@@ -705,7 +727,16 @@ tool.plan?.toLowerCase()==="free"
 
 </div>
 
-<ChevronDown className={`w-5 h-5 transition ${expanded ? "rotate-180 text-yellow-400" : ""}`}/>
+<ChevronDown
+className={`
+w-5 h-5 flex-shrink-0
+transition-all duration-500
+${expanded
+? "rotate-180 text-yellow-400"
+: "text-zinc-600"
+}
+`}
+/>
 
 </div>
 
@@ -713,16 +744,41 @@ tool.plan?.toLowerCase()==="free"
 
 </div>
 
-<div className={`grid transition-all duration-500 ${expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+<div
+className={`grid transition-all duration-500 ease-out
+${expanded
+? "grid-rows-[1fr] opacity-100"
+: "grid-rows-[0fr] opacity-0"
+}`}
+>
 
 <div className="overflow-hidden">
 
-<div className="px-5 pb-5">
+<div className="px-5 pb-5 relative">
+{expanded && (
+<div className="absolute inset-0 bg-gradient-to-b from-yellow-500/[0.03] to-transparent pointer-events-none rounded-b-3xl"></div>
+)}
 
 {tool.features?.map((f,i)=>(
 
-<div key={i} className="bg-[#151515] border border-white/5 rounded-xl px-4 py-3 text-sm mb-2 hover:border-yellow-500/30 transition">
-{f}
+<div
+key={i}
+className="
+flex items-center gap-3
+bg-white/[0.03]
+border border-white/5
+rounded-xl
+px-4 py-3
+text-sm text-zinc-300
+mb-2
+transition-all duration-300
+hover:bg-yellow-500/5
+hover:border-yellow-500/30
+"
+>
+<div className="w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0"></div>
+
+<span>{f}</span>
 </div>
 
 ))}
