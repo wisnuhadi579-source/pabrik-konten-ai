@@ -358,6 +358,17 @@ return
 }
 
 /* =========================
+   PREVENT SAME PLAN CLAIM
+========================= */
+
+if(userPlan === codeData.plan){
+
+setClaimMessage(`Kamu sudah memiliki plan ${codeData.plan}`)
+return
+
+}
+
+/* =========================
    INSERT LICENSE
 ========================= */
 
@@ -401,10 +412,9 @@ used_at: new Date().toISOString()
 ========================= */
 
 const updatedSession = {
-...user,
-member: codeData.plan
+  ...user,
+  plan: codeData.plan
 }
-
 localStorage.setItem(
 "userSession",
 JSON.stringify(updatedSession)
@@ -457,7 +467,7 @@ iklan, dan automation lebih cepat dengan sistem AI terintegrasi.
    PREMIUM CLAIM BOX
 ========================= */}
 
-{userPlan === "free" && (
+{userPlan !== "vip" && (
 
 <div className="max-w-3xl mx-auto mb-8 px-4">
 
@@ -471,19 +481,19 @@ iklan, dan automation lebih cepat dengan sistem AI terintegrasi.
 
 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[3px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
 
-<div className="relative z-10 px-5 md:px-6 py-4">
+<div className="relative z-10 px-4 py-3 md:px-6 md:py-4">
 
 {/* title */}
 
 <div className="text-center">
 
-<h2 className="text-lg md:text-xl font-black italic uppercase tracking-wide text-white">
+<h2 className="text-base md:text-xl font-black italic uppercase tracking-wide text-white leading-tight">
 
 💎 Buka Semua Akses Premium
 
 </h2>
 
-<p className="text-zinc-400 text-sm mt-2">
+<p className="text-zinc-400 text-xs md:text-sm mt-1">
 Masukkan kode akses Premium/VIP untuk membuka seluruh tools eksklusif.
 </p>
 
@@ -491,7 +501,7 @@ Masukkan kode akses Premium/VIP untuk membuka seluruh tools eksklusif.
 
 {/* input */}
 
-<div className="mt-3 flex flex-col md:flex-row gap-3">
+<div className="mt-3 flex flex-col md:flex-row gap-2">
 
 <input
 value={accessCode}
@@ -504,7 +514,7 @@ border
 border-yellow-500/20
 rounded-2xl
 px-5
-py-2
+py-1
 text-white
 placeholder:text-zinc-500
 outline-none
@@ -517,7 +527,7 @@ onClick={claimAccessCode}
 disabled={claimLoading}
 className="
 px-6
-py-2
+py-1
 rounded-2xl
 font-black
 uppercase
@@ -550,7 +560,7 @@ transition-all
 
 {/* footer */}
 
-<div className="mt-5 text-center text-xs text-zinc-500">
+<div className="mt-3 text-center text-[11px] text-zinc-500">
 
 Belum punya kode akses?
 
@@ -584,7 +594,7 @@ Beli Paket Premium
 value={search}
 onChange={e=>setSearch(e.target.value)}
 placeholder="Cari fitur..."
-className="w-full bg-[#0c0c0c] border border-white/10 rounded-xl pl-9 py-2 focus:border-yellow-500"
+className="w-full bg-[#0c0c0c] border border-white/10 rounded-xl pl-9 py-1 focus:border-yellow-500"
 />
 
 </div>
@@ -595,7 +605,7 @@ className="w-full bg-[#0c0c0c] border border-white/10 rounded-xl pl-9 py-2 focus
 
 <button
 onClick={()=>setFilterOpen(!filterOpen)}
-className="bg-[#111] border border-white/10 px-6 py-2 rounded-xl text-xs uppercase tracking-widest hover:border-yellow-400 transition"
+className="bg-[#111] border border-white/10 px-6 py-1 rounded-xl text-xs uppercase tracking-widest hover:border-yellow-400 transition"
 >
 
 FILTER TOOLS ▾ </button>
