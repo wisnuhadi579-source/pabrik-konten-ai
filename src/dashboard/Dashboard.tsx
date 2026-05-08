@@ -410,11 +410,11 @@ tool.plan==="free"
 
 <div>
 
-<h3 className="font-black italic uppercase tracking-tighter text-xl text-[#FFD700]">
+<h3 className="font-black italic uppercase tracking-normal leading-tight text-xl text-white">
 {tool.name}
 </h3>
 
-<p className="text-[11px] uppercase tracking-[0.28em] text-zinc-500 mt-2">
+<p className="text-xs uppercase tracking-[0.14em] text-zinc-500 mt-2">
 {tool.description}
 </p>
 
