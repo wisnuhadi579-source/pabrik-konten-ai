@@ -459,7 +459,7 @@ return (
 
 <div className="max-w-3xl mx-auto mb-8 px-4">
 
-<div className="relative overflow-hidden rounded-2xl border border-yellow-500/20 bg-[#0b0b0b] shadow-[0_0_80px_rgba(255,180,0,0.12)]">
+<div className="relative overflow-hidden rounded-xl border border-yellow-500/20 bg-[#0b0b0b] shadow-[0_0_80px_rgba(255,180,0,0.12)]">
 
 {/* glow */}
 
@@ -500,7 +500,7 @@ flex-1
 bg-black
 border
 border-yellow-500/20
-rounded-2xl
+rounded-xl
 px-5
 py-1
 text-white
@@ -516,7 +516,7 @@ disabled={claimLoading}
 className="
 px-6
 py-1
-rounded-2xl
+rounded-xl
 font-black
 uppercase
 tracking-wide
@@ -628,7 +628,7 @@ activeCategory===cat ? "text-yellow-400 font-semibold" : "text-gray-400"
 
 </div>
 
-<div className="max-w-6xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div className="max-w-6xl mx-auto mt-8 px-3 md:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
 
 {filtered.map(tool=>{
 
@@ -659,15 +659,15 @@ l.product === (tool.product || tool.id)
 })()
 return (
 
-<div key={tool.id} className={`group relative rounded-3xl overflow-hidden bg-[#0a0a0a] border border-white/25 transition-all duration-500 hover:border-yellow-400/60 hover:shadow-[0_40px_120px_rgba(255,215,0,0.35)] hover:-translate-y-2 ${expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1.02]" : ""}`}>
+<div key={tool.id} className={`group relative rounded-2xl overflow-hidden bg-[#0a0a0a] border border-white/25 transition-all duration-500 hover:border-yellow-400/60 hover:shadow-[0_40px_120px_rgba(255,215,0,0.35)] hover:-translate-y-2 ${expanded ? "border-yellow-400 shadow-[0_50px_140px_rgba(255,215,0,0.4)] scale-[1.02]" : ""}`}>
 
 <div onClick={()=>setOpenCard(expanded?null:tool.id)} className="cursor-pointer">
 
 <div className="p-2 relative">
 
-<div className="relative border border-white/15 rounded-2xl overflow-hidden">
+<div className="relative border border-white/15 rounded-xl overflow-hidden">
 
-<div className="relative h-40 overflow-hidden">
+<div className="relative h-32 md:h-40 overflow-hidden">
 
 <ImageSlider images={tool.images}/>
 
@@ -689,17 +689,17 @@ tool.plan?.toLowerCase()==="free"
 
 </div>
 
-<div className="p-5">
+<div className="p-4">
 
 <div className="flex justify-between items-start">
 
 <div>
 
-<h3 className="font-black italic uppercase tracking-normal leading-tight text-xl text-white">
+<h3 className="font-black italic uppercase tracking-normal leading-tight text-lg md:text-xl text-white">
 {tool.name}
 </h3>
 
-<p className="text-xs uppercase tracking-[0.14em] text-zinc-500 mt-2">
+<p className="text-[10px] md:text-xs uppercase tracking-[0.12em] text-zinc-500 mt-2">
 {tool.description}
 </p>
 
