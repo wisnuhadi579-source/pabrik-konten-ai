@@ -90,7 +90,7 @@ export const Pricing = () => {
       price: "Rp 99rb",
       period: "/Selamanya",
 
-      description: "🚀 Akses All tools + Free Update tool baru",
+      description: "🚀 Paket Komplit - Dapat Semua Akses",
 
       icon: <Crown className="text-fuchsia-400" size={32} />,
 
