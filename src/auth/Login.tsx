@@ -172,8 +172,7 @@ function Login({ onLogin }: any) {
 
       {/* CARD */}
 
-      <div className="relative w-full max-w-sm rounded-3xl border border-zinc-800 bg-[#0f1017] p-7 shadow-[0_0_40px_rgba(255,180,0,0.08)]">
-
+      <div className="relative w-full max-w-[340px] rounded-3xl border border-zinc-800 bg-[#0f1017] p-5 shadow-[0_0_40px_rgba(255,180,0,0.08)]">
         {/* CLOSE BUTTON */}
 
         <button
@@ -184,7 +183,7 @@ function Login({ onLogin }: any) {
 
         {/* LOGO */}
 
-<div className="flex justify-center mb-6">
+<div className="flex justify-center mb-4">
 
   <div className="relative inline-flex items-center">
 
@@ -192,7 +191,7 @@ function Login({ onLogin }: any) {
 
     <div className="bg-gradient-to-b from-red-500 to-red-700 px-3 py-[4px] rounded-sm">
 
-      <span className="text-gray-100 font-black text-lg">
+      <span className="text-gray-100 font-black text-base">
         Pakar Digital
       </span>
 
@@ -224,13 +223,13 @@ function Login({ onLogin }: any) {
 
         {/* TITLE */}
 
-        <h2 className="text-3xl font-bold text-white text-center mb-2">
+        <h2 className="text-2xl font-bold text-white text-center mb-1">
           {authMode === "login" ? "Selamat Datang" : "Daftar Akun"}
         </h2>
 
         {/* SUBTITLE */}
 
-        <p className="text-zinc-400 text-sm text-center mb-6">
+        <p className="text-zinc-400 text-xs text-center mb-5">
 
           {authMode === "login"
             ? "Silahkan masuk dengan Emailmu"
@@ -251,7 +250,7 @@ function Login({ onLogin }: any) {
         <input
           type="email"
           placeholder="Masukkan email"
-          className="w-full bg-[#e9edf5] text-black rounded-xl px-4 py-3 mb-4 outline-none"
+          className="w-full bg-[#e9edf5] text-black rounded-xl px-4 py-2.5 mb-3 outline-none text-sm"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -263,7 +262,7 @@ function Login({ onLogin }: any) {
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Masukkan password"
-            className="w-full bg-[#e9edf5] text-black rounded-xl px-4 py-3 pr-12 outline-none"
+            className="w-full bg-[#e9edf5] text-black rounded-xl px-4 py-2.5 pr-12 outline-none text-sm"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -288,7 +287,7 @@ function Login({ onLogin }: any) {
 
         {authMode === "login" && (
 
-          <div className="text-right mb-5">
+          <div className="text-right mb-4">
 
             <span
               className="text-[11px] text-yellow-400 font-semibold cursor-pointer hover:underline"
@@ -306,7 +305,7 @@ function Login({ onLogin }: any) {
         <button
           onClick={handleAuth}
           disabled={isLoading}
-          className="w-full rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 py-3 text-white font-bold shadow-lg hover:scale-[1.02] transition-all"
+          className="w-full rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 py-2.5 text-white font-bold shadow-lg hover:scale-[1.02] transition-all text-sm"
         >
 
           {isLoading
@@ -319,7 +318,7 @@ function Login({ onLogin }: any) {
 
         {/* FOOTER */}
 
-        <div className="mt-6 text-center">
+        <div className="mt-5 text-center">
 
           {authMode === "login" ? (
 
