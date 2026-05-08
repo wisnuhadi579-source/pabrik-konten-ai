@@ -132,7 +132,7 @@ return;
 const { error } = await supabase.auth.resetPasswordForEmail(
 user.data.user.email,
 {
-redirectTo: `${window.location.origin}/reset-password`
+redirectTo: `${window.location.origin}/#/reset-password`
 }
 );
 
