@@ -14,18 +14,27 @@ export async function onRequestGet(context) {
     const res = await fetch(SHEET_URL);
     const text = await res.text();
 
-    const rows = text.split("\n").slice(1);
+    const rows = text
+  .trim()
+  .split(/\r?\n/)
+  .slice(1);
 
     for (const row of rows) {
 
       try {
 
-        const cols = row.split(",");
+        const cols = row
+  .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+  .map(v => v.replace(/^"|"$/g, "").trim());
 
         const email = cols[0]?.trim();
         const status = cols[1]?.trim();
         const title = cols[2]?.trim();
-        const amount = parseFloat(cols[3] || "0");
+       const amount =
+  Number(
+    (cols[3] || "0")
+      .replace(/[^\d]/g, "")
+  ) || 0;
         const date = cols[4]?.trim();
 
         if (!email || status !== "SUCCESS") {
