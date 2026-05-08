@@ -4,6 +4,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { Dashboard } from "./dashboard/Dashboard"
 import Login from "./auth/Login"
 import ResetPassword from "./pages/ResetPassword"
+import Aktivasi from "./pages/Aktivasi"
 import { Navbar } from "./components/Navbar"
 
 import { Landing } from "./pages/Landing"
@@ -129,6 +130,7 @@ element={<Login onLogin={setUser} />}
 path="/reset-password"
 element={<ResetPassword />}
 />
+  <Route path="/aktivasi" element={<Aktivasi />} />
 
 {/* USER DASHBOARD */}
 
