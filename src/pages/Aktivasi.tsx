@@ -127,7 +127,7 @@ export default function Aktivasi() {
               onClick={() => navigate("/daftar")}
               className="w-full h-14 rounded-2xl border border-yellow-500/20 text-white font-semibold hover:bg-white/5 transition-all"
             >
-              DAFTAR AKUN BARU
+              BELUM PUNYA AKUN? DAFTAR SEKARANG
             </button>
 
           </div>
