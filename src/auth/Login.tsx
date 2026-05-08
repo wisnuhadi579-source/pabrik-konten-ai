@@ -184,15 +184,43 @@ function Login({ onLogin }: any) {
 
         {/* LOGO */}
 
-        <div className="flex justify-center mb-6">
+<div className="flex justify-center mb-6">
 
-          <img
-            src="/logo-pakar-digital.png"
-            alt="Pakar Digital"
-            className="h-12 object-contain"
-          />
+  <div className="relative inline-flex items-center">
 
-        </div>
+    {/* Logo utama */}
+
+    <div className="bg-gradient-to-b from-red-500 to-red-700 px-3 py-[4px] rounded-sm">
+
+      <span className="text-gray-100 font-black text-lg">
+        Pakar Digital
+      </span>
+
+    </div>
+
+    {/* Badge APP */}
+
+    <span
+      className="
+        absolute
+        -top-1
+        -right-9
+        text-[10px]
+        text-yellow-400
+        border
+        border-yellow-400
+        rounded
+        px-1
+        font-bold
+        bg-black
+      "
+    >
+      APP
+    </span>
+
+  </div>
+
+</div>
 
         {/* TITLE */}
 
