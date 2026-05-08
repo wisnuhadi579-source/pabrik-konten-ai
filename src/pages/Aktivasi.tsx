@@ -77,8 +77,8 @@ export default function Aktivasi() {
 
         {/* Title */}
         <h1 className="text-white text-3xl font-black text-center leading-tight">
-          {status === "loading" && "Mengaktifkan Paket Premium"}
-          {status === "success" && "Paket Berhasil Aktif"}
+          {status === "loading" && "Mengaktifkan Akses"}
+          {status === "success" && "Aksess Berhasil Aktif"}
           {status === "error" && "Aktivasi Gagal"}
         </h1>
 
@@ -88,10 +88,10 @@ export default function Aktivasi() {
             "Mohon tunggu sekitar 1 menit. Sistem sedang menghubungkan pembelian kamu ke akun Pakar Digital App."}
 
           {status === "success" &&
-            "Sekarang kamu bisa login atau daftar menggunakan email pembelian untuk menikmati akses premium."}
+            "Sekarang kamu bisa login atau daftar menggunakan email pembelian untuk menikmati aksesnya."}
 
           {status === "error" &&
-            "Terjadi kesalahan saat aktivasi paket. Silakan coba lagi beberapa saat."}
+            "Terjadi kesalahan saat aktivasi akses. Silakan coba lagi beberapa saat."}
         </p>
 
         {/* Progress */}
