@@ -12,7 +12,7 @@ export const Pricing = () => {
          LINK GRATIS
       ========================= */
 
-      link: "/dashboard",
+      link: "/#/dashboard",
 
       price: "Rp 0",
 
