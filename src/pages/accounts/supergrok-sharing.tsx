@@ -176,94 +176,248 @@ leading-tight
           </div>
         </div>
 
-        <div className={`
-${cardStyle}
-${glowStyle}
-overflow-x-auto
-w-full
-`}>
+        {/* DESKTOP TABLE */}
+<div className={`hidden md:block ${cardStyle} ${glowStyle} overflow-hidden`}>
 
-          <table className="w-full min-w-[760px]">
-            <thead className="bg-white/5 text-gray-300 text-sm">
-              <tr>
-                <th className="p-4 text-left">EMAIL AKUN</th>
-                <th className="p-4 text-center">PASSWORD</th>
-                <th className="p-4 text-center">MASA BERLAKU</th>
-                <th className="p-4 text-right">STATUS</th>
-              </tr>
-            </thead>
+  <table className="w-full">
 
-            <tbody>
+    <thead className="bg-white/5 text-gray-300 text-sm">
+      <tr>
+        <th className="p-4 text-left">EMAIL AKUN</th>
+        <th className="p-4 text-center">PASSWORD</th>
+        <th className="p-4 text-center">MASA BERLAKU</th>
+        <th className="p-4 text-right">STATUS</th>
+      </tr>
+    </thead>
 
-              {loading && (
-                <tr>
-                  <td colSpan={4} className="text-center p-6">
-                    Loading...
-                  </td>
-                </tr>
-              )}
+    <tbody>
 
-              {!loading && accounts.length === 0 && (
-                <tr>
-                  <td colSpan={4} className="text-center p-6 text-yellow-400">
-                    Tidak ada data akun
-                  </td>
-                </tr>
-              )}
+      {loading && (
+        <tr>
+          <td colSpan={4} className="text-center p-6">
+            Loading...
+          </td>
+        </tr>
+      )}
 
-              {!loading && Array.isArray(accounts) && accounts.map((acc: any) => (
+      {!loading && accounts.length === 0 && (
+        <tr>
+          <td colSpan={4} className="text-center p-6 text-yellow-400">
+            Tidak ada data akun
+          </td>
+        </tr>
+      )}
 
-                <tr key={acc.id || acc.email} className="border-t border-white/5 hover:bg-white/5 transition">
+      {!loading &&
+        Array.isArray(accounts) &&
+        accounts.map((acc: any) => (
 
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-yellow-500/10 rounded-lg flex items-center justify-center">
-                        📧
-                      </div>
+          <tr
+            key={acc.id || acc.email}
+            className="border-t border-white/5 hover:bg-white/5 transition"
+          >
 
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold">{acc.email}</span>
-                        <button
-                          onClick={() => copy(acc.email, "Email")}
-                          className="text-gray-400 hover:text-white text-xs"
-                        >
-                          copy
-                        </button>
-                      </div>
-                    </div>
-                  </td>
+            <td className="p-4">
+              <div className="flex items-center gap-3">
 
-                  <td className="p-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
-                        {acc.password}
-                      </span>
-                      <button
-                        onClick={() => copy(acc.password, "Password")}
-                        className="text-gray-400 hover:text-white text-xs"
-                      >
-                        copy
-                      </button>
-                    </div>
-                  </td>
+                <div className="w-9 h-9 bg-yellow-500/10 rounded-lg flex items-center justify-center">
+                  📧
+                </div>
 
-                  <td className="p-4 text-center text-sm">
-                    {acc.expired_at || "-"}
-                  </td>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">
+                    {acc.email}
+                  </span>
 
-                  <td className="p-4 text-right">
-                    <span className="bg-green-500 px-3 py-1 rounded-xl text-xs font-bold">
-                      AKTIF
-                    </span>
-                  </td>
+                  <button
+                    onClick={() => copy(acc.email, "Email")}
+                    className="text-gray-400 hover:text-white text-xs"
+                  >
+                    copy
+                  </button>
+                </div>
 
-                </tr>
+              </div>
+            </td>
 
-              ))}
+            <td className="p-4 text-center">
 
-            </tbody>
-          </table>
+              <div className="flex items-center justify-center gap-2">
+
+                <span className="bg-yellow-500/20 px-3 py-1 rounded font-mono">
+                  {acc.password}
+                </span>
+
+                <button
+                  onClick={() => copy(acc.password, "Password")}
+                  className="text-gray-400 hover:text-white text-xs"
+                >
+                  copy
+                </button>
+
+              </div>
+
+            </td>
+
+            <td className="p-4 text-center text-sm">
+              {acc.expired_at || "-"}
+            </td>
+
+            <td className="p-4 text-right">
+
+              <span className="bg-green-500 px-3 py-1 rounded-xl text-xs font-bold">
+                AKTIF
+              </span>
+
+            </td>
+
+          </tr>
+
+        ))}
+
+    </tbody>
+
+  </table>
+
+</div>
+
+{/* MOBILE CARD LIST */}
+<div className="md:hidden space-y-4">
+
+  {loading && (
+    <div className={`${cardStyle} p-6 text-center`}>
+      Loading...
+    </div>
+  )}
+
+  {!loading && accounts.length === 0 && (
+    <div className={`${cardStyle} p-6 text-center text-yellow-400`}>
+      Tidak ada data akun
+    </div>
+  )}
+
+  {!loading &&
+    Array.isArray(accounts) &&
+    accounts.map((acc: any) => (
+
+      <div
+        key={acc.id || acc.email}
+        className={`
+        ${cardStyle}
+        ${glowStyle}
+        p-4
+        rounded-2xl
+        `}
+      >
+
+        {/* EMAIL */}
+        <div className="mb-4">
+
+          <div className="text-gray-400 text-xs mb-2">
+            EMAIL AKUN
+          </div>
+
+          <div className="flex items-start justify-between gap-3">
+
+            <div className="font-semibold break-all text-sm leading-relaxed">
+              {acc.email}
+            </div>
+
+            <button
+              onClick={() => copy(acc.email, "Email")}
+              className="
+              shrink-0
+              text-xs
+              px-3 py-1
+              rounded-lg
+              bg-white/10
+              hover:bg-white/20
+              "
+            >
+              COPY
+            </button>
+
+          </div>
+
         </div>
+
+        {/* PASSWORD */}
+        <div className="mb-4">
+
+          <div className="text-gray-400 text-xs mb-2">
+            PASSWORD
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+
+            <div className="
+            bg-yellow-500/15
+            px-3 py-2
+            rounded-xl
+            font-mono
+            text-sm
+            break-all
+            ">
+              {acc.password}
+            </div>
+
+            <button
+              onClick={() => copy(acc.password, "Password")}
+              className="
+              shrink-0
+              text-xs
+              px-3 py-1
+              rounded-lg
+              bg-yellow-500
+              text-black
+              font-bold
+              "
+            >
+              COPY
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* FOOTER */}
+        <div className="
+        flex items-center
+        justify-between
+        pt-3
+        border-t border-white/10
+        ">
+
+          <div>
+
+            <div className="text-gray-500 text-[11px]">
+              MASA BERLAKU
+            </div>
+
+            <div className="text-sm">
+              {acc.expired_at || "-"}
+            </div>
+
+          </div>
+
+          <span className="
+          bg-green-500
+          px-3 py-1
+          rounded-full
+          text-xs
+          font-bold
+          text-black
+          ">
+            AKTIF
+          </span>
+
+        </div>
+
+      </div>
+
+    ))}
+
+</div>
 
         <div className="mt-6 p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-sm uppercase tracking-wide">
           <span className="text-red-500 font-bold">PERHATIAN :</span>{" "}
