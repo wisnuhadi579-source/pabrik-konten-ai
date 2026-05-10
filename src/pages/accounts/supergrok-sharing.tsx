@@ -100,12 +100,12 @@ tracking-tight
 ">
           AKSES EKSKLUSIF <br />
           <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-            GROK AI PREMIUM
+            SUPER GROK AI PREMIUM
           </span>
         </h1>
 
         <p className="text-gray-400 mt-6 max-w-xl mx-auto">
-          Dapatkan kredensial instan untuk Grok Premium tanpa biaya mahal.
+          Dapatkan kredensial instan untuk SuperGrok Premium tanpa biaya mahal.
         </p>
 
        <div className="
@@ -162,7 +162,7 @@ uppercase
 leading-tight
 ">DAFTAR AKUN PREMIUM</h2>
             <p className="text-gray-400 text-sm">
-              Gunakan kredensial berikut untuk akses Grok Premium
+              Gunakan akun berikut untuk akses SuperGrok
             </p>
           </div>
 
@@ -262,7 +262,7 @@ w-full
 
         <div className="mt-6 p-4 border border-red-500/20 bg-red-500/5 rounded-xl text-sm uppercase tracking-wide">
           <span className="text-red-500 font-bold">PERHATIAN :</span>{" "}
-          DILARANG KERAS MENGUBAH PASSWORD AKUN GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
+          DILARANG KERAS MENGUBAH PASSWORD AKUN SUPER GROK DIATAS (KETAHUAN AKAN LANGSUNG KAMI BLACKLIST)
         </div>
 
       </div>
@@ -308,8 +308,8 @@ gap-5
 
       <ul className="text-sm text-gray-300 space-y-3 mb-8">
         <li>✔ Akses akun sharing</li>
-        <li>✔ Bisa dipakai gratis</li>
-        <li>✔ Cocok untuk coba</li>
+        <li>✔ Bisa dipakai gratis bersama-sama</li>
+        <li>✔ Cocok untuk yang mau coba-coba</li>
         <li className="opacity-40">✖ Akun privat</li>
         <li className="opacity-40">✖ No Garansi</li>
         <li className="opacity-40">✖ Prioritas akses</li>
@@ -339,15 +339,15 @@ gap-5
         Akses akun privat full
       </p>
 
-      <h1 className="text-3xl font-bold mb-6">Rp 2rb</h1>
+      <h1 className="text-3xl font-bold mb-6">Rp 30rb</h1>
 
       <ul className="text-sm text-gray-300 space-y-3 mb-8">
         <li>✔ 1 akun privat</li>
-        <li>✔ Tidak sharing</li>
+        <li>✔ Dipakai sendiri (tidak sharing)</li>
         <li>✔ Lebih stabil</li>
         <li>✔ Full akses</li>
-        <li>✔ Full Garansi</li>
-        <li>✔ Masa aktif 3 hari</li>
+        <li>✔ Harga terjangkau</li>
+        <li>✔ Masa aktif 1 bulan</li>
       </ul>
 
       <a
@@ -369,10 +369,10 @@ gap-5
 
       <h3 className="text-3xl md:text-5xl font-black upercase italic mb-2 text-purple-400">TUTORIAL</h3>
       <p className="text-gray-400 text-sm mb-6">
-        Tutorial bikin akun sendiri 100% Gratis
+        Tutorial bikin akun Supergrok sendiri 100% Gratis
       </p>
 
-      <h1 className="text-3xl font-bold mb-6">Rp 49rb</h1>
+      <h1 className="text-3xl font-bold mb-6">Rp 99rb</h1>
 
       <ul className="text-sm text-gray-300 space-y-3 mb-8">
         <li>✔ Bikin akun Unlimited</li>
