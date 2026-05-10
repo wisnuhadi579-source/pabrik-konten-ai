@@ -59,7 +59,12 @@ export default function SuperGrokSharing() {
     "shadow-[0_0_40px_rgba(217,119,6,0.15)] border border-yellow-500/20"
 
   return (
-    <div className="bg-[#050505] text-white min-h-screen">
+    <div className="
+bg-[#050505]
+text-white
+min-h-screen
+overflow-x-hidden
+">
 
       {/* HERO */}
       <div className="text-center pt-24 pb-16 px-6">
