@@ -143,6 +143,17 @@ element={
 }
 />
 
+{/* DASHBOARD SHARE LINK */}
+
+<Route
+path="/dashboard/:slug"
+element={
+<ProtectedRoute user={user}>
+<Dashboard />
+</ProtectedRoute>
+}
+/>
+
 {/* SUPERGROK-COURSE */}
 <Route
   path="/supergrok-course"
