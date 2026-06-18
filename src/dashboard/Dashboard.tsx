@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
+import {
+useNavigate,
+useParams
+} from "react-router-dom"
 import { supabase } from "../services/supabaseClient"
 import {
 Search,
@@ -260,6 +263,7 @@ ${i === index
 export const Dashboard = () => {
 
 const navigate = useNavigate()
+const { slug } = useParams()
 
 const [isLoggedIn,setIsLoggedIn] = useState(false)
 const [loading,setLoading] = useState(true)
@@ -422,6 +426,47 @@ supabase.removeChannel(channel)
 
 },[])
 
+/* =========================
+   SHARE LINK AUTO OPEN
+========================= */
+
+useEffect(()=>{
+
+if(!slug) return
+
+if(!tools || tools.length === 0) return
+
+const selectedTool = tools.find(
+
+tool => tool.slug === slug
+
+)
+
+if(!selectedTool) return
+
+setOpenCard(selectedTool.id)
+
+setTimeout(()=>{
+
+document
+
+.getElementById(
+
+`tool-${selectedTool.id}`
+
+)
+
+?.scrollIntoView({
+
+behavior:"smooth",
+
+block:"center"
+
+})
+
+},500)
+
+},[slug,tools])
 /* =========================
    FILTER TOOLS
 ========================= */
@@ -686,7 +731,11 @@ l.product === (tool.product || tool.id)
 return (
 
 <div
+
+id={`tool-${tool.id}`}
+
 key={tool.id}
+
 className={`
 group relative
 rounded-3xl
@@ -965,6 +1014,57 @@ flex items-center justify-center gap-2
 <Play size={14}/>
 
 TUTORIAL VIDEO
+
+</button>
+<button
+
+onClick={(e)=>{
+
+e.stopPropagation()
+
+const shareLink =
+
+`${window.location.origin}/#/dashboard/${tool.slug}`
+
+navigator.clipboard.writeText(
+
+shareLink
+
+)
+
+alert(
+
+"Link aplikasi berhasil disalin"
+
+)
+
+}}
+
+className="
+
+w-full
+
+bg-blue-600
+
+text-white
+
+text-sm
+
+py-3
+
+rounded-3xl
+
+mt-3
+
+hover:bg-blue-700
+
+transition
+
+"
+
+>
+
+SHARE LINK
 
 </button>
 
