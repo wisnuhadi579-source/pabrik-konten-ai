@@ -1013,7 +1013,7 @@ flex items-center justify-center gap-2
 
 <Play size={14}/>
 
-TUTORIAL VIDEO
+TUTORIAL
 
 </button>
 <button
