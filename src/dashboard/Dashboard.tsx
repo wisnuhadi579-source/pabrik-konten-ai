@@ -11,18 +11,6 @@ ChevronRight,
 Play
 } from "lucide-react"
 
-const TOOL_CATEGORIES = [
-"Semua Tools",
-"Creator",
-"Affiliator",
-"Influencer",
-"Seller",
-"Vlogger",
-"Blogger",
-"Designer",
-"Fotografer",
-"Videografer"
-]
 
 /* =========================
    IMAGE SLIDER TOOL CARD
@@ -263,6 +251,7 @@ ${i === index
 export const Dashboard = () => {
 
 const navigate = useNavigate()
+const { type } = useParams()
 const { slug } = useParams()
 
 const [isLoggedIn,setIsLoggedIn] = useState(false)
@@ -297,7 +286,19 @@ const { data } = await supabase
 setLicenses(data || [])
 
 }
+useEffect(() => {
 
+if (!type) {
+
+setActiveCategory("Semua Tools")
+
+return
+
+}
+
+setActiveCategory(type.toUpperCase())
+
+}, [type])
 /* =========================
    SESSION CHECK
 ========================= */
@@ -467,6 +468,28 @@ block:"center"
 },500)
 
 },[slug,tools])
+
+const TOOL_CATEGORIES = useMemo(() => {
+
+    return [
+
+        "Semua Tools",
+
+        ...Array.from(
+
+            new Set(
+
+                tools
+                    .map(tool => tool.type)
+                    .filter(type => type && type.trim() !== "")
+
+            )
+
+        ).sort()
+
+    ]
+
+}, [tools])
 /* =========================
    FILTER TOOLS
 ========================= */
@@ -480,7 +503,7 @@ tool.name.toLowerCase().includes(search.toLowerCase())
 
 const matchCategory =
 activeCategory === "Semua Tools" ||
-tool.labels?.includes(activeCategory)
+tool.type?.toLowerCase() === activeCategory.toLowerCase()
 
 return matchSearch && matchCategory
 
@@ -655,9 +678,20 @@ z-50
 
 <div
 key={cat}
-onClick={()=>{
-setActiveCategory(cat)
-setFilterOpen(false)
+onClick={() => {
+
+    setFilterOpen(false)
+
+    if (cat === "Semua Tools") {
+
+        navigate("/dashboard")
+
+    } else {
+
+        navigate(`/dashboard/kategori/${cat.toLowerCase()}`)
+
+    }
+
 }}
 className={`
 px-4 py-2
