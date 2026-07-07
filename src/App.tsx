@@ -143,6 +143,15 @@ element={
 }
 />
 
+<Route
+path="/dashboard/kategori/:type"
+element={
+<ProtectedRoute user={user}>
+<Dashboard />
+</ProtectedRoute>
+}
+/>
+
 {/* DASHBOARD SHARE LINK */}
 
 <Route
